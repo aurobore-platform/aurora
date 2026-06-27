@@ -1,0 +1,19 @@
+{
+  "manifestVersion": 1,
+  "name": "device",
+  "display": "Device",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "types": {
+    "DeviceInfo": {
+      "model": "string",
+      "platform": "string",
+      "osVersion": "string",
+      "locale": "string"
+    }
+  },
+  "methods": {
+    "getInfo": { "args": {}, "result": "DeviceInfo" }
+  }
+}

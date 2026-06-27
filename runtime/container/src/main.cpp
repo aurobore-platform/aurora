@@ -60,6 +60,11 @@ int main(int argc, char *argv[])
 
     LifecycleBridge lifecycleBridge;
     BridgeRouter bridgeRouter;
+    bridgeRouter.setGrantedPermissions(
+        QStringList() << QStringLiteral("Internet"));
+    if (!bridgeRouter.initializePlugins()) {
+        qWarning("[aurobore-container] no plugins registered");
+    }
     QObject::connect(
         application.data(), &QGuiApplication::applicationStateChanged,
         &lifecycleBridge, &LifecycleBridge::onApplicationStateChanged);

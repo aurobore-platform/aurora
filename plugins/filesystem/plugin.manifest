@@ -1,0 +1,22 @@
+{
+  "manifestVersion": 1,
+  "name": "filesystem",
+  "display": "FileSystem",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "scopes": ["appData"],
+  "types": {
+    "FsText": { "text": "string" },
+    "FsExists": { "exists": "boolean" },
+    "FsList": { "entries": "array" }
+  },
+  "methods": {
+    "readText": { "args": { "path": "string" }, "result": "FsText" },
+    "writeText": { "args": { "path": "string", "text": "string" }, "result": "void" },
+    "exists": { "args": { "path": "string" }, "result": "FsExists" },
+    "mkdir": { "args": { "path": "string" }, "result": "void" },
+    "delete": { "args": { "path": "string" }, "result": "void" },
+    "list": { "args": { "path": "string" }, "result": "FsList" }
+  }
+}

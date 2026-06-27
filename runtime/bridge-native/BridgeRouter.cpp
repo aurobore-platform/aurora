@@ -1,5 +1,6 @@
 #include "BridgeRouter.h"
-#include "EchoPlugin.h"
+
+#include "PluginManager.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QJsonDocument>
@@ -8,7 +9,7 @@
 
 BridgeRouter::BridgeRouter(QObject *parent)
     : QObject(parent)
-    , m_echoPlugin(new EchoPlugin(this, this))
+    , m_pluginManager(new PluginManager(this, this))
 {
 }
 
@@ -20,6 +21,26 @@ void BridgeRouter::setTrustedOrigin(bool trusted)
         return;
     m_trustedOrigin = trusted;
     emit trustedOriginChanged();
+}
+
+void BridgeRouter::setGrantedPermissions(const QStringList &permissions)
+{
+    m_pluginManager->setGrantedPermissions(permissions);
+}
+
+bool BridgeRouter::initializePlugins()
+{
+    const bool loaded = m_pluginManager->loadFromRegistry();
+    if (loaded) {
+        qInfo("[aurobore-bridge-native] M3 plugins: %s",
+              qPrintable(m_pluginManager->registeredPlugins().join(QStringLiteral(", "))));
+    }
+    return loaded;
+}
+
+void BridgeRouter::emitOutbound(const QVariant &message)
+{
+    emit outbound(message);
 }
 
 QVariant BridgeRouter::handleMessage(const QVariant &inbound)
@@ -35,7 +56,7 @@ QVariant BridgeRouter::handleMessage(const QVariant &inbound)
     auto emitError = [this](const QString &id, const QString &code, const QString &message,
                             const QVariant &data = QVariant()) -> QVariant {
         const QVariant response = makeErrorResponse(id, code, message, data);
-        emit outbound(response);
+        emitOutbound(response);
         return response;
     };
 
@@ -59,15 +80,18 @@ QVariant BridgeRouter::handleMessage(const QVariant &inbound)
             event.insert(QStringLiteral("name"), QStringLiteral("app:echo"));
             if (data.isValid())
                 event.insert(QStringLiteral("data"), data);
-            emit outbound(event);
+            emitOutbound(event);
         }
         return QVariant();
     }
 
     if (type == QStringLiteral("cancel")) {
         const QString id = map.value(QStringLiteral("id")).toString();
-        if (!id.isEmpty())
-            m_echoPlugin->cancel(id);
+        if (!id.isEmpty()) {
+            for (const QString &plugin : m_pluginManager->registeredPlugins()) {
+                m_pluginManager->dispatchCancel(plugin, id);
+            }
+        }
         return QVariant();
     }
 
@@ -97,34 +121,7 @@ QVariant BridgeRouter::handleMessage(const QVariant &inbound)
                          QStringLiteral("plugin and method required"));
     }
 
-    if (plugin != QStringLiteral("Echo")) {
-        return emitError(id, QStringLiteral("BRIDGE_PLUGIN_NOT_FOUND"),
-                         QStringLiteral("Unknown plugin: ") + plugin);
-    }
-
-    const QVariant result = m_echoPlugin->invoke(method, args, id, isStream);
-
-    if (method == QStringLiteral("watchTicks") && isStream) {
-        return QVariant();
-    }
-
-    if (result.type() == QVariant::Map) {
-        const QVariantMap resultMap = result.toMap();
-        if (resultMap.contains(QStringLiteral("code")) && resultMap.contains(QStringLiteral("message"))) {
-            return emitError(id,
-                             resultMap.value(QStringLiteral("code")).toString(),
-                             resultMap.value(QStringLiteral("message")).toString(),
-                             resultMap.value(QStringLiteral("data")));
-        }
-    }
-
-    if (result.isValid()) {
-        const QVariant response = makeOkResponse(id, result);
-        emit outbound(response);
-        return response;
-    }
-
-    return QVariant();
+    return m_pluginManager->dispatchInvoke(plugin, method, args, id, isStream);
 }
 
 void BridgeRouter::emitEvent(const QString &name, const QVariant &data)
@@ -134,7 +131,7 @@ void BridgeRouter::emitEvent(const QString &name, const QVariant &data)
     event.insert(QStringLiteral("name"), name);
     if (data.isValid())
         event.insert(QStringLiteral("data"), data);
-    emit outbound(event);
+    emitOutbound(event);
 }
 
 QVariant BridgeRouter::makeErrorResponse(const QString &id, const QString &code, const QString &message,
@@ -175,5 +172,5 @@ void BridgeRouter::emitStream(const QString &subscriptionId, const QString &phas
         stream.insert(QStringLiteral("payload"), payload);
     if (error.isValid())
         stream.insert(QStringLiteral("error"), error);
-    emit outbound(stream);
+    emitOutbound(stream);
 }

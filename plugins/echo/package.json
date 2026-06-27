@@ -1,0 +1,14 @@
+{
+  "name": "@aurobore/echo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Echo conformance plugin for Aurobore bridge",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./generated/index.d.ts",
+      "import": "./generated/index.js"
+    }
+  }
+}

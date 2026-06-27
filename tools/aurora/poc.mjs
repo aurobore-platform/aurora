@@ -33,6 +33,14 @@ const PROJECTS = {
         source: path.join(REPO_ROOT, "runtime", "bridge-native"),
         destName: "bridge-native",
       },
+      {
+        source: path.join(REPO_ROOT, "runtime", "native-sdk"),
+        destName: "native-sdk",
+      },
+      {
+        source: path.join(REPO_ROOT, "plugins"),
+        destName: "plugins",
+      },
     ],
   },
 };
@@ -223,7 +231,23 @@ function cmdSync() {
   }
 }
 
+function runCodegenPlugins() {
+  log("codegen: plugins");
+  const res = spawnSync("pnpm", ["codegen:plugins"], {
+    cwd: REPO_ROOT,
+    env: childEnv(),
+    shell: true,
+    stdio: "inherit",
+  });
+  if (res.status !== 0) {
+    fail(`codegen:plugins завершился с кодом ${res.status}`);
+  }
+}
+
 function cmdBuild() {
+  if (project === "container") {
+    runCodegenPlugins();
+  }
   cmdSync();
   const cwd = cfg.POC_BUILD_DIR;
   cfg.POC_RPM_GLOB = projectCfg.rpmGlob;

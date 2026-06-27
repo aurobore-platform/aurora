@@ -1,0 +1,15 @@
+{
+  "manifestVersion": 1,
+  "name": "clipboard",
+  "display": "Clipboard",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "types": {
+    "ClipboardText": { "text": "string" }
+  },
+  "methods": {
+    "copy": { "args": { "text": "string" }, "result": "void" },
+    "paste": { "args": {}, "result": "ClipboardText" }
+  }
+}

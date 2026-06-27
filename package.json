@@ -17,6 +17,7 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "doctor": "pnpm --filter @aurobore/cli exec aurobore doctor",
+    "codegen:plugins": "pnpm --filter @aurobore/build build && node packages/build/scripts/codegen-plugins.mjs",
     "poc:sync": "node tools/aurora/poc.mjs sync",
     "poc:build": "node tools/aurora/poc.mjs build",
     "poc:deploy": "node tools/aurora/poc.mjs deploy",

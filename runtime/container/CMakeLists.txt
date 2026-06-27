@@ -17,18 +17,38 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
 pkg_check_modules(AuroraWebView aurorawebview REQUIRED IMPORTED_TARGET)
 
+set(PLUGIN_NATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../plugins)
+set(NATIVE_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../native-sdk)
+set(BRIDGE_NATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../bridge-native)
+
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/AppConfig.cpp
     src/AssetResolver.cpp
     src/AssetSchemeServer.cpp
     src/LifecycleBridge.cpp
-    ../bridge-native/BridgeRouter.cpp
-    ../bridge-native/EchoPlugin.cpp
+    generated/PluginRegistry.cpp
+    ${BRIDGE_NATIVE_DIR}/BridgeRouter.cpp
+    ${NATIVE_SDK_DIR}/IPlugin.cpp
+    ${NATIVE_SDK_DIR}/PluginManager.cpp
+    ${PLUGIN_NATIVE_DIR}/echo/native/EchoPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/device/native/DevicePlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/storage/native/StoragePlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/filesystem/native/FileSystemPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/clipboard/native/ClipboardPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/network/native/NetworkPlugin.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../bridge-native
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated
+    ${BRIDGE_NATIVE_DIR}
+    ${NATIVE_SDK_DIR}
+    ${PLUGIN_NATIVE_DIR}/echo/native
+    ${PLUGIN_NATIVE_DIR}/device/native
+    ${PLUGIN_NATIVE_DIR}/storage/native
+    ${PLUGIN_NATIVE_DIR}/filesystem/native
+    ${PLUGIN_NATIVE_DIR}/clipboard/native
+    ${PLUGIN_NATIVE_DIR}/network/native
 )
 
 target_link_libraries(${PROJECT_NAME}

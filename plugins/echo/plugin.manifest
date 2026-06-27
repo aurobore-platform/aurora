@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "name": "echo",
+  "display": "Echo",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "types": {
+    "PingResult": { "pong": "boolean", "ts": "number" }
+  },
+  "methods": {
+    "ping": { "args": {}, "result": "PingResult" },
+    "echo": { "args": "object", "result": "object" },
+    "fail": { "args": {}, "result": "void" },
+    "watchTicks": { "args": {}, "result": "void", "stream": true }
+  }
+}

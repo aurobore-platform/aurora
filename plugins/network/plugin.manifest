@@ -1,0 +1,23 @@
+{
+  "manifestVersion": 1,
+  "name": "network",
+  "display": "Network",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": ["Internet"],
+  "types": {
+    "NetworkStatus": {
+      "online": "boolean",
+      "connectionType": "string"
+    }
+  },
+  "methods": {
+    "getStatus": { "args": {}, "result": "NetworkStatus" }
+  },
+  "events": {
+    "network:change": {
+      "online": "boolean",
+      "connectionType": "string"
+    }
+  }
+}

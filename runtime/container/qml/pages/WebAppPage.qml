@@ -63,7 +63,8 @@ Page {
         webView.addMessageListener("aurobore:ready")
         webView.addMessageListener("aurobore:back")
         webView.addMessageListener("aurobore:m2-ok")
-        bridgeRouter.trustedOrigin = true
+        webView.addMessageListener("aurobore:m3-ok")
+        bridgeRouter.trustedOrigin = assetServerOrigin && assetServerOrigin.length > 0
         splashTimer.start()
         entryLoadTimer.start()
         console.log("[aurobore-container] htmlRootPath:", htmlRootPath)
@@ -181,6 +182,8 @@ Page {
                 page.handleBackNavigation()
             } else if (name === "aurobore:m2-ok") {
                 console.log("[aurobore-container] M2 OK: bridge invoke, events, stream verified")
+            } else if (name === "aurobore:m3-ok") {
+                console.log("[aurobore-container] M3 OK: plugins registered, Device + Storage verified")
             }
         }
     }

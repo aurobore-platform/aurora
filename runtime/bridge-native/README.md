@@ -1,27 +1,19 @@
-# bridge-native (M2)
+# bridge-native (M2/M3)
 
-Native-сторона моста: валидация протокола, маршрутизация invoke/event, stub-плагин **Echo**.
+Native-сторона моста: валидация протокола, `trustedOrigin`, делегирование в **PluginManager**.
 
 ## BridgeRouter
 
 | API | Назначение |
 |-----|------------|
-| `handleMessage(QVariant)` | JS→native: parse, validate, dispatch |
-| `emitEvent(name, data)` | native→JS lifecycle / demo events |
+| `handleMessage(QVariant)` | JS→native: parse, validate, dispatch через PluginManager |
+| `initializePlugins()` | Загрузка плагинов из сгенерированного `PluginRegistry` |
+| `setGrantedPermissions(QStringList)` | Разрешения приложения для проверки invoke |
+| `emitEvent(name, data)` | native→JS lifecycle / plugin events |
 | `emitStream(id, phase, payload?, error?)` | native→JS stream chunks |
 | `outbound` signal | QML → `runJavaScript(__auroboreBridgeReceive(...))` |
 
-## Echo stub (до M3 Plugin Manager)
-
-| Метод | Поведение |
-|-------|-----------|
-| `ping` | `{ pong: true, ts }` |
-| `echo` | возвращает args |
-| `fail` | `ECHO_TEST_ERROR` |
-| `watchTicks` | stream: 5× `{ tick: 1..5 }` @ 200ms, затем `complete` |
-
-Events: `app:demo` → native отвечает `app:echo` с тем же data.
-
-Cancel: `{ type: "cancel", id }` — прерывает активный stream (`watchTicks`) по subscription id; тихая остановка без `complete`.
+Плагины описываются в `plugins/*/plugin.manifest` и регистрируются кодогеном (`pnpm codegen:plugins`).
+Реализации — `plugins/*/native/`, контракт — `runtime/native-sdk/IPlugin.h`.
 
 Канал WebView: `aurobore:bridge` (см. `@aurobore/core` `BRIDGE_CHANNEL`).

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Запуск M1 container на эмуляторе (вызывается через SSH от poc.mjs deploy/run).
+# Запуск M1/M3 container на эмуляторе (вызывается через SSH от poc.mjs deploy/run).
 set -eu
 
 pkill -f ru.auroraos.aurobore-container 2>/dev/null || true
@@ -38,18 +38,18 @@ if ! pgrep -f ru.auroraos.aurobore-container >/dev/null 2>&1; then
   exit 1
 fi
 
-# Дождаться загрузки WebView и M2-проверок (stream ~1.2s после ready).
-sleep 8
+# Дождаться загрузки WebView, M2- и M3-проверок (stream ~1.2s после ready).
+sleep 10
 
 max_wait="${POC_RUN_WAIT_SEC:-90}"
 elapsed=0
 while [ "$elapsed" -lt "$max_wait" ]; do
-  if journalctl --no-pager -n 80 --since "1 min ago" 2>/dev/null | grep -q "M2 OK: bridge invoke, events, stream verified"; then
+  if journalctl --no-pager -n 100 --since "1 min ago" 2>/dev/null | grep -q "M3 OK: plugins registered"; then
     echo "=== LOG (tail) ==="
     tail -n 40 /tmp/container.log 2>/dev/null || true
     echo "=== JOURNAL (container) ==="
-    journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-bridge" || true
-    echo "=== RESULT: M2 OK ==="
+    journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-bridge|aurobore-plugin" || true
+    echo "=== RESULT: M3 OK ==="
     exit 0
   fi
   sleep 3
@@ -60,6 +60,6 @@ echo "=== LOG START ==="
 cat /tmp/container.log 2>/dev/null || true
 echo "=== LOG END ==="
 echo "=== JOURNAL (container) ==="
-journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web" || true
-echo "=== RESULT: M2 OK not found in journal within ${max_wait}s ==="
+journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-plugin" || true
+echo "=== RESULT: M3 OK not found in journal within ${max_wait}s ==="
 exit 1

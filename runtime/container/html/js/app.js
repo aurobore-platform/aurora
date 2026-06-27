@@ -2,11 +2,14 @@
   var routes = {
     "/": {
       title: "Главная",
-      html: "<p>Локальное SPA через loopback origin (<code>http://127.0.0.1</code>).</p>",
+      html:
+        "<p>Локальное SPA через loopback origin (<code>http://127.0.0.1</code>).</p>" +
+        "<p id=\"m3-device\">Device: …</p>" +
+        "<p id=\"m3-storage\">Storage: …</p>",
     },
     "/about": {
       title: "О приложении",
-      html: "<p>Runtime M2 — контейнер Aurobore + Bridge.</p>",
+      html: "<p>Runtime M3 — контейнер Aurobore + Bridge + Plugins.</p>",
     },
     "/settings": {
       title: "Настройки",
@@ -18,6 +21,7 @@
   var viewEl = document.getElementById("view");
   var routeDepth = 0;
   var m2Checks = { ping: false, stream: false, event: false };
+  var m3Checks = { device: false, storage: false, plugins: false };
 
   function currentPath() {
     var path = location.pathname || "/";
@@ -38,6 +42,17 @@
       );
       if (typeof sendAsyncMessage === "function") {
         sendAsyncMessage("aurobore:m2-ok", { ok: true });
+      }
+    }
+  }
+
+  function maybeM3Ok() {
+    if (m3Checks.device && m3Checks.storage && m3Checks.plugins) {
+      console.log(
+        "[aurobore-container] M3 OK: plugins registered, Device + Storage verified"
+      );
+      if (typeof sendAsyncMessage === "function") {
+        sendAsyncMessage("aurobore:m3-ok", { ok: true });
       }
     }
   }
@@ -151,6 +166,43 @@
     Aurobore.emit("app:demo", { hello: "native" });
   }
 
+  function runM3Checks() {
+    if (Aurobore.__plugins && Aurobore.Device && Aurobore.Storage) {
+      m3Checks.plugins = true;
+    }
+
+    if (Aurobore.Device && typeof Aurobore.Device.getInfo === "function") {
+      Aurobore.Device.getInfo()
+        .then(function (info) {
+          m3Checks.device = true;
+          var el = document.getElementById("m3-device");
+          if (el) el.textContent = "Device: " + JSON.stringify(info);
+          maybeM3Ok();
+        })
+        .catch(function (err) {
+          console.error("[aurobore-web] Device.getInfo failed:", err);
+        });
+    }
+
+    if (Aurobore.Storage && typeof Aurobore.Storage.set === "function") {
+      Aurobore.Storage.set({ key: "demo", value: "m3" })
+        .then(function () {
+          return Aurobore.Storage.get({ key: "demo" });
+        })
+        .then(function (result) {
+          if (result && result.value === "m3") {
+            m3Checks.storage = true;
+            var el = document.getElementById("m3-storage");
+            if (el) el.textContent = "Storage: " + JSON.stringify(result);
+            maybeM3Ok();
+          }
+        })
+        .catch(function (err) {
+          console.error("[aurobore-web] Storage failed:", err);
+        });
+    }
+  }
+
   function onReady() {
     navigate("/", true);
 
@@ -163,7 +215,10 @@
       console.log(
         "[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works"
       );
-      setTimeout(runM2Checks, 400);
+      setTimeout(function () {
+        runM2Checks();
+        runM3Checks();
+      }, 400);
     }, 800);
   }
 

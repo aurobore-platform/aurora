@@ -1,0 +1,19 @@
+{
+  "manifestVersion": 1,
+  "name": "storage",
+  "display": "Storage",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "types": {
+    "StorageValue": { "value": "string" },
+    "StorageKeys": { "keys": "array" }
+  },
+  "methods": {
+    "get": { "args": { "key": "string" }, "result": "StorageValue" },
+    "set": { "args": { "key": "string", "value": "string" }, "result": "void" },
+    "remove": { "args": { "key": "string" }, "result": "void" },
+    "keys": { "args": {}, "result": "StorageKeys" },
+    "clear": { "args": {}, "result": "void" }
+  }
+}

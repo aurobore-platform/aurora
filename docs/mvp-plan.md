@@ -128,21 +128,19 @@ FR-B1…B6. См. [architecture/bridge.md](architecture/bridge.md), [ADR-002](ad
 
 FR-P1…P5, FR-S1…S3. См. [plugins/plugin-api.md](plugins/plugin-api.md), [ADR-003](adr/ADR-003-plugin-api.md), [ADR-008](adr/ADR-008-typescript-sdk-codegen.md).
 
+- [x] Формат манифеста (SoT); валидация; статическая регистрация (build-time); проверка совместимости (runtime).
 
-
-- [ ] Формат манифеста (SoT); валидация; статическая регистрация (build-time); проверка совместимости (runtime).
-
-- [ ] **Plugin Manager** на native: заменить hardcode `Echo` в `BridgeRouter` на реестр из манифеста
+- [x] **Plugin Manager** на native: заменить hardcode `Echo` в `BridgeRouter` на реестр из манифеста
 
       (см. [ADR-003](adr/ADR-003-plugin-api.md), [architecture/plugin-loader.md](architecture/plugin-loader.md)).
 
-- [ ] Кодоген JS-обёрток и TS-типов из манифеста (ADR-008).
+- [x] Кодоген JS-обёрток и TS-типов из манифеста (ADR-008).
 
-- [ ] **Безопасность моста (долг M2):** `trustedOrigin` привязать к origin asset server (не unconditional
+- [x] **Безопасность моста (долг M2):** `trustedOrigin` привязать к origin asset server (не unconditional
 
       `true` в `WebAppPage.qml`); проверка permissions/scope по манифесту перед invoke.
 
-- [ ] Плагины MVP: **Device, Storage, FileSystem, Clipboard, Network** (+ Echo как conformance-stub).
+- [x] Плагины MVP: **Device, Storage, FileSystem, Clipboard, Network** (+ Echo как conformance-stub).
 
 
 
