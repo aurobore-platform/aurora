@@ -64,6 +64,13 @@ QVariant BridgeRouter::handleMessage(const QVariant &inbound)
         return QVariant();
     }
 
+    if (type == QStringLiteral("cancel")) {
+        const QString id = map.value(QStringLiteral("id")).toString();
+        if (!id.isEmpty())
+            m_echoPlugin->cancel(id);
+        return QVariant();
+    }
+
     if (type != QStringLiteral("invoke")) {
         const QString id = map.value(QStringLiteral("id")).toString();
         return emitError(id, QStringLiteral("BRIDGE_PROTOCOL_MISMATCH"),

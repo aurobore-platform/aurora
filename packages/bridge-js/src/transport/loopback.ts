@@ -51,8 +51,19 @@ export class LoopbackTransport implements LoopbackTransportLike {
 
 /** Симуляция native-стороны в loopback-тестах. */
 export class LoopbackNativeStub {
+  private activeStreamId: string | null = null;
+  private streamTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
   constructor(private readonly transport: LoopbackTransport) {
     transport.onReceiveRaw((msg) => {
+      if (msg.type === "cancel") {
+        if (this.activeStreamId === msg.id && this.streamTimeoutId !== null) {
+          clearTimeout(this.streamTimeoutId);
+          this.streamTimeoutId = null;
+          this.activeStreamId = null;
+        }
+        return;
+      }
       if (msg.type === "invoke") {
         const { id, plugin, method, args } = msg;
         if (plugin === "Echo" && method === "ping") {
@@ -97,6 +108,7 @@ export class LoopbackNativeStub {
   }
 
   private streamTicks(subscriptionId: string): void {
+    this.activeStreamId = subscriptionId;
     let tick = 0;
     const send = (): void => {
       tick += 1;
@@ -107,8 +119,10 @@ export class LoopbackNativeStub {
           phase: "data",
           payload: { tick },
         });
-        setTimeout(send, 10);
+        this.streamTimeoutId = setTimeout(send, 10);
       } else {
+        this.streamTimeoutId = null;
+        this.activeStreamId = null;
         this.transport.sendRaw({
           type: "stream",
           subscriptionId,

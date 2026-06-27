@@ -35,7 +35,7 @@ aurobore/
 │   ├── container/             # исходники контейнера (генерируется/линкуется при сборке)
 │   ├── bridge-native/         # native-сторона моста
 │   ├── transport/             # шов транспорта моста (тонкий)
-│   │   ├── cef/               #   реализация на CefMessageRouter/cefQuery (целевая)
+│   │   ├── webview/           #   WebViewTransport (sendAsyncMessage/…; целевая)
 │   │   └── loopback/          #   in-memory двойник для тестов
 │   └── native-sdk/            # библиотека/контракты для авторов плагинов
 │
@@ -87,7 +87,7 @@ aurobore/
 - **container** — шаблон нативного контейнера Аврора (окно, WebView, lifecycle, навигация, splash, asset loader).
 - **bridge-native** — native-сторона моста (валидация, маршрутизация, ошибки).
 - **transport/** — тонкий шов [транспорта моста](architecture/bridge.md#транспорт): целевая реализация
-  на CEF (`CefMessageRouter`/`cefQuery`) + loopback-двойник для тестов (Gecko не поддерживается, ADR-004).
+  на WebView async API (`packages/bridge-js` `WebViewTransport`) + loopback-двойник для тестов (Gecko не поддерживается, ADR-004).
 - **native-sdk** — контракты/библиотека для авторов плагинов (см. [native-sdk.md](architecture/native-sdk.md)).
 
 ### `plugins/`

@@ -15,6 +15,7 @@ public:
     explicit EchoPlugin(BridgeRouter *router, QObject *parent = nullptr);
 
     QVariant invoke(const QString &method, const QVariant &args, const QString &id, bool isStream);
+    void cancel(const QString &id);
 
 private:
     void startWatchTicks(const QString &subscriptionId);

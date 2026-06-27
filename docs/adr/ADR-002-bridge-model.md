@@ -7,10 +7,9 @@
 
 ## Контекст
 Нужен надёжный, безопасный и удобный канал JS↔native. Целевой WebView Авроры — **Chromium/CEF**
-([ADR-004](ADR-004-webview-engine-abstraction.md)). Нативный мост CEF — **`CefMessageRouter`**:
-JS `window.cefQuery({request, onSuccess, onFailure})` ↔ C++ `Handler::OnQuery(... persistent, callback)`
-+ `CefFrame::ExecuteJavaScript` для native→JS. Это асинхронная request/response-модель с `query_id`,
-идеально ложащаяся на Promise (разовый query) и стримы (`persistent: true`).
+([ADR-004](ADR-004-webview-engine-abstraction.md)). **Фактическая интеграция MVP (V-1)** — WebView wrapper API
+(`sendAsyncMessage`/`onRecvAsyncMessage`/`runJavaScript`). Ниже CEF — **`CefMessageRouter`** /
+`window.cefQuery` как деталь реализации.
 
 > Уточнение: **Qt WebChannel здесь не используется** — он является автоматическим мостом только для
 > QtWebEngine (`QWebEnginePage::setWebChannel()`), а не для CEF-WebView Авроры; поднимать его поверх

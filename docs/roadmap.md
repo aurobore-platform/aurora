@@ -22,8 +22,8 @@
 ## Этап 0 — Research (исследование) ✅
 - Изучить ОС Аврора: SDK, lifecycle, Qt/QML, WebView (движки по версиям), permissions, упаковку RPM.
 - Изучить аналоги: Cordova, Capacitor, Tauri (мост, плагины, процессная модель, безопасность).
-- Зафиксировать ключевые ограничения (CEF-WebView и его мост `cefQuery`/`CefMessageRouter` вместо
-  WebChannel, движок зависит от версии ОС, CMake/RPM).
+- Зафиксировать ключевые ограничения (CEF-WebView; мост через WebView async API, не WebChannel;
+  упаковка CMake/RPM).
 - **Выход:** раздел источников и допущений в [vision.md](vision.md).
 
 ## Этап 1 — Design (проектирование) ✅
@@ -42,7 +42,7 @@
 - **Runtime:** контейнер + WebView (целевой движок), bootstrap, splash, lifecycle, asset loader, навигация
   (FR-R1…R6).
 - **Bridge:** async message passing, Promise, корреляция, базовые события, ошибки, JSON-сериализация,
-  транспорт на `CefMessageRouter`/`cefQuery` (Chromium/CEF) + loopback для тестов (FR-B1…B5).
+  транспорт на WebView async API + loopback для тестов (FR-B1…B6).
 - **Plugin System:** манифест, статическая регистрация, экспорт API; кодоген обёрток/типов (FR-P1…P4, FR-S1…S3).
 - **Плагины MVP:** Device, Storage, FileSystem, Clipboard, Network (FR-P5).
 - **CLI:** create, dev (live reload), build, run, plugin add/remove/list, doctor (FR-C1…C6).

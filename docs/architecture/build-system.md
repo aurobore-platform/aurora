@@ -45,7 +45,7 @@ aurobore build
 - Целевой движок — **Chromium/CEF** ([ADR-004](../adr/ADR-004-webview-engine-abstraction.md)); Gecko не поддерживается.
 - Подключается пакет CEF-WebView: `ru.auroraos.webview` (`BuildRequires: pkgconfig(aurorawebview)` /
   `ru.auroraos.webview-devel`, `Requires: ru.auroraos.webview`) — точные имена верифицируются на SDK.
-- Транспорт моста — единственная реализация на `CefMessageRouter`/`cefQuery` (см. [bridge.md](bridge.md#транспорт)).
+- Транспорт моста — единственная реализация на WebView async API (`WebViewTransport`; см. [bridge.md](bridge.md#транспорт)).
 - `build.minOs` задаёт минимальную версию ОС (Chromium-линейка, ориентир 5.1.5/5.1.6+).
 
 ## 5. Требования к окружению

@@ -150,10 +150,7 @@ export class Bridge {
       onData: () => {},
       onError: () => {},
       onComplete: () => {},
-      stop: () => {
-        this.streams.delete(subscriptionId);
-        this.transport.send(createCancel(subscriptionId));
-      },
+      stop: () => {},
     };
 
     this.streams.set(subscriptionId, {
@@ -177,6 +174,31 @@ export class Bridge {
       clearTimeout(timeoutId);
       originalOnComplete();
     };
+
+    const cleanupStream = (): void => {
+      this.streams.delete(subscriptionId);
+      clearTimeout(timeoutId);
+      this.transport.send(createCancel(subscriptionId));
+    };
+
+    sub.stop = () => {
+      cleanupStream();
+    };
+
+    if (options?.signal) {
+      if (options.signal.aborted) {
+        cleanupStream();
+        return Promise.reject(createBridgeError(BRIDGE_ERROR_CODES.CANCELLED, "Invoke cancelled"));
+      }
+      options.signal.addEventListener(
+        "abort",
+        () => {
+          cleanupStream();
+          sub.onError(createBridgeError(BRIDGE_ERROR_CODES.CANCELLED, "Invoke cancelled"));
+        },
+        { once: true },
+      );
+    }
 
     this.transport.send(msg);
     return Promise.resolve(sub);

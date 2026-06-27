@@ -70,3 +70,12 @@ void EchoPlugin::startWatchTicks(const QString &subscriptionId)
     m_streamTick = 0;
     m_streamTimer->start();
 }
+
+void EchoPlugin::cancel(const QString &id)
+{
+    if (m_streamId != id || !m_streamTimer->isActive())
+        return;
+    m_streamTimer->stop();
+    m_streamId.clear();
+    m_streamTick = 0;
+}

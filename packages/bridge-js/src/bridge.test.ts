@@ -87,4 +87,23 @@ describe("Bridge (loopback)", () => {
       code: BRIDGE_ERROR_CODES.INVALID_ARGS,
     });
   });
+
+  it("AbortSignal отменяет stream на native", async () => {
+    const { bridge } = setup();
+    const controller = new AbortController();
+    const ticks: number[] = [];
+    const sub = (await bridge.invoke("Echo", "watchTicks", {}, {
+      stream: true,
+      signal: controller.signal,
+    })) as import("./bridge.js").StreamSubscription;
+
+    await new Promise<void>((resolve) => {
+      sub.onData = (payload: unknown) => {
+        ticks.push((payload as { tick: number }).tick);
+        if (ticks.length === 2) controller.abort();
+      };
+      sub.onError = () => resolve();
+    });
+    expect(ticks.length).toBeLessThan(5);
+  });
 });

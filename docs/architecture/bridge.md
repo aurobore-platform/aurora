@@ -151,7 +151,8 @@ JS-поток (FR-B8). Подробности — [event-system.md](event-system
 
 | Реализация транспорта | Механизм (концептуально) |
 |---|---|
-| **CEF/Chromium** (основная, целевая) | `CefMessageRouter`: JS `window.cefQuery({request, onSuccess, onFailure})` → C++ `Handler::OnQuery(query_id, request, persistent, callback)` + `callback->Success/Failure`; native→JS через `CefFrame::ExecuteJavaScript`. Разовый query → invoke/Promise; `persistent:true` → стрим/подписка; корреляция по `query_id`. |
+| **WebView (основная, MVP)** | `ru.auroraos.WebView`: JS `sendAsyncMessage(channel, data)` ↔ QML `onRecvAsyncMessage` + `addMessageListener`; native→JS через `runJavaScript`. Канал протокола: `aurobore:bridge`. Реализация: `WebViewTransport` (`packages/bridge-js`). |
+| **CEF (уровень ниже)** | `CefMessageRouter` / `window.cefQuery` — деталь CEF под wrapper-API; не публичный контракт интеграции. |
 | **Dev/тест (loopback)** | In-memory транспорт для модульного тестирования моста без устройства. |
 
 Верхние уровни моста (корреляция, Promise, события, стримы, ошибки) **не зависят** от транспорта.
@@ -159,7 +160,8 @@ JS-поток (FR-B8). Подробности — [event-system.md](event-system
 ради второй платформенной реализации.
 
 > Примечание: **Qt WebChannel не используется** — это автоматический мост только для QtWebEngine, а не
-> для CEF-WebView Авроры. Штатный `CefMessageRouter`/`cefQuery` покрывает invoke, события и стримы.
+> для CEF-WebView Авроры. Интеграция MVP — **WebView async API** ([aurora/webview.md](../aurora/webview.md) §5);
+> `CefMessageRouter`/`cefQuery` — деталь CEF ниже wrapper-API.
 > Авторов плагинов транспорт не касается: они работают с контрактом [Native SDK](native-sdk.md).
 
 ## 11. Производительность

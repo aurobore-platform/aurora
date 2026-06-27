@@ -150,8 +150,6 @@
         onComplete: () => {
         },
         stop: () => {
-          this.streams.delete(subscriptionId);
-          this.transport.send(createCancel(subscriptionId));
         }
       };
       this.streams.set(subscriptionId, {
@@ -173,6 +171,28 @@
         clearTimeout(timeoutId);
         originalOnComplete();
       };
+      const cleanupStream = () => {
+        this.streams.delete(subscriptionId);
+        clearTimeout(timeoutId);
+        this.transport.send(createCancel(subscriptionId));
+      };
+      sub.stop = () => {
+        cleanupStream();
+      };
+      if (options?.signal) {
+        if (options.signal.aborted) {
+          cleanupStream();
+          return Promise.reject(createBridgeError(BRIDGE_ERROR_CODES.CANCELLED, "Invoke cancelled"));
+        }
+        options.signal.addEventListener(
+          "abort",
+          () => {
+            cleanupStream();
+            sub.onError(createBridgeError(BRIDGE_ERROR_CODES.CANCELLED, "Invoke cancelled"));
+          },
+          { once: true }
+        );
+      }
       this.transport.send(msg);
       return Promise.resolve(sub);
     }

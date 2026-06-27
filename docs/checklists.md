@@ -18,9 +18,9 @@
 - [x] Принцип SoT (манифест → код/типы/доки) соблюдён, дублирования нет. → [ADR-003](adr/ADR-003-plugin-api.md), [ADR-008](adr/ADR-008-typescript-sdk-codegen.md), [plugin-system.md](architecture/plugin-system.md).
 
 ## 2. Инфраструктурный чек-лист
-- [ ] Монорепо настроено (workspaces, скрипты).
-- [ ] CI: сборка JS-пакетов, линт, типы, модульные тесты.
-- [ ] CI: сборка нативного контейнера под Аврора (Aurora SDK в окружении).
+- [x] Монорепо настроено (pnpm workspaces, root scripts в `package.json`).
+- [x] CI: сборка JS-пакетов, линт, format:check, типы, модульные тесты (`.github/workflows/ci.yml`, Node 20/22).
+- [ ] CI: сборка нативного контейнера под Аврора (job `native` есть, **`if: false`** — до self-hosted runner с SDK; локально `pnpm container:all` / `pnpm poc:all`).
 - [ ] Кэширование сборок; детерминированность (NFR-11).
 - [ ] Версионирование/релизы (changesets) и публикация в npm.
 - [ ] Политики веток, ревью, шаблоны PR/issue.
@@ -43,24 +43,25 @@
 - [x] Splash показывается/скрывается (по сигналу готовности + таймаут-fallback).
 - [x] Lifecycle-события прокидываются в JS (ready/pause/resume/backbutton/…).
 - [x] Навигация SPA + аппаратная «назад» обрабатываются (аппаратная — симуляция на SDK 5.2.1.200, V-14).
-- [x] Asset Loader через безопасную схему (не сырой `file://` для entry; подресурсы — относительные пути в sandbox, V-13).
-- [ ] Разрешения сопоставляются с конфигом; deep links обрабатываются.
+- [x] Asset Loader: loopback HTTP origin (`http://127.0.0.1:<port>/`) + логический ключ `aurobore-app://localhost/…`; не `file://` для entry (V-13; см. [runtime/container/README.md](../runtime/container/README.md)).
+- [ ] Разрешения сопоставляются с конфигом; deep links обрабатываются (→ M3/M4).
 - [ ] Исключение в плагине не роняет Runtime (NFR-7).
 
 ## 5. Bridge чек-лист
 - [x] Формат сообщений (invoke/response/event/stream) и версия протокола зафиксированы.
 - [x] Корреляция запрос↔ответ, таблица ожидания, таймауты.
-- [x] Promise API; отмена через AbortSignal (JS-сторона).
+- [x] Promise API; отмена через AbortSignal (JS + native cancel).
 - [x] События двунаправленные; стримы (backpressure — post-M2).
 - [x] Сериализация JSON; бинарные данные — через ссылки на ресурсы (post-M2).
 - [x] Структурированные ошибки с пространствами имён кодов.
-- [x] Проверка источника, разрешений, области, схемы аргументов (базовая: trustedOrigin + stub).
+- [ ] Проверка источника, разрешений, области, схемы аргументов (M2: trustedOrigin stub; полная проверка — M3).
 - [x] Транспорт на WebView async API + loopback для тестов; шов тонкий.
 
 ## 6. Plugin API чек-лист
 - [ ] Формат манифеста определён (методы/события/типы/разрешения/nativeDeps/compat).
 - [ ] Кодоген JS-обёртки и TS-типов из манифеста работает.
 - [ ] Статическая регистрация (build-time) + инициализация (runtime) описаны/реализованы.
+- [ ] **Plugin Manager** на native вместо hardcode `Echo` в `BridgeRouter` (→ M3).
 - [ ] Проверка совместимости плагина при загрузке.
 - [ ] Native SDK предоставляет контракты методов/событий/стримов/ошибок.
 - [ ] Conformance-тесты для плагина проходят (FR-T1).
@@ -83,7 +84,7 @@
 
 ## 9. Чек-лист тестирования
 - [ ] Модульные тесты в каждом пакете.
-- [ ] Тесты моста на loopback-транспорте.
+- [x] Тесты моста на loopback-транспорте → [`packages/bridge-js/src/bridge.test.ts`](../packages/bridge-js/src/bridge.test.ts).
 - [ ] e2e: create→build→run→проверка вызова/события/стрима.
 - [ ] Conformance-suite для плагинов (FR-T1).
 - [ ] Матрица версий Аврора/движков (NFR-3).

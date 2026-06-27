@@ -5,10 +5,10 @@
 | Термин | Определение |
 |---|---|
 | **App (приложение)** | Веб-приложение пользователя (HTML/CSS/JS/TS), упакованное Aurobore в нативное приложение Аврора. |
-| **Asset Loader** | Подсистема Runtime, отдающая локальные веб-ресурсы в WebView через защищённую кастомную схему (а не `file://`). |
+| **Asset Loader** | Подсистема Runtime, отдающая локальные веб-ресурсы в WebView без `file://` для entry (M1: loopback HTTP + логический `aurobore-app://`; см. V-13). |
 | **Bridge (мост)** | Канал двунаправленной связи между JS и нативным кодом: вызовы методов, ответы (Promise), события, стримы, ошибки. Состоит из JS-стороны и native-стороны. |
-| **Bridge Transport** | Низкоуровневый транспорт моста на `CefMessageRouter`/`cefQuery` (Chromium/CEF). Скрыт за тонким внутренним швом; авторов плагинов не касается. |
-| **CefMessageRouter / cefQuery** | Штатный асинхронный мост CEF: JS `window.cefQuery({request,onSuccess,onFailure})` ↔ C++ `Handler::OnQuery(...callback)`. Основа Bridge на Авроре. |
+| **Bridge Transport** | Низкоуровневый транспорт моста на WebView async API (`sendAsyncMessage`/…, `ru.auroraos.WebView`) + loopback для тестов. Скрыт за тонким швом; авторов плагинов не касается. |
+| **CefMessageRouter / cefQuery** | Штатный асинхронный мост CEF (уровень ниже WebView wrapper): JS `window.cefQuery` ↔ C++ `Handler::OnQuery`. Деталь реализации, не публичный контракт MVP. |
 | **Aurobore** | Рабочее кодовое имя платформы. |
 | **Capability / Scope (область)** | Ограничение, какие плагины и какие ресурсы доступны приложению (например, FS только в каталоге данных приложения). |
 | **CLI** | Инструмент командной строки Aurobore (`aurobore`, алиас `bor`): create / dev / build / run / plugin / doctor / publish и др. |

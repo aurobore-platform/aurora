@@ -70,8 +70,8 @@ C++ API `Aurora::WebView::*`, наличие `libcef`. `CefMessageRouter`/`windo
 
 **V-1 закрыт:** обёртка `ru.auroraos.WebView` даёт собственный async-message API —
 `sendAsyncMessage`/`addMessageListener`/`onRecvAsyncMessage`/`runJavaScript` (подтверждено исходниками
-демо WebViewAPI, см. [aurora/webview.md](../aurora/webview.md) §5). Транспортный шов строим **поверх него**,
-а `CefMessageRouter`/`cefQuery` — деталь/fallback.
+демо WebViewAPI, см. [aurora/webview.md](../aurora/webview.md) §5). Транспортный шов строим **поверх него**
+(`WebViewTransport` в `packages/bridge-js`); `CefMessageRouter`/`cefQuery` — деталь/fallback.
 
 **Остаётся проверить на SDK/устройстве** (реестр §2): изменения `qtium-driver` в 5.2.0 (**V-4**);
 минимальная целевая версия ОС (**V-5**); пропускная способность/латентность на устройстве (**V-7**).

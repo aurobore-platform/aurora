@@ -19,10 +19,12 @@
 - **FR-R3.** Поддерживать SPA-навигацию (history API) и корректную обработку аппаратной кнопки «назад».
 - **FR-R4.** Показывать splash screen до готовности веб-приложения.
 - **FR-R5.** Прокидывать события жизненного цикла приложения (pause/resume/foreground/background) в JS.
-- **FR-R6.** Отдавать локальные ресурсы через безопасную кастомную схему (не сырой `file://`).
+- **FR-R6.** Отдавать локальные ресурсы без сырого `file://` для entry (M1: loopback HTTP origin +
+  логический ключ `aurobore-app://localhost/…`; см. V-13).
 - **FR-R7.** Работать на **Chromium/CEF-WebView** актуальной линейки Аврора (база 5.1.5/5.1.6+).
-  Транспорт моста — на `CefMessageRouter`/`cefQuery`, изолирован за тонким внутренним швом (без
-  поддержки Gecko). См. [ADR-004](adr/ADR-004-webview-engine-abstraction.md).
+  Транспорт моста — на WebView async API (`sendAsyncMessage`/`onRecvAsyncMessage`/`runJavaScript`,
+  `ru.auroraos.WebView`), изолирован за тонким внутренним швом (без поддержки Gecko).
+  CEF `CefMessageRouter`/`cefQuery` — деталь реализации ниже. См. [ADR-004](adr/ADR-004-webview-engine-abstraction.md).
 
 ### Bridge
 - **FR-B1.** Вызов нативного метода из JS с аргументами и возвратом результата как **Promise**.
