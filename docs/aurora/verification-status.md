@@ -39,13 +39,17 @@
 | V-6 | 🟡 **Частично.** PoC ставит `.desktop` с `Permissions=Internet` (`[X-Application]`), приложение стартует без отказа sandbox. Полный синтаксис/список общих директорий 5.2.x — подтвердить по справочнику. | 🟡 | Средний (permissions) | Справочник «Установочные пакеты»/«.desktop»; PoC |
 | V-7 | Пропускная способность/латентность моста на реальном устройстве (нужен ли бинарный протокол, FR-B9) | ⏳ | Низкий (post-MVP) | Бенчмарк на устройстве |
 | V-8 | ✅ **Закрыт (PoC).** C++-devel **`ru.auroraos.webview-devel`** доступен в онлайн-репозитории OMP; после `sfdk tools target package-install ru.auroraos.webview-devel` и пересоздания snapshot — `pkgconfig(aurorawebview)` и `webenginecontext.h` в таргете. Сборка PoC с линковкой `PkgConfig::AuroraWebView` и `InitBrowser()` успешна. | ✅ | — | `sfdk tools target package-install`; snapshot `.default` |
+| V-12 | ✅ **Закрыт (M1).** `InitBrowser()` после `createView()`, до `setSource()` с `ApplicationWindow` + `pageStack` + `cover` — приложение стартует на SDK 5.2.1.200. | ✅ | — | `runtime/container`; `pnpm container:all` |
+| V-13 | 🟡 **Частично (M1).** Entry `aurobore-app://localhost/…` перехватывается `LoadRequestExtension.beforeUrlLoad` и маппится на `file://` в `share/html`. CEF **игнорирует** `aurobore-app://` в `<link>`/`<script>` (TT_LINK); подресурсы грузятся относительными путями под sandbox `file://` (разрешены `isAllowedFileUrl`). Полный custom-scheme для всех ассетов — открытый вопрос. | 🟡 | Средний (FR-R6) | `runtime/container/qml/pages/WebAppPage.qml`, `AssetResolver` |
+| V-14 | 🟡 **Частично (M1).** Тип `BackNavigation` недоступен в QML на 5.2.1.200. SPA «назад» — `history.back()` по `sendAsyncMessage("aurobore:back")` (симуляция в демо); аппаратный жест Silica — уточнить на устройстве. | 🟡 | Средний (UX) | Демо SPA; WebViewAPI / Silica PageStack на устройстве |
 
 ## 3. Влияние на завершение этапа Design
 
 - §1 (C-1…C-13) — допущения **сняты**: достаточно для проектных решений. Механизм моста (async messages
   + `runJavaScript`) подтверждён и демо, и системой типов реального SDK (V-1).
 - §2 — по итогам **M0-спайка на реальном SDK 5.2.1.200** закрыты V-1/V-2/V-3/V-4/V-8 (мост, RPM, libcef,
-  CEF init, devel-пакет); частично V-6 (`.desktop` + `Permissions=Internet`).
+  CEF init, devel-пакет); частично V-6 (`.desktop` + `Permissions=Internet`). **M1** закрыл V-12;
+  частично V-13/V-14 (asset loader, аппаратная «назад»).
 
 > Вывод этапа Design сохраняется: ключевой архитектурный риск (модель моста) снят. **M0 на эмуляторе**
 > подтвердил полный круг web↔native и упаковочные факты; для CEF на 5.2.x обязателен `InitBrowser()`
@@ -62,3 +66,15 @@
 | Путь `libcef` и loader-path (V-3) | ✅ `/usr/lib/cef`, нужен `LD_LIBRARY_PATH`/RPATH |
 | CEF init через `InitBrowser()` (V-4) | ✅ `aurorawebview-devel` + вызов в `main.cpp` |
 | Полный круг web↔native (эхо + ack) | ✅ journal: `[poc-native] PoC OK: round-trip подтверждён` |
+
+## 5. Подтверждено практикой в M1 (контейнер `runtime/container` на эмуляторе 5.2.1.200)
+
+| Что | Результат |
+|---|---|
+| `ApplicationWindow` + Silica `pageStack`/`cover` + `InitBrowser` (V-12) | ✅ |
+| Entry через `aurobore-app://localhost/index.html` → sandbox `file://` (V-13) | 🟡 entry да; подресурсы — относительные `file://` |
+| Splash + `aurobore:ready` / таймаут-fallback | ✅ |
+| Lifecycle `ready`/`pause`/`resume` в JS (`Aurobore._emit`) | ✅ |
+| Demo SPA (History API) + симуляция «назад» (V-14) | 🟡 |
+| `CMAKE_INSTALL_RPATH` → `$ORIGIN/../lib/cef` + dev `LD_LIBRARY_PATH` | ✅ |
+| Полный цикл dev-toolkit | ✅ journal: `[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works` |

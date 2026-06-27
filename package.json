@@ -22,7 +22,13 @@
     "poc:deploy": "node tools/aurora/poc.mjs deploy",
     "poc:run": "node tools/aurora/poc.mjs run",
     "poc:emulator": "node tools/aurora/poc.mjs emulator",
-    "poc:all": "node tools/aurora/poc.mjs all"
+    "poc:all": "node tools/aurora/poc.mjs all",
+    "container:sync": "node tools/aurora/poc.mjs sync container",
+    "container:build": "node tools/aurora/poc.mjs build container",
+    "container:deploy": "node tools/aurora/poc.mjs deploy container",
+    "container:run": "node tools/aurora/poc.mjs run container",
+    "container:emulator": "node tools/aurora/poc.mjs emulator container",
+    "container:all": "node tools/aurora/poc.mjs all container"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",

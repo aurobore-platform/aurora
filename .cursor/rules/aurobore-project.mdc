@@ -11,7 +11,8 @@ alwaysApply: true
 
 - **M0** ✅ — PoC моста, инфраструктура JS
 - **M0.5** ✅ — dev-toolkit `pnpm poc:*` (`tools/aurora/`)
-- **M1** — runtime-контейнер (следующий)
+- **M1** ✅ — runtime-контейнер `runtime/container/`, `pnpm container:*`
+- **M2** — Bridge (следующий)
 - **M4** — продуктовый CLI `aurobore build/run` (пока **не** реализован)
 
 ## Где что лежит
@@ -20,12 +21,13 @@ alwaysApply: true
 |------|------------|
 | `packages/*` | JS/TS: core, cli, build, bridge-js |
 | `runtime/poc-bridge` | PoC C++/QML (источник; сборка через staging) |
-| `tools/aurora/` | Оркестратор эмулятора (`poc.mjs`) |
+| `runtime/container` | M1 нативный контейнер (ApplicationWindow, asset loader, lifecycle) |
+| `tools/aurora/` | Оркестратор эмулятора (`poc.mjs`: poc-bridge + container) |
 | `docs/aurora/` | Факты SDK, verification-status |
 
 ## Нативная проверка на эмуляторе
 
-Если задача затрагивает `runtime/**` или проверку на Aurora SDK — см. правило **aurora-dev-toolkit**: используй `pnpm poc:all`, не изобретай цепочку sfdk/scp заново.
+Если задача затрагивает `runtime/**` или проверку на Aurora SDK — см. правило **aurora-dev-toolkit**: используй `pnpm poc:all` (PoC) или `pnpm container:all` (M1), не изобретай цепочку sfdk/scp заново.
 
 ## Коммиты
 

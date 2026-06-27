@@ -4,11 +4,13 @@ globs: runtime/**,tools/aurora/**
 alwaysApply: false
 ---
 
-# Aurora dev-toolkit (PoC / эмулятор)
+# Aurora dev-toolkit (PoC / M1 container / эмулятор)
 
 Продуктового `aurobore build/run` ещё нет (M4). Для проверки нативного кода используй **dev-toolkit**, не ручной robocopy/sfdk/scp.
 
 ## Команды (из корня репо)
+
+### PoC (M0)
 
 ```powershell
 pnpm poc:sync      # runtime/poc-bridge → POC_BUILD_DIR
@@ -19,7 +21,13 @@ pnpm poc:all       # build → deploy → run (полная проверка)
 pnpm poc:emulator  # только поднять/дождаться эмулятор
 ```
 
-Эквивалент: `node tools/aurora/poc.mjs <команда>`. Подробности: `tools/aurora/README.md`.
+### M1 container
+
+```powershell
+pnpm container:sync | build | deploy | run | emulator | all
+```
+
+Эквивалент: `node tools/aurora/poc.mjs <команда> [poc-bridge|container]`. Подробности: `tools/aurora/README.md`.
 
 ## Обязательно для агента
 
@@ -34,14 +42,16 @@ pnpm poc:emulator  # только поднять/дождаться эмулят
 | Задача | Команда |
 |--------|---------|
 | Изменил C++/QML/html PoC, нужна полная проверка | `pnpm poc:all` |
+| Изменил `runtime/container` (M1) | `pnpm container:all` |
 | Только пересборка RPM | `pnpm poc:build` |
 | RPM уже собран, нужен деплой/запуск | `pnpm poc:deploy` / `pnpm poc:run` |
 | Правишь сам `tools/aurora/poc.mjs` | тестируй затронутую подкоманду |
 | Только JS/TS монорепо | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm doctor` |
 
-## Успех прогона PoC
+## Успех прогона
 
-В journal эмулятора должна быть строка: `[poc-native] PoC OK: round-trip подтверждён`.
+- PoC: journal `[poc-native] PoC OK: round-trip подтверждён`
+- M1 container: journal `[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works`
 
 ## Отладка toolkit
 

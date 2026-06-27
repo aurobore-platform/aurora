@@ -38,12 +38,12 @@
 - [x] Допущения об Аврора помечены как подлежащие верификации. → [aurora/verification-status.md](aurora/verification-status.md), [aurora/sources.md](aurora/sources.md).
 
 ## 4. Runtime чек-лист
-- [ ] Bootstrap и порядок инициализации определены.
-- [ ] WebView создаётся на CEF/Chromium (`ru.auroraos.webview`) через тонкий шов транспорта.
-- [ ] Splash показывается/скрывается (по сигналу готовности + таймаут-fallback).
-- [ ] Lifecycle-события прокидываются в JS (ready/pause/resume/backbutton/…).
-- [ ] Навигация SPA + аппаратная «назад» обрабатываются.
-- [ ] Asset Loader через безопасную схему (не сырой `file://`).
+- [x] Bootstrap и порядок инициализации определены.
+- [x] WebView создаётся на CEF/Chromium (`ru.auroraos.webview`) через тонкий шов транспорта.
+- [x] Splash показывается/скрывается (по сигналу готовности + таймаут-fallback).
+- [x] Lifecycle-события прокидываются в JS (ready/pause/resume/backbutton/…).
+- [x] Навигация SPA + аппаратная «назад» обрабатываются (аппаратная — симуляция на SDK 5.2.1.200, V-14).
+- [x] Asset Loader через безопасную схему (не сырой `file://` для entry; подресурсы — относительные пути в sandbox, V-13).
 - [ ] Разрешения сопоставляются с конфигом; deep links обрабатываются.
 - [ ] Исключение в плагине не роняет Runtime (NFR-7).
 

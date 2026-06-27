@@ -12,15 +12,45 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
-const POC_SOURCE = path.join(REPO_ROOT, "runtime", "poc-bridge");
-const RUN_SCRIPT = path.join(__dirname, "run-poc.sh");
+
+/** @type {Record<string, { source: string; rpmGlob: string; runScript: string; deployRpmName: string; stagingName: string }>} */
+const PROJECTS = {
+  "poc-bridge": {
+    source: path.join(REPO_ROOT, "runtime", "poc-bridge"),
+    rpmGlob: "ru.auroraos.poc-bridge-*.rpm",
+    runScript: path.join(__dirname, "run-poc.sh"),
+    deployRpmName: "poc-bridge.rpm",
+    stagingName: "poc-bridge",
+  },
+  container: {
+    source: path.join(REPO_ROOT, "runtime", "container"),
+    rpmGlob: "ru.auroraos.aurobore-container-*.rpm",
+    runScript: path.join(__dirname, "run-container.sh"),
+    deployRpmName: "aurobore-container.rpm",
+    stagingName: "aurobore-container",
+  },
+};
 
 const COMMANDS = ["sync", "build", "deploy", "run", "emulator", "all"];
 
-/** @type {Record<string, string>} */
-const cfg = loadConfig();
+const project = resolveProject();
+const projectCfg = PROJECTS[project];
 
-function loadConfig() {
+/** @type {Record<string, string>} */
+const cfg = loadConfig(projectCfg.stagingName);
+
+function resolveProject() {
+  const fromArgv = process.argv[3];
+  const fromEnv = process.env.RUNTIME_PROJECT;
+  const name = fromArgv || fromEnv || "poc-bridge";
+  if (!PROJECTS[name]) {
+    console.error(`[runtime] ERROR: неизвестный проект: ${name} (доступны: ${Object.keys(PROJECTS).join(", ")})`);
+    process.exit(1);
+  }
+  return name;
+}
+
+function loadConfig(stagingName) {
   /** @type {Record<string, string>} */
   const env = {
     SFDK_TARGET: "AuroraOS-5.2.1.200-x86_64",
@@ -28,8 +58,9 @@ function loadConfig() {
     EMULATOR_SSH_HOST: "127.0.0.1",
     EMULATOR_SSH_PORT: "2223",
     EMULATOR_BOOT_TIMEOUT: "300",
+    EMULATOR_WARMUP_SEC: "15",
     EMULATOR_SSH_CONNECT_TIMEOUT: "5",
-    POC_RPM_GLOB: "ru.auroraos.poc-bridge-*.rpm",
+    POC_RPM_GLOB: PROJECTS["poc-bridge"].rpmGlob,
   };
 
   const localEnv = path.join(__dirname, "local.env");
@@ -47,7 +78,7 @@ function loadConfig() {
   }
 
   if (!env.POC_BUILD_DIR) {
-    env.POC_BUILD_DIR = path.join(os.homedir(), "aurobore-spike", "poc-bridge");
+    env.POC_BUILD_DIR = path.join(os.homedir(), "aurobore-spike", stagingName);
   } else {
     env.POC_BUILD_DIR = expandPath(env.POC_BUILD_DIR);
   }
@@ -78,11 +109,11 @@ function expandPath(s) {
 }
 
 function log(msg) {
-  console.log(`[poc] ${msg}`);
+  console.log(`[${project}] ${msg}`);
 }
 
 function fail(msg) {
-  console.error(`[poc] ERROR: ${msg}`);
+  console.error(`[${project}] ERROR: ${msg}`);
   process.exit(1);
 }
 
@@ -156,7 +187,7 @@ function pathsEqual(a, b) {
 }
 
 function cmdSync() {
-  const src = POC_SOURCE;
+  const src = projectCfg.source;
   const dst = cfg.POC_BUILD_DIR;
 
   if (pathsEqual(src, dst)) {
@@ -181,6 +212,7 @@ function cmdSync() {
 function cmdBuild() {
   cmdSync();
   const cwd = cfg.POC_BUILD_DIR;
+  cfg.POC_RPM_GLOB = projectCfg.rpmGlob;
   const sfdkArgs = ["-c", `target=${cfg.SFDK_TARGET}`, "build"];
   log(`build: target=${cfg.SFDK_TARGET} cwd=${cwd}`);
   run(sfdkPath(), sfdkArgs, { cwd, maxBuffer: 20 * 1024 * 1024 });
@@ -199,12 +231,12 @@ function cmdBuild() {
 
 function findRpm() {
   const rpmsDir = path.join(cfg.POC_BUILD_DIR, "RPMS");
-  const glob = cfg.POC_RPM_GLOB.replace(/\*/g, ".*");
+  const glob = projectCfg.rpmGlob.replace(/\*/g, ".*");
   const re = new RegExp(`^${glob}$`);
   const rpms = fs.existsSync(rpmsDir)
     ? fs.readdirSync(rpmsDir).filter((f) => re.test(f))
     : [];
-  if (rpms.length === 0) fail(`RPM не найден: ${rpmsDir}/${cfg.POC_RPM_GLOB}`);
+  if (rpms.length === 0) fail(`RPM не найден: ${rpmsDir}/${projectCfg.rpmGlob}`);
   return path.join(rpmsDir, rpms[0]);
 }
 
@@ -274,9 +306,48 @@ function sshEcho() {
   return res.status === 0;
 }
 
+/** Эмулятор слушает SSH, но GUI/Wayland может ещё не подняться. */
+function emulatorSessionReady() {
+  const res = spawnSync(
+    openSshTool("ssh"),
+    sshArgs(
+      "test -S /run/display/wayland-0 && test -d /run/user/100000 && echo session_ok",
+    ),
+    { encoding: "utf8", shell: false, stdio: "pipe", env: childEnv() },
+  );
+  return res.status === 0 && (res.stdout ?? "").includes("session_ok");
+}
+
+async function waitForEmulatorReady(wasColdStart) {
+  const timeoutSec = Number(cfg.EMULATOR_BOOT_TIMEOUT) || 300;
+  const deadline = Date.now() + timeoutSec * 1000;
+  while (Date.now() < deadline) {
+    if ((await emulatorReachable()) && sshEcho() && emulatorSessionReady()) {
+      const warmupSec = wasColdStart ? Number(cfg.EMULATOR_WARMUP_SEC) || 15 : 0;
+      if (warmupSec > 0) {
+        log(`emulator: сессия готова, пауза ${warmupSec} с (холодный старт)…`);
+        await sleep(warmupSec * 1000);
+      }
+      return;
+    }
+    await sleep(5000);
+  }
+  fail(
+    `эмулятор не готов за ${timeoutSec} с (нужны SSH ${cfg.EMULATOR_SSH_HOST}:${cfg.EMULATOR_SSH_PORT} и Wayland /run/display/wayland-0)`,
+  );
+}
+
 async function cmdEmulator() {
-  if (sshEcho()) {
-    log("emulator: SSH доступен, запуск не требуется");
+  const alreadyUp = sshEcho() && emulatorSessionReady();
+  if (alreadyUp) {
+    log("emulator: SSH и Wayland-сессия доступны, запуск не требуется");
+    return;
+  }
+
+  if (sshEcho() && !emulatorSessionReady()) {
+    log("emulator: SSH доступен, но Wayland ещё не готов — ожидание сессии…");
+    await waitForEmulatorReady(false);
+    log("emulator: готов");
     return;
   }
 
@@ -289,18 +360,8 @@ async function cmdEmulator() {
   });
   child.unref();
 
-  const timeoutSec = Number(cfg.EMULATOR_BOOT_TIMEOUT) || 300;
-  const deadline = Date.now() + timeoutSec * 1000;
-  while (Date.now() < deadline) {
-    await sleep(5000);
-    if ((await emulatorReachable()) && sshEcho()) {
-      log("emulator: готов");
-      return;
-    }
-  }
-  fail(
-    `эмулятор не ответил за ${timeoutSec} с (проверьте ${cfg.EMULATOR_SSH_HOST}:${cfg.EMULATOR_SSH_PORT})`,
-  );
+  await waitForEmulatorReady(true);
+  log("emulator: готов");
 }
 
 function sleep(ms) {
@@ -315,11 +376,12 @@ async function cmdDeploy() {
   }
   await cmdEmulator();
   const rpm = findRpm();
-  run(openSshTool("scp"), scpArgs(rpm, "/tmp/poc-bridge.rpm"));
+  const remoteRpm = `/tmp/${projectCfg.deployRpmName}`;
+  run(openSshTool("scp"), scpArgs(rpm, remoteRpm));
   run(
     openSshTool("ssh"),
     sshArgs(
-      "sudo rpm -Uvh --replacepkgs --define '__transaction_validation %{nil}' /tmp/poc-bridge.rpm",
+      `sudo rpm -Uvh --replacepkgs --define '__transaction_validation %{nil}' ${remoteRpm}`,
     ),
   );
   log("deploy: RPM установлен");
@@ -327,8 +389,8 @@ async function cmdDeploy() {
 
 async function cmdRun() {
   await cmdEmulator();
-  run(openSshTool("scp"), scpArgs(RUN_SCRIPT, "/tmp/run-poc.sh"));
-  run(openSshTool("ssh"), sshArgs("sudo sh /tmp/run-poc.sh"));
+  run(openSshTool("scp"), scpArgs(projectCfg.runScript, `/tmp/run-${project}.sh`));
+  run(openSshTool("ssh"), sshArgs(`sudo sh /tmp/run-${project}.sh`));
 }
 
 async function cmdAll() {
@@ -341,17 +403,19 @@ async function cmdAll() {
 async function main() {
   const cmd = process.argv[2];
   if (!cmd || !COMMANDS.includes(cmd)) {
-    console.log(`Usage: node tools/aurora/poc.mjs <${COMMANDS.join("|")}>`);
+    console.log(`Usage: node tools/aurora/poc.mjs <${COMMANDS.join("|")}> [project]`);
     console.log("");
-    console.log("  sync      repo/runtime/poc-bridge → POC_BUILD_DIR");
+    console.log("  project   poc-bridge (default) | container");
+    console.log("");
+    console.log("  sync      runtime/<project> → POC_BUILD_DIR");
     console.log("  build     sync + sfdk build");
     console.log("  deploy    emulator + scp + rpm -Uvh");
-    console.log("  run       emulator + запуск PoC + проверка journal");
+    console.log("  run       emulator + запуск + проверка journal");
     console.log("  emulator  поднять эмулятор, если SSH недоступен");
     console.log("  all       build + deploy + run");
     console.log("");
     console.log(
-      `POC_BUILD_DIR (default): ${path.join(os.homedir(), "aurobore-spike", "poc-bridge")}`,
+      `POC_BUILD_DIR (default): ${path.join(os.homedir(), "aurobore-spike", projectCfg.stagingName)}`,
     );
     console.log(`Config: ${path.join(__dirname, "local.env")} (see local.env.example)`);
     process.exit(cmd ? 1 : 0);

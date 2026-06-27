@@ -47,9 +47,9 @@ M0 (Spike/PoC) ─► M0.5 Dev-toolkit ─► M1 Runtime ─► M2 Bridge ─►
 ## M1 — Runtime (минимальный контейнер)
 FR-R1…R6. См. [architecture/runtime.md](architecture/runtime.md), [ADR-001](adr/ADR-001-runtime-architecture.md).
 
-- [ ] Нативный контейнер (C++/QML) + WebView во весь экран, bootstrap, инициализация WebEngineContext.
-- [ ] Asset Loader: локальные ресурсы через безопасную схему `aurobore-app://` (не `file://`).
-- [ ] Lifecycle (ready/pause/resume), splash, SPA-навигация + аппаратная «назад».
+- [x] Нативный контейнер (C++/QML) + WebView во весь экран, bootstrap, инициализация WebEngineContext.
+- [x] Asset Loader: локальные ресурсы через безопасную схему `aurobore-app://` (не `file://`).
+- [x] Lifecycle (ready/pause/resume), splash, SPA-навигация + аппаратная «назад» (симуляция на SDK 5.2.1.200; см. V-14).
 
 ## M2 — Bridge (поверх WebView API)
 FR-B1…B6. См. [architecture/bridge.md](architecture/bridge.md), [ADR-002](adr/ADR-002-bridge-model.md).

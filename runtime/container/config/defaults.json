@@ -1,0 +1,24 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.aurobore-container",
+    "name": "Aurobore Container",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "splash": {
+      "background": "#1a1a2e",
+      "image": "resources/splash.png",
+      "timeoutMs": 10000
+    }
+  },
+  "web": {
+    "root": "html",
+    "entry": "index.html",
+    "entryUrl": "aurobore-app://localhost/index.html"
+  },
+  "permissions": ["Internet"],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}
