@@ -7,10 +7,24 @@
 ## Порядок майлстоунов
 
 ```
-M0 (Spike/PoC) ─► M1 Runtime ─► M2 Bridge ─► M3 Plugins+Codegen ─► M4 CLI/Build ─► M5 SDK/Docs
-   мост на SDK     контейнер     invoke/      манифест + 5          create/dev/    @aurobore/core
-   + инфра         + WebView     события      плагинов             build/run      + шаблон + пример
+M0 (Spike/PoC) ─► M0.5 Dev-toolkit ─► M1 Runtime ─► M2 Bridge ─► M3 Plugins ─► M4 CLI/Build ─► M5 SDK/Docs
+   мост на SDK     poc:sync/build/     контейнер     invoke/      манифест + 5    create/dev/    @aurobore/core
+   + инфра         deploy/run/all      + WebView     события      плагинов        build/run      + шаблон
 ```
+
+---
+
+## M0.5 — Dev-toolkit: цикл PoC одной командой
+
+**Цель:** убрать ручной robocopy/sfdk/scp/ssh между итерациями M1; не путать с продуктовым CLI (M4).
+
+- [x] Оркестратор `tools/aurora/poc.mjs`: **sync** → **build** → **deploy** → **run** + **all**.
+- [x] Конфиг `tools/aurora/local.env` (из `local.env.example`): staging-dir, таргет sfdk, SSH эмулятора.
+- [x] Автопроверка эмулятора (SSH доступен → ок; иначе `sfdk emulator start` + ожидание).
+- [x] npm-скрипты в корне: `pnpm poc:sync|build|deploy|run|all`.
+- [x] Документация в `tools/aurora/README.md` и ссылка из `runtime/poc-bridge/README.md`.
+
+**Выход M0.5:** разработчик платформы гоняет PoC на эмуляторе без копирования команд из чата; логика позже мигрирует в `aurobore build/run` (M4).
 
 ---
 

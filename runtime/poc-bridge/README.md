@@ -30,32 +30,28 @@
 
 ## Сборка и запуск
 
-Среда: Windows + Aurora SDK (`C:\AuroraOS\bin\sfdk.exe`), движок сборки и эмулятор QEMU.
-Проект собирается из общей папки SDK (`C:\Users\<user>\aurobore-spike\poc-bridge`), т.к. движок
-монтирует только `C:\Users\<user>` и `C:\AuroraOS`:
+Рекомендуемый способ — **dev-toolkit** (M0.5), см. [tools/aurora/README.md](../../tools/aurora/README.md):
 
 ```powershell
-robocopy C:\inetpub2026\aurora\runtime\poc-bridge C:\Users\maxgr\aurobore-spike\poc-bridge /MIR /XD RPMS
-cd C:\Users\maxgr\aurobore-spike\poc-bridge
-sfdk -c target=AuroraOS-5.2.1.200-x86_64 build
-# -> RPMS/ru.auroraos.poc-bridge-0.1.0-1.x86_64.rpm
+# один раз: copy tools\aurora\local.env.example tools\aurora\local.env
+pnpm poc:all          # sync → build → deploy → run
+pnpm poc:build        # только сборка RPM
+pnpm poc:run          # только запуск на эмуляторе (если RPM уже установлен)
 ```
 
-**BuildRequires:** в snapshot таргета должен быть `ru.auroraos.webview-devel` (`pkgconfig(aurorawebview)`).
-Установка: `sfdk tools target package-install ru.auroraos.webview-devel` (при необходимости пересоздать snapshot).
+Среда: Windows + Aurora SDK (`sfdk`), эмулятор QEMU. Исходники в репо — `runtime/poc-bridge`;
+сборка идёт из **staging** (`%USERPROFILE%\aurobore-spike\poc-bridge` по умолчанию), т.к. Docker
+build engine монтирует только домашний каталог и `C:\AuroraOS`.
 
-Деплой на эмулятор — по SSH (root, ключ `C:\AuroraOS\vmshare\ssh\private_keys\sdk`, порт 2223):
+### Ручной цикл (если нужен)
 
-```sh
-rpm -Uvh --replacepkgs --define '__transaction_validation %{nil}' ru.auroraos.poc-bridge-*.rpm
-
-# запуск (libcef в /usr/lib/cef)
-XDG_RUNTIME_DIR=/run/user/100000 WAYLAND_DISPLAY=/run/display/wayland-0 \
-  LD_LIBRARY_PATH=/usr/lib/cef QT_QPA_PLATFORM=wayland \
-  /usr/bin/ru.auroraos.poc-bridge
+```powershell
+pnpm poc:sync
+pnpm poc:build
+# RPMS/ru.auroraos.poc-bridge-0.1.0-1.x86_64.rpm в POC_BUILD_DIR
+pnpm poc:deploy
+pnpm poc:run
 ```
-
-Скрипт `C:\Users\maxgr\aurobore-spike\run-poc.sh` автоматизирует запуск и сбор лога в `/tmp/poc.log`.
 
 ## Результаты прогона (подтверждено на эмуляторе)
 

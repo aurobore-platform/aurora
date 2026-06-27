@@ -1,0 +1,32 @@
+---
+description: Контекст монорепо Aurobore — этапы MVP, где что лежит, что агент не должен путать
+alwaysApply: true
+---
+
+# Aurobore — контекст для агента
+
+Монорепо платформы WebView-приложений под **ОС Аврора**. План: `docs/mvp-plan.md`.
+
+## Этапы (кратко)
+
+- **M0** ✅ — PoC моста, инфраструктура JS
+- **M0.5** ✅ — dev-toolkit `pnpm poc:*` (`tools/aurora/`)
+- **M1** — runtime-контейнер (следующий)
+- **M4** — продуктовый CLI `aurobore build/run` (пока **не** реализован)
+
+## Где что лежит
+
+| Путь | Назначение |
+|------|------------|
+| `packages/*` | JS/TS: core, cli, build, bridge-js |
+| `runtime/poc-bridge` | PoC C++/QML (источник; сборка через staging) |
+| `tools/aurora/` | Оркестратор эмулятора (`poc.mjs`) |
+| `docs/aurora/` | Факты SDK, verification-status |
+
+## Нативная проверка на эмуляторе
+
+Если задача затрагивает `runtime/**` или проверку на Aurora SDK — см. правило **aurora-dev-toolkit**: используй `pnpm poc:all`, не изобретай цепочку sfdk/scp заново.
+
+## Коммиты
+
+Коммитить только по явной просьбе пользователя.

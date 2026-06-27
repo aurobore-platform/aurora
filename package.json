@@ -16,7 +16,13 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "doctor": "pnpm --filter @aurobore/cli exec aurobore doctor"
+    "doctor": "pnpm --filter @aurobore/cli exec aurobore doctor",
+    "poc:sync": "node tools/aurora/poc.mjs sync",
+    "poc:build": "node tools/aurora/poc.mjs build",
+    "poc:deploy": "node tools/aurora/poc.mjs deploy",
+    "poc:run": "node tools/aurora/poc.mjs run",
+    "poc:emulator": "node tools/aurora/poc.mjs emulator",
+    "poc:all": "node tools/aurora/poc.mjs all"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",

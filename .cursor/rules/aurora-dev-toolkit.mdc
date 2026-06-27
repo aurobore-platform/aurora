@@ -1,0 +1,48 @@
+---
+description: Сборка и прогон PoC/нативного runtime на эмуляторе Aurora (M0.5 dev-toolkit)
+globs: runtime/**,tools/aurora/**
+alwaysApply: false
+---
+
+# Aurora dev-toolkit (PoC / эмулятор)
+
+Продуктового `aurobore build/run` ещё нет (M4). Для проверки нативного кода используй **dev-toolkit**, не ручной robocopy/sfdk/scp.
+
+## Команды (из корня репо)
+
+```powershell
+pnpm poc:sync      # runtime/poc-bridge → POC_BUILD_DIR
+pnpm poc:build     # sync + sfdk build → RPM
+pnpm poc:deploy    # эмулятор + установка RPM
+pnpm poc:run       # запуск + journal «PoC OK»
+pnpm poc:all       # build → deploy → run (полная проверка)
+pnpm poc:emulator  # только поднять/дождаться эмулятор
+```
+
+Эквивалент: `node tools/aurora/poc.mjs <команда>`. Подробности: `tools/aurora/README.md`.
+
+## Обязательно для агента
+
+- **Не** вызывай `sfdk build` из `runtime/poc-bridge` на Windows — Docker build engine не видит пути вне `%USERPROFILE%` и `C:\AuroraOS`. Оркестратор сам sync-ит в staging.
+- **Не** дублируй robocopy/scp/ssh/rpm вручную, если задача — проверить PoC; используй `pnpm poc:*`.
+- Перед первым прогоном убедись, что есть `tools/aurora/local.env` (копия из `local.env.example`). Defaults SDK подставляются автоматически на типичной установке.
+- Эмулятор: оркестратор сам проверяет SSH на `:2223` и при необходимости запускает `sfdk emulator start`.
+- `LD_LIBRARY_PATH=/usr/lib/cef` уже в `tools/aurora/run-poc.sh` — не забывай его при любом **своем** ручном запуске.
+
+## Когда что запускать
+
+| Задача | Команда |
+|--------|---------|
+| Изменил C++/QML/html PoC, нужна полная проверка | `pnpm poc:all` |
+| Только пересборка RPM | `pnpm poc:build` |
+| RPM уже собран, нужен деплой/запуск | `pnpm poc:deploy` / `pnpm poc:run` |
+| Правишь сам `tools/aurora/poc.mjs` | тестируй затронутую подкоманду |
+| Только JS/TS монорепо | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm doctor` |
+
+## Успех прогона PoC
+
+В journal эмулятора должна быть строка: `[poc-native] PoC OK: round-trip подтверждён`.
+
+## Отладка toolkit
+
+Ручные команды допустимы только при поломке оркестратора. Источник правды по фактам SDK: `docs/aurora/verification-status.md`.

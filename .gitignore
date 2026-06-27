@@ -32,3 +32,4 @@ Thumbs.db
 # Local env
 .env
 .env.local
+tools/aurora/local.env
