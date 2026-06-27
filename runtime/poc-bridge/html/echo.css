@@ -1,0 +1,64 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  background: #16181d;
+  color: #e6e8ec;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 1.25rem;
+  color: #9aa0aa;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #9aa0aa;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #2c2f36;
+  border-radius: 8px;
+  background: #1d2026;
+  color: #e6e8ec;
+}
+
+button {
+  margin-top: 0.8rem;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #3d6df0;
+  color: #fff;
+}
+
+button:active {
+  background: #2f57c4;
+}
+
+pre {
+  margin-top: 0.4rem;
+  padding: 0.8rem;
+  min-height: 8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 8px;
+  background: #1d2026;
+  color: #b8e6c1;
+  font-size: 0.85rem;
+}

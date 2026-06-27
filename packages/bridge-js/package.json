@@ -1,0 +1,25 @@
+{
+  "name": "@aurobore/bridge-js",
+  "version": "0.0.0",
+  "description": "Низкоуровневая JS-сторона моста: корреляция, Promise, события, стримы, сериализация.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@aurobore/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  }
+}

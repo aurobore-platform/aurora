@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  js:
+    name: JS (lint / typecheck / test)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+  native:
+    name: Native container (Aurora SDK)
+    runs-on: ubuntu-latest
+    # TODO(M0/M4): требуется раннер с установленным Aurora SDK (mb2) и эмулятором.
+    # Сейчас job отключён до настройки self-hosted раннера/контейнера SDK.
+    # Локально PoC собирается из Git Bash: см. runtime/poc-bridge/README.md.
+    if: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build PoC bridge (placeholder)
+        run: echo "Aurora SDK build will run here (mb2 build runtime/poc-bridge)."

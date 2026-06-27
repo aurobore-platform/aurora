@@ -1,0 +1,12 @@
+**/dist/**
+**/build/**
+**/node_modules/**
+**/coverage/**
+pnpm-lock.yaml
+**/generated/**
+
+# Проектная документация — авторская проза, не подлежит код-форматированию
+docs/**
+
+# Нативные исходники PoC (C++/QML/CMake/.spec/.desktop) — вне зоны Prettier
+runtime/poc-bridge/**

@@ -1,0 +1,462 @@
+Первоначальная постановка задачи.
+
+Хочу сделать свой аналог cordova или capacitor для платформы Аврора ОС, чтобы иметь возможность быстро создавать webview приложения. Распиши по пунктам что нужно учесть и что сделать.
+
+
+Ответ LLM:
+Если цель — сделать аналог Cordova/Capacitor именно для Аврора ОС, то я бы не пытался копировать их архитектуру один в один. Лучше сделать современный runtime с нативными плагинами, который будет учитывать особенности Aurora OS (Qt/QML + C++). Это позволит позже расширить проект и даже сделать его стандартом для сообщества.
+
+Я бы разбил проект на несколько этапов.
+
+Этап 1. Изучить платформу
+
+Нужно понять ограничения Aurora OS.
+
+Изучить:
+
+SDK Aurora
+жизненный цикл приложения
+Qt/QML
+Qt WebEngine или WebView
+механизм публикации приложений
+разрешения (permissions)
+работу с файловой системой
+работу с сервисами
+доступ к камере
+доступ к геолокации
+уведомления
+фоновые задачи
+межпроцессное взаимодействие
+
+Нужно понять:
+
+Что можно сделать из C++ и что нельзя сделать из JavaScript.
+
+Этап 2. Определить архитектуру
+
+Cordova:
+
+JS
+ ↓
+Bridge
+ ↓
+Native Plugin
+ ↓
+OS
+
+Capacitor:
+
+JS
+ ↓
+Bridge
+ ↓
+Native API
+ ↓
+OS
+
+Для Aurora я бы сделал
+
+HTML
+CSS
+JS
+
+↓
+
+Aurora Bridge
+
+↓
+
+Plugin Manager
+
+↓
+
+Native Plugins
+
+↓
+
+Qt / Aurora APIs
+Этап 3. Runtime
+
+Это будет сердце проекта.
+
+Runtime отвечает за:
+
+запуск WebView
+загрузку локальных файлов
+загрузку SPA
+bridge
+события жизненного цикла
+ошибки
+навигацию
+splash screen
+
+По сути это контейнер.
+
+Этап 4. Bridge между JS и C++
+
+Это самая важная часть.
+
+Например
+
+JS
+
+Aurora.camera.open()
+
+↓
+
+Bridge
+
+↓
+
+C++
+
+CameraPlugin::open()
+
+↓
+
+Возвращается Promise
+
+const image = await Aurora.camera.open();
+
+Нужно сделать:
+
+Promise API
+callback API
+события
+бинарные данные
+JSON сериализацию
+Этап 5. Plugin API
+
+Это самая важная вещь после Bridge.
+
+Например
+
+plugins/
+
+camera/
+
+filesystem/
+
+location/
+
+notifications/
+
+contacts/
+
+share/
+
+Каждый плагин имеет
+
+plugin.json
+
+C++
+
+JS wrapper
+
+resources
+
+Например
+
+camera
+
+├── plugin.json
+├── camera.cpp
+├── camera.h
+├── camera.js
+Этап 6. Plugin Loader
+
+Во время запуска
+
+Runtime
+
+↓
+
+читает plugins/
+
+↓
+
+регистрирует bridge
+
+↓
+
+экспортирует API
+
+Получается
+
+Aurora.Camera
+Aurora.Location
+Aurora.FileSystem
+Этап 7. CLI
+
+Очень желательно сделать CLI.
+
+Например
+
+aurora create MyApp
+
+Создает
+
+src/
+
+public/
+
+plugins/
+
+aurora.config.json
+
+Потом
+
+aurora run
+
+Запускает эмулятор.
+
+Потом
+
+aurora build
+
+Собирает приложение.
+
+Потом
+
+aurora add camera
+
+Подключает плагин.
+
+Потом
+
+aurora doctor
+
+Проверяет SDK.
+
+Этап 8. Конфигурация
+
+Например
+
+{
+  "appId": "ru.demo.app",
+  "name": "Demo",
+  "version": "1.0",
+  "orientation": "portrait",
+  "permissions": [
+    "camera",
+    "location"
+  ]
+}
+
+CLI автоматически генерирует нужные файлы Aurora.
+
+Этап 9. Работа с WebView
+
+Нужно решить
+
+где лежат html
+поддержка SPA
+history
+роутинг
+deep links
+offline
+Этап 10. API
+
+Желательно сделать максимально похожим на Capacitor.
+
+Например
+
+import { Camera } from "@aurora/camera";
+
+const photo = await Camera.getPhoto();
+
+или
+
+Aurora.Camera.getPhoto();
+Этап 11. Нативные плагины
+
+Минимальный набор
+
+Device
+device.model
+device.name
+device.os
+device.version
+FileSystem
+read
+
+write
+
+mkdir
+
+delete
+
+exists
+
+copy
+Camera
+takePhoto
+
+pickPhoto
+
+video
+Geolocation
+watch
+
+current
+
+stop
+Notifications
+local
+
+push
+Clipboard
+copy
+
+paste
+Share
+shareText()
+
+shareFile()
+Network
+online
+
+offline
+
+type
+Storage
+key-value
+Contacts
+Sensors
+Biometric
+Secure Storage
+Этап 12. Система событий
+
+Например
+
+Aurora.on("pause")
+Aurora.on("resume")
+Aurora.on("backbutton")
+Aurora.on("memoryWarning")
+Этап 13. Dev Server
+
+Чтобы не пересобираться постоянно.
+
+npm run dev
+
+↓
+
+WebView
+
+↓
+
+localhost
+
+↓
+
+hot reload
+
+Это сильно ускорит разработку.
+
+Этап 14. Сборка
+
+CLI должна:
+
+копировать web
+
+↓
+
+генерировать проект Aurora
+
+↓
+
+подключать плагины
+
+↓
+
+вызывать сборку
+
+↓
+
+получать пакет
+Этап 15. Документация
+
+Нужно сразу описать:
+
+создание проекта
+написание плагинов
+публикацию
+API
+архитектуру bridge
+примеры
+Этап 16. Архитектура репозитория
+aurora-platform/
+
+    cli/
+
+    runtime/
+
+    bridge/
+
+    plugin-api/
+
+    plugins/
+
+        camera/
+
+        location/
+
+        filesystem/
+
+    templates/
+
+        vanilla/
+
+        react/
+
+        vue/
+
+        svelte/
+
+    examples/
+
+    docs/
+Этап 17. Что можно сделать лучше, чем Cordova
+
+Вместо устаревшей архитектуры Cordova можно сразу заложить современные принципы:
+
+Типизированный API — официальный пакет TypeScript с автодополнением и строгими типами.
+Асинхронный bridge — использовать только Promise и async/await, без callback-интерфейсов.
+Автоматическая регистрация плагинов — без ручного редактирования конфигурационных файлов.
+Двунаправленные события — поддержка потоковых данных (например, геолокация или сенсоры) через подписки.
+Code generation — генерация JS-обёрток и типов из описания плагина (plugin.json или аналогичного манифеста), чтобы избежать дублирования кода.
+Версионирование API — чтобы плагины и runtime могли эволюционировать независимо.
+DevTools — встроенные средства логирования, инспекции bridge-вызовов и профилирования производительности.
+Официальные шаблоны для React, Vue, Angular, Svelte и Vanilla JS.
+Возможная дорожная карта (MVP → 1.0)
+
+MVP (1–2 месяца):
+
+Runtime с WebView.
+JS ↔ C++ bridge.
+CLI (create, run, build).
+Поддержка локальных HTML/CSS/JS.
+3–5 базовых плагинов (Device, Storage, Filesystem, Clipboard, Network).
+
+Версия 0.5:
+
+Camera.
+Geolocation.
+Share.
+Notifications.
+Live Reload.
+Шаблоны React/Vue.
+
+Версия 1.0:
+
+Полноценная система плагинов.
+Генерация типов TypeScript.
+Публикация собственных плагинов через npm.
+Подробная документация и примеры.
+Тестовый набор для проверки совместимости плагинов.
+
+Такой подход даст не просто "обёртку над WebView", а полноценную платформу разработки. Если проект будет качественно реализован, он сможет занять для Aurora OS ту же нишу, что Capacitor занимает в мире Android и iOS: единый runtime, удобный мост между вебом и нативными возможностями системы, а также расширяемую экосистему плагинов.
+
+
+
+--------- https://developer.auroraos.ru/

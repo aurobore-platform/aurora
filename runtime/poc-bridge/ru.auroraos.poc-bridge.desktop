@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Aurobore PoC Bridge
+Comment=Эхо-мост web<->native (Aurobore Spike)
+Icon=ru.auroraos.poc-bridge
+Exec=ru.auroraos.poc-bridge
+X-Application-Type=silica-qt5
+
+# V-6: точный синтаксис деклараций разрешений и список общих директорий для 5.2.x
+# подтвердить на SDK (справочник «Установочные пакеты» / sandbox-and-permissions.md).
+# Для PoC заявляем доступ в сеть (на случай загрузки внешних ресурсов веб-страницей).
+[X-Application]
+Permissions=Internet
+OrganizationName=ru.auroraos
+ApplicationName=poc-bridge

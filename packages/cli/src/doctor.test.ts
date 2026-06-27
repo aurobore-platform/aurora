@@ -1,0 +1,23 @@
+import { describe, expect, it } from "vitest";
+import { formatReport, runDoctor } from "./doctor.js";
+
+describe("@aurobore/cli doctor", () => {
+  it("проверяет окружение и всегда включает Node, pnpm, Aurora SDK", () => {
+    const report = runDoctor();
+    const names = report.checks.map((c) => c.name);
+    expect(names.some((n) => n.startsWith("Node"))).toBe(true);
+    expect(names.some((n) => n.startsWith("pnpm"))).toBe(true);
+    expect(names.some((n) => n.startsWith("Aurora SDK"))).toBe(true);
+  });
+
+  it("Node-проверка проходит (тесты идут на поддерживаемой версии)", () => {
+    const node = runDoctor().checks.find((c) => c.name.startsWith("Node"));
+    expect(node?.status).toBe("ok");
+  });
+
+  it("formatReport выводит человекочитаемый отчёт", () => {
+    const text = formatReport(runDoctor());
+    expect(text).toMatch(/Node\.js/);
+    expect(text).toMatch(/\[ OK \]|\[WARN\]|\[FAIL\]/);
+  });
+});

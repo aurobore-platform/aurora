@@ -1,0 +1,30 @@
+{
+  "name": "@aurobore/cli",
+  "version": "0.0.0",
+  "description": "CLI Aurobore: create/dev/build/run/plugin/doctor.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "aurobore": "./dist/cli.js",
+    "bor": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@aurobore/build": "workspace:*",
+    "@aurobore/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  }
+}
