@@ -30,7 +30,6 @@ function loadConfig() {
     EMULATOR_BOOT_TIMEOUT: "300",
     EMULATOR_SSH_CONNECT_TIMEOUT: "5",
     POC_RPM_GLOB: "ru.auroraos.poc-bridge-*.rpm",
-    ...process.env,
   };
 
   const localEnv = path.join(__dirname, "local.env");
@@ -62,6 +61,9 @@ function loadConfig() {
     if (fs.existsSync(path.join(sdkBin, "sfdk.exe"))) env.AURORA_SDK_BIN = sdkBin;
   }
 
+  env.PATH = process.env.PATH ?? "";
+  env.SystemRoot = process.env.SystemRoot ?? "C:\\Windows";
+
   return env;
 }
 
@@ -84,41 +86,63 @@ function fail(msg) {
   process.exit(1);
 }
 
-/** @returns {NodeJS.ProcessEnv} */
-function sfdkEnv() {
-  const env = { ...process.env };
-  if (cfg.AURORA_SDK_BIN) {
-    env.PATH = `${cfg.AURORA_SDK_BIN}${path.delimiter}${env.PATH ?? ""}`;
-  }
-  return env;
+/** @returns {NodeJS.ProcessEnv} — чистая копия env с Aurora SDK в PATH (не мутировать process.env.PATH). */
+function childEnv() {
+  const sdkBin =
+    cfg.AURORA_SDK_BIN ||
+    (process.platform === "win32" ? "C:\\AuroraOS\\bin" : "");
+  if (!sdkBin) return { ...process.env };
+  return {
+    ...process.env,
+    PATH: `${sdkBin}${path.delimiter}${process.env.PATH ?? ""}`,
+  };
 }
 
-function sfdkBin() {
+function sfdkPath() {
+  if (cfg.AURORA_SDK_BIN) {
+    return path.join(cfg.AURORA_SDK_BIN, process.platform === "win32" ? "sfdk.exe" : "sfdk");
+  }
   return process.platform === "win32" ? "sfdk.exe" : "sfdk";
+}
+
+/** @param {"ssh"|"scp"} tool */
+function openSshTool(tool) {
+  if (process.platform === "win32") {
+    const candidate = path.join(
+      cfg.SystemRoot ?? process.env.SystemRoot ?? "C:\\Windows",
+      "System32",
+      "OpenSSH",
+      `${tool}.exe`,
+    );
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return tool;
 }
 
 /**
  * @param {string} cmd
  * @param {string[]} args
- * @param {{ cwd?: string; inherit?: boolean; allowCodes?: number[] }} [opts]
+ * @param {{ cwd?: string; inherit?: boolean; allowCodes?: number[]; maxBuffer?: number }} [opts]
  */
 function run(cmd, args, opts = {}) {
-  log(`${cmd} ${args.join(" ")}`);
+  log(`${path.basename(cmd)} ${args.join(" ")}`);
+  const inherit = opts.inherit ?? false;
   const res = spawnSync(cmd, args, {
     cwd: opts.cwd,
-    env: sfdkEnv(),
-    encoding: "utf8",
-    shell: process.platform === "win32",
-    stdio: opts.inherit ? "inherit" : "pipe",
+    env: childEnv(),
+    shell: false,
+    stdio: inherit ? "inherit" : "pipe",
+    maxBuffer: opts.maxBuffer ?? 10 * 1024 * 1024,
+    ...(inherit ? {} : { encoding: "utf8" }),
   });
+  if (!inherit) {
+    if (res.stdout) process.stdout.write(res.stdout);
+    if (res.stderr) process.stderr.write(res.stderr);
+  }
   const ok =
     res.status === 0 || (opts.allowCodes != null && opts.allowCodes.includes(res.status ?? -1));
   if (!ok) {
-    if (!opts.inherit) {
-      if (res.stdout) process.stdout.write(res.stdout);
-      if (res.stderr) process.stderr.write(res.stderr);
-    }
-    fail(`команда завершилась с кодом ${res.status}: ${cmd} ${args.join(" ")}`);
+    fail(`команда завершилась с кодом ${res.status}: ${path.basename(cmd)} ${args.join(" ")}`);
   }
   return res;
 }
@@ -146,13 +170,10 @@ function cmdSync() {
     const robocopy = path.join(process.env.SystemRoot ?? "C:\\Windows", "System32", "robocopy.exe");
     // /E — обновить дерево источников; не /MIR, чтобы не сносить CMake/RPMS в staging
     run(robocopy, [src, dst, "/E", "/XD", "RPMS", "CMakeFiles", ".sfdk", "/NFL", "/NDL", "/NJH", "/NJS"], {
-      inherit: true,
       allowCodes: [0, 1, 2, 3, 4, 5, 6, 7],
     });
   } else {
-    run("rsync", ["-a", "--delete", "--exclude", "RPMS/", `${src}/`, `${dst}/`], {
-      inherit: true,
-    });
+    run("rsync", ["-a", "--delete", "--exclude", "RPMS/", `${src}/`, `${dst}/`]);
   }
   log(`sync: ${src} → ${dst}`);
 }
@@ -160,7 +181,9 @@ function cmdSync() {
 function cmdBuild() {
   cmdSync();
   const cwd = cfg.POC_BUILD_DIR;
-  run(sfdkBin(), ["-c", `target=${cfg.SFDK_TARGET}`, "build"], { cwd, inherit: true });
+  const sfdkArgs = ["-c", `target=${cfg.SFDK_TARGET}`, "build"];
+  log(`build: target=${cfg.SFDK_TARGET} cwd=${cwd}`);
+  run(sfdkPath(), sfdkArgs, { cwd, maxBuffer: 20 * 1024 * 1024 });
 
   const rpmsDir = path.join(cwd, "RPMS");
   const glob = cfg.POC_RPM_GLOB.replace(/\*/g, ".*");
@@ -242,10 +265,11 @@ function emulatorReachable() {
 }
 
 function sshEcho() {
-  const res = spawnSync("ssh", sshArgs("echo connected"), {
+  const res = spawnSync(openSshTool("ssh"), sshArgs("echo connected"), {
     encoding: "utf8",
-    shell: process.platform === "win32",
+    shell: false,
     stdio: "pipe",
+    env: childEnv(),
   });
   return res.status === 0;
 }
@@ -257,9 +281,9 @@ async function cmdEmulator() {
   }
 
   log("emulator: SSH недоступен — запуск sfdk emulator start…");
-  const child = spawn(sfdkBin(), ["emulator", "start"], {
-    env: sfdkEnv(),
-    shell: process.platform === "win32",
+  const child = spawn(sfdkPath(), ["emulator", "start"], {
+    env: childEnv(),
+    shell: false,
     detached: true,
     stdio: "ignore",
   });
@@ -291,21 +315,20 @@ async function cmdDeploy() {
   }
   await cmdEmulator();
   const rpm = findRpm();
-  run("scp", scpArgs(rpm, "/tmp/poc-bridge.rpm"), { inherit: true });
+  run(openSshTool("scp"), scpArgs(rpm, "/tmp/poc-bridge.rpm"));
   run(
-    "ssh",
+    openSshTool("ssh"),
     sshArgs(
       "sudo rpm -Uvh --replacepkgs --define '__transaction_validation %{nil}' /tmp/poc-bridge.rpm",
     ),
-    { inherit: true },
   );
   log("deploy: RPM установлен");
 }
 
 async function cmdRun() {
   await cmdEmulator();
-  run("scp", scpArgs(RUN_SCRIPT, "/tmp/run-poc.sh"), { inherit: true });
-  run("ssh", sshArgs("sudo sh /tmp/run-poc.sh"), { inherit: true });
+  run(openSshTool("scp"), scpArgs(RUN_SCRIPT, "/tmp/run-poc.sh"));
+  run(openSshTool("ssh"), sshArgs("sudo sh /tmp/run-poc.sh"));
 }
 
 async function cmdAll() {
