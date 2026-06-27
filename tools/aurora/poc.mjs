@@ -28,6 +28,12 @@ const PROJECTS = {
     runScript: path.join(__dirname, "run-container.sh"),
     deployRpmName: "aurobore-container.rpm",
     stagingName: "aurobore-container",
+    extraSync: [
+      {
+        source: path.join(REPO_ROOT, "runtime", "bridge-native"),
+        destName: "bridge-native",
+      },
+    ],
   },
 };
 
@@ -186,6 +192,18 @@ function pathsEqual(a, b) {
   }
 }
 
+function syncDir(src, dst) {
+  fs.mkdirSync(dst, { recursive: true });
+  if (process.platform === "win32") {
+    const robocopy = path.join(process.env.SystemRoot ?? "C:\\Windows", "System32", "robocopy.exe");
+    run(robocopy, [src, dst, "/E", "/XD", "RPMS", "CMakeFiles", ".sfdk", "/NFL", "/NDL", "/NJH", "/NJS"], {
+      allowCodes: [0, 1, 2, 3, 4, 5, 6, 7],
+    });
+  } else {
+    run("rsync", ["-a", "--delete", "--exclude", "RPMS/", `${src}/`, `${dst}/`]);
+  }
+}
+
 function cmdSync() {
   const src = projectCfg.source;
   const dst = cfg.POC_BUILD_DIR;
@@ -195,18 +213,14 @@ function cmdSync() {
     return;
   }
 
-  fs.mkdirSync(dst, { recursive: true });
-
-  if (process.platform === "win32") {
-    const robocopy = path.join(process.env.SystemRoot ?? "C:\\Windows", "System32", "robocopy.exe");
-    // /E — обновить дерево источников; не /MIR, чтобы не сносить CMake/RPMS в staging
-    run(robocopy, [src, dst, "/E", "/XD", "RPMS", "CMakeFiles", ".sfdk", "/NFL", "/NDL", "/NJH", "/NJS"], {
-      allowCodes: [0, 1, 2, 3, 4, 5, 6, 7],
-    });
-  } else {
-    run("rsync", ["-a", "--delete", "--exclude", "RPMS/", `${src}/`, `${dst}/`]);
-  }
+  syncDir(src, dst);
   log(`sync: ${src} → ${dst}`);
+
+  for (const extra of projectCfg.extraSync ?? []) {
+    const extraDst = path.join(path.dirname(dst), extra.destName);
+    syncDir(extra.source, extraDst);
+    log(`sync: ${extra.source} → ${extraDst}`);
+  }
 }
 
 function cmdBuild() {

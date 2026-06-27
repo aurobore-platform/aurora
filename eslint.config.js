@@ -39,5 +39,21 @@ export default [
       ],
     },
   },
+  {
+    files: ["packages/bridge-js/src/bundle.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+  {
+    files: ["packages/bridge-js/scripts/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
   prettier,
 ];

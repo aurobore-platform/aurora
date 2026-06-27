@@ -2,11 +2,11 @@
   var routes = {
     "/": {
       title: "Главная",
-      html: "<p>Локальное SPA через <code>aurobore-app://</code>.</p>",
+      html: "<p>Локальное SPA через loopback origin (<code>http://127.0.0.1</code>).</p>",
     },
     "/about": {
       title: "О приложении",
-      html: "<p>Runtime M1 — минимальный контейнер Aurobore.</p>",
+      html: "<p>Runtime M2 — контейнер Aurobore + Bridge.</p>",
     },
     "/settings": {
       title: "Настройки",
@@ -17,16 +17,13 @@
   var statusEl = document.getElementById("status");
   var viewEl = document.getElementById("view");
   var routeDepth = 0;
+  var m2Checks = { ping: false, stream: false, event: false };
 
-  // На file:// pushState("/about") ведёт на file:///about — ломает страницу. Используем hash-маршруты.
   function currentPath() {
-    var hash = (location.hash || "").replace(/^#/, "");
-    if (!hash || hash === "/") return "/";
-    return hash.charAt(0) === "/" ? hash : "/" + hash;
-  }
-
-  function pathToHash(path) {
-    return path === "/" ? "#/" : "#" + path;
+    var path = location.pathname || "/";
+    if (path.length > 1 && path.charAt(path.length - 1) === "/")
+      path = path.slice(0, -1);
+    return path || "/";
   }
 
   function setStatus(text) {
@@ -34,21 +31,31 @@
     console.log("[aurobore-web] " + text);
   }
 
+  function maybeM2Ok() {
+    if (m2Checks.ping && m2Checks.stream && m2Checks.event) {
+      console.log(
+        "[aurobore-container] M2 OK: bridge invoke, events, stream verified"
+      );
+      if (typeof sendAsyncMessage === "function") {
+        sendAsyncMessage("aurobore:m2-ok", { ok: true });
+      }
+    }
+  }
+
   function renderRoute(path) {
     var route = routes[path] || routes["/"];
     if (viewEl) {
       viewEl.innerHTML = "<h2>" + route.title + "</h2>" + route.html;
     }
-    setStatus("Маршрут: " + path + " | scheme: " + location.protocol);
+    setStatus("Маршрут: " + path + " | origin: " + location.origin);
   }
 
   function navigate(path, replace) {
     var state = { path: path, depth: ++routeDepth };
-    var hash = pathToHash(path);
     if (replace) {
-      history.replaceState(state, "", hash);
+      history.replaceState(state, "", path);
     } else {
-      history.pushState(state, "", hash);
+      history.pushState(state, "", path);
     }
     renderRoute(path);
   }
@@ -61,14 +68,10 @@
     return false;
   };
 
-  function onRouteChange() {
-    var path = currentPath();
-    renderRoute(path);
-    setStatus("маршрут → " + path);
-  }
-
-  window.addEventListener("popstate", onRouteChange);
-  window.addEventListener("hashchange", onRouteChange);
+  window.addEventListener("popstate", function () {
+    renderRoute(currentPath());
+    setStatus("popstate → " + currentPath());
+  });
 
   document.querySelectorAll("[data-route]").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -93,7 +96,7 @@
   }
 
   Aurobore.on("ready", function () {
-    setStatus("ready | entry: aurobore-app://localhost/index.html");
+    setStatus("ready | origin: " + location.origin);
   });
   Aurobore.on("pause", function () {
     setStatus("pause");
@@ -105,12 +108,51 @@
     setStatus("backbutton (no SPA history)");
   });
 
-  function onReady() {
-    if (!location.hash) {
-      navigate("/", true);
-    } else {
-      renderRoute(currentPath());
+  Aurobore.on("app:echo", function (data) {
+    m2Checks.event = true;
+    setStatus("app:echo: " + JSON.stringify(data));
+    maybeM2Ok();
+  });
+
+  function runM2Checks() {
+    if (!window.Aurobore || typeof Aurobore.invoke !== "function") {
+      console.log("[aurobore-web] Aurobore.invoke unavailable");
+      return;
     }
+
+    Aurobore.invoke("Echo", "ping")
+      .then(function (result) {
+        m2Checks.ping = true;
+        setStatus("ping: " + JSON.stringify(result));
+        maybeM2Ok();
+      })
+      .catch(function (err) {
+        console.error("[aurobore-web] ping failed:", err);
+      });
+
+    Aurobore.invoke("Echo", "watchTicks", {}, { stream: true })
+      .then(function (sub) {
+        var ticks = [];
+        sub.onData = function (payload) {
+          ticks.push(payload.tick);
+        };
+        sub.onComplete = function () {
+          if (ticks.length >= 5) {
+            m2Checks.stream = true;
+            setStatus("stream ticks: " + ticks.join(","));
+            maybeM2Ok();
+          }
+        };
+      })
+      .catch(function (err) {
+        console.error("[aurobore-web] stream failed:", err);
+      });
+
+    Aurobore.emit("app:demo", { hello: "native" });
+  }
+
+  function onReady() {
+    navigate("/", true);
 
     setTimeout(function () {
       if (typeof sendAsyncMessage === "function") {
@@ -121,6 +163,7 @@
       console.log(
         "[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works"
       );
+      setTimeout(runM2Checks, 400);
     }, 800);
   }
 

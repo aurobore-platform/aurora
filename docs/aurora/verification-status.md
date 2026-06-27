@@ -40,7 +40,7 @@
 | V-7 | Пропускная способность/латентность моста на реальном устройстве (нужен ли бинарный протокол, FR-B9) | ⏳ | Низкий (post-MVP) | Бенчмарк на устройстве |
 | V-8 | ✅ **Закрыт (PoC).** C++-devel **`ru.auroraos.webview-devel`** доступен в онлайн-репозитории OMP; после `sfdk tools target package-install ru.auroraos.webview-devel` и пересоздания snapshot — `pkgconfig(aurorawebview)` и `webenginecontext.h` в таргете. Сборка PoC с линковкой `PkgConfig::AuroraWebView` и `InitBrowser()` успешна. | ✅ | — | `sfdk tools target package-install`; snapshot `.default` |
 | V-12 | ✅ **Закрыт (M1).** `InitBrowser()` после `createView()`, до `setSource()` с `ApplicationWindow` + `pageStack` + `cover` — приложение стартует на SDK 5.2.1.200. | ✅ | — | `runtime/container`; `pnpm container:all` |
-| V-13 | 🟡 **Частично (M1).** Entry `aurobore-app://localhost/…` перехватывается `LoadRequestExtension.beforeUrlLoad` и маппится на `file://` в `share/html`. CEF **игнорирует** `aurobore-app://` в `<link>`/`<script>` (TT_LINK); подресурсы грузятся относительными путями под sandbox `file://` (разрешены `isAllowedFileUrl`). Полный custom-scheme для всех ассетов — открытый вопрос. | 🟡 | Средний (FR-R6) | `runtime/container/qml/pages/WebAppPage.qml`, `AssetResolver` |
+| V-13 | 🟡 **Частично (M1).** Прямой `CefRegisterSchemeHandlerFactory` недоступен в public SDK. Реализован **loopback `AssetSchemeServer`** (`http://127.0.0.1:<port>/`) с маппингом через `AssetResolver`; path-based SPA, subresources по относительным URL. Логический entry в конфиге — `aurobore-app://localhost/…`. | 🟡 | Средний (FR-R6) | `src/AssetSchemeServer.*`, `AssetResolver` |
 | V-14 | 🟡 **Частично (M1).** Тип `BackNavigation` недоступен в QML на 5.2.1.200. SPA «назад» — `history.back()` по `sendAsyncMessage("aurobore:back")` (симуляция в демо); аппаратный жест Silica — уточнить на устройстве. | 🟡 | Средний (UX) | Демо SPA; WebViewAPI / Silica PageStack на устройстве |
 
 ## 3. Влияние на завершение этапа Design
@@ -72,7 +72,7 @@
 | Что | Результат |
 |---|---|
 | `ApplicationWindow` + Silica `pageStack`/`cover` + `InitBrowser` (V-12) | ✅ |
-| Entry через `aurobore-app://localhost/index.html` → sandbox `file://` (V-13) | 🟡 entry да; подресурсы — относительные `file://` |
+| Entry через loopback HTTP + логический `aurobore-app://` (V-13) | 🟡 loopback origin; secure context — post-M1 |
 | Splash + `aurobore:ready` / таймаут-fallback | ✅ |
 | Lifecycle `ready`/`pause`/`resume` в JS (`Aurobore._emit`) | ✅ |
 | Demo SPA (History API) + симуляция «назад» (V-14) | 🟡 |

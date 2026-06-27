@@ -54,10 +54,10 @@ FR-R1…R6. См. [architecture/runtime.md](architecture/runtime.md), [ADR-001](
 ## M2 — Bridge (поверх WebView API)
 FR-B1…B6. См. [architecture/bridge.md](architecture/bridge.md), [ADR-002](adr/ADR-002-bridge-model.md).
 
-- [ ] Тонкий шов транспорта **поверх** `sendAsyncMessage`/`onRecvAsyncMessage`/`runJavaScript`
+- [x] Тонкий шов транспорта **поверх** `sendAsyncMessage`/`onRecvAsyncMessage`/`runJavaScript`
       + loopback-двойник для тестов ([ADR-004](adr/ADR-004-webview-engine-abstraction.md)).
-- [ ] `invoke → Promise` с корреляцией по id; двунаправленные события; базовые стримы.
-- [ ] Структурированные ошибки (код/сообщение/данные) → reject; JSON-сериализация; проверка источника/разрешений.
+- [x] `invoke → Promise` с корреляцией по id; двунаправленные события; базовые стримы.
+- [x] Структурированные ошибки (код/сообщение/данные) → reject; JSON-сериализация; проверка источника/разрешений.
 
 ## M3 — Plugin System + Codegen + плагины MVP
 FR-P1…P5, FR-S1…S3. См. [plugins/plugin-api.md](plugins/plugin-api.md), [ADR-003](adr/ADR-003-plugin-api.md), [ADR-008](adr/ADR-008-typescript-sdk-codegen.md).

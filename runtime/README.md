@@ -6,7 +6,7 @@
 | Каталог               | Назначение                                                                                    |
 | --------------------- | --------------------------------------------------------------------------------------------- |
 | `container/`          | ✅ M1: шаблон нативного контейнера (ApplicationWindow, WebView, lifecycle, splash, asset loader `aurobore-app://`). |
-| `bridge-native/`      | Native-сторона моста (валидация, маршрутизация, ошибки) — M2.                                 |
+| `bridge-native/`      | ✅ M2: native-сторона моста (BridgeRouter, Echo stub).                                       |
 | `transport/cef/`      | Целевая реализация транспорта на CEF (`CefMessageRouter`/`cefQuery`) — M2.                    |
 | `transport/loopback/` | In-memory двойник транспорта для тестов — M2.                                                 |
 | `native-sdk/`         | Контракты/библиотека для авторов плагинов — M3.                                               |

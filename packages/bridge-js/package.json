@@ -18,8 +18,11 @@
   "dependencies": {
     "@aurobore/core": "workspace:*"
   },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && node scripts/bundle.mjs",
     "clean": "tsc -b --clean"
   }
 }

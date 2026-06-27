@@ -38,15 +38,18 @@ if ! pgrep -f ru.auroraos.aurobore-container >/dev/null 2>&1; then
   exit 1
 fi
 
-max_wait="${POC_RUN_WAIT_SEC:-60}"
+# Дождаться загрузки WebView и M2-проверок (stream ~1.2s после ready).
+sleep 8
+
+max_wait="${POC_RUN_WAIT_SEC:-90}"
 elapsed=0
 while [ "$elapsed" -lt "$max_wait" ]; do
-  if journalctl --no-pager -n 300 2>/dev/null | grep -q "M1 OK: aurobore-app loaded"; then
+  if journalctl --no-pager -n 80 --since "1 min ago" 2>/dev/null | grep -q "M2 OK: bridge invoke, events, stream verified"; then
     echo "=== LOG (tail) ==="
     tail -n 40 /tmp/container.log 2>/dev/null || true
     echo "=== JOURNAL (container) ==="
-    journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web" || true
-    echo "=== RESULT: M1 OK ==="
+    journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-bridge" || true
+    echo "=== RESULT: M2 OK ==="
     exit 0
   fi
   sleep 3
@@ -58,5 +61,5 @@ cat /tmp/container.log 2>/dev/null || true
 echo "=== LOG END ==="
 echo "=== JOURNAL (container) ==="
 journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web" || true
-echo "=== RESULT: M1 OK not found in journal within ${max_wait}s ==="
+echo "=== RESULT: M2 OK not found in journal within ${max_wait}s ==="
 exit 1

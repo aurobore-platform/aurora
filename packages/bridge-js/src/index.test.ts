@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { createInvoke, nextCallId } from "./index.js";
+import { createInvoke, nextCallId } from "./messages.js";
 
-describe("@aurobore/bridge-js", () => {
+describe("@aurobore/bridge-js messages", () => {
   it("nextCallId выдаёт уникальные id", () => {
     expect(nextCallId()).not.toBe(nextCallId());
   });

@@ -16,7 +16,9 @@
 
 #include "AppConfig.h"
 #include "AssetResolver.h"
+#include "AssetSchemeServer.h"
 #include "LifecycleBridge.h"
+#include "BridgeRouter.h"
 
 int main(int argc, char *argv[])
 {
@@ -46,17 +48,34 @@ int main(int argc, char *argv[])
     }
     assetResolver.setWebRoot(htmlRoot);
 
+    AssetSchemeServer assetServer;
+    QString entryUrl;
+    if (assetServer.start(&assetResolver)) {
+        entryUrl = assetServer.baseUrl() + QStringLiteral("/index.html");
+    } else {
+        entryUrl = QString::fromLatin1(Aurobore::AppConfig::kEntryUrl);
+        qWarning("[aurobore-container] AssetSchemeServer failed; fallback entry %s",
+                 qPrintable(entryUrl));
+    }
+
     LifecycleBridge lifecycleBridge;
+    BridgeRouter bridgeRouter;
     QObject::connect(
         application.data(), &QGuiApplication::applicationStateChanged,
         &lifecycleBridge, &LifecycleBridge::onApplicationStateChanged);
+    QObject::connect(
+        &lifecycleBridge, &LifecycleBridge::lifecycleEvent,
+        &bridgeRouter, [&bridgeRouter](const QString &event) {
+            bridgeRouter.emitEvent(event);
+        });
 
     auto *rootContext = view->rootContext();
     rootContext->setContextProperty(QStringLiteral("htmlRootPath"), htmlRoot);
     rootContext->setContextProperty(QStringLiteral("assetResolver"), &assetResolver);
+    rootContext->setContextProperty(QStringLiteral("assetServerOrigin"), assetServer.origin());
     rootContext->setContextProperty(QStringLiteral("lifecycleBridge"), &lifecycleBridge);
-    rootContext->setContextProperty(QStringLiteral("entryUrl"),
-                                    QString::fromLatin1(Aurobore::AppConfig::kEntryUrl));
+    rootContext->setContextProperty(QStringLiteral("bridgeRouter"), &bridgeRouter);
+    rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());
 

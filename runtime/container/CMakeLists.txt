@@ -11,7 +11,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/cef")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-find_package(Qt5 COMPONENTS Core Gui Qml Quick REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Qml Quick Network REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
@@ -21,7 +21,14 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/AppConfig.cpp
     src/AssetResolver.cpp
+    src/AssetSchemeServer.cpp
     src/LifecycleBridge.cpp
+    ../bridge-native/BridgeRouter.cpp
+    ../bridge-native/EchoPlugin.cpp
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../bridge-native
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -30,6 +37,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Gui
         Qt5::Qml
         Qt5::Quick
+        Qt5::Network
         PkgConfig::Auroraapp
         PkgConfig::AuroraWebView
 )

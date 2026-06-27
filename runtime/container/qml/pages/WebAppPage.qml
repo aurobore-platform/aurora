@@ -1,4 +1,4 @@
-// Aurobore M1 — fullscreen WebView + splash + asset loader + lifecycle.
+// Aurobore M1/M2 — fullscreen WebView + splash + asset loader + lifecycle + bridge.
 
 import QtQuick 2.6
 import Sailfish.Silica 1.0
@@ -13,7 +13,6 @@ Page {
 
     property bool splashVisible: true
     property bool webReady: false
-    property bool internalNavigation: false
 
     function hideSplash() {
         if (!splashVisible)
@@ -21,18 +20,17 @@ Page {
         splashVisible = false
         if (!webReady) {
             webReady = true
-            emitLifecycle("ready")
+            bridgeRouter.emitEvent("ready")
         }
     }
 
-    function emitLifecycle(event) {
-        var payload = JSON.stringify({ event: event })
+    function deliverBridgeMessage(message) {
+        var json = JSON.stringify(message)
         webView.runJavaScript(
-            "window.Aurobore && window.Aurobore._emit(" + JSON.stringify(event) + ")",
+            "globalThis.__auroboreBridgeReceive && globalThis.__auroboreBridgeReceive(" + json + ")",
             function () {},
-            function (err) { console.log("[aurobore-container] runJavaScript lifecycle error:", err) }
+            function (err) { console.log("[aurobore-container] bridge deliver error:", err) }
         )
-        console.log("[aurobore-container] lifecycle:", event)
     }
 
     function handleBackNavigation() {
@@ -41,7 +39,7 @@ Page {
             function (handled) {
                 if (!handled) {
                     console.log("[aurobore-container] back: default (no SPA history)")
-                    emitLifecycle("backbutton")
+                    bridgeRouter.emitEvent("backbutton")
                 }
             },
             function (err) { console.log("[aurobore-container] back navigation error:", err) }
@@ -49,12 +47,27 @@ Page {
         return true
     }
 
+    function isAllowedAppUrl(urlString) {
+        if (assetServerOrigin && assetServerOrigin.length > 0
+                && urlString.indexOf(assetServerOrigin) === 0) {
+            return true
+        }
+        if (urlString.indexOf("aurobore-app://") === 0) {
+            return assetResolver.isAllowedUrl(urlString)
+        }
+        return false
+    }
+
     Component.onCompleted: {
+        webView.addMessageListener("aurobore:bridge")
         webView.addMessageListener("aurobore:ready")
         webView.addMessageListener("aurobore:back")
+        webView.addMessageListener("aurobore:m2-ok")
+        bridgeRouter.trustedOrigin = true
         splashTimer.start()
         entryLoadTimer.start()
         console.log("[aurobore-container] htmlRootPath:", htmlRootPath)
+        console.log("[aurobore-container] assetServerOrigin:", assetServerOrigin)
         console.log("[aurobore-container] entry:", entryUrl)
     }
 
@@ -69,8 +82,8 @@ Page {
     }
 
     Connections {
-        target: lifecycleBridge
-        onLifecycleEvent: page.emitLifecycle(event)
+        target: bridgeRouter
+        onOutbound: page.deliverBridgeMessage(message)
     }
 
     Timer {
@@ -80,19 +93,6 @@ Page {
         onTriggered: {
             console.log("[aurobore-container] splash timeout fallback")
             page.hideSplash()
-        }
-    }
-
-    Timer {
-        id: navigateTimer
-        interval: 0
-        repeat: false
-        property string pendingUrl: ""
-        onTriggered: {
-            webView.url = pendingUrl
-            page.internalNavigation = false
-            pendingUrl = ""
-            pageLoadProbeTimer.start()
         }
     }
 
@@ -121,42 +121,38 @@ Page {
         TouchInput { enabled: true }
         KeyboardInput { enabled: true }
 
+        onLoadingChanged: {
+            if (!loading && webView.url.indexOf("127.0.0.1") !== -1)
+                pageLoadProbeTimer.start()
+        }
+
         LoadRequestExtension {
             id: loadRequestExtension
 
             enabled: true
-            nativeSchemeHandling: false
+            nativeSchemeHandling: true
 
             function beforeUrlLoad(url, userGesture, isRedirect) {
-                if (page.internalNavigation)
-                    return true
+                var urlString = url.url
 
-                if (url.scheme === "aurobore-app") {
-                    var localPath = assetResolver.toFilesystemPath(url.url)
-                    if (localPath.length === 0) {
-                        console.log("[aurobore-container] blocked aurobore-app:", url.url)
-                        return false
-                    }
-
-                    console.log("[aurobore-container] asset via aurobore-app:", url.url, "->", localPath)
-
-                    var pathStr = "" + localPath
-                    var fileUrl = assetResolver.toFileUrl(url.url)
-                    page.internalNavigation = true
-                    navigateTimer.pendingUrl = fileUrl
-                    navigateTimer.start()
-                    return false
-                }
-
-                if (url.scheme === "file") {
-                    var allowed = assetResolver.isAllowedFileUrl(url.url)
+                if (url.scheme === "http" || url.scheme === "https") {
+                    var allowed = page.isAllowedAppUrl(urlString)
                     if (!allowed)
-                        console.log("[aurobore-container] blocked file:", url.url)
+                        console.log("[aurobore-container] blocked external:", urlString)
                     return allowed
                 }
 
-                if (url.scheme === "http" || url.scheme === "https") {
-                    console.log("[aurobore-container] blocked external:", url.url)
+                if (url.scheme === "aurobore-app") {
+                    var ok = assetResolver.isAllowedUrl(urlString)
+                    if (!ok)
+                        console.log("[aurobore-container] blocked aurobore-app:", urlString)
+                    else
+                        console.log("[aurobore-container] allow aurobore-app:", urlString)
+                    return ok
+                }
+
+                if (url.scheme === "file") {
+                    console.log("[aurobore-container] blocked file:", urlString)
                     return false
                 }
 
@@ -165,15 +161,26 @@ Page {
         }
     }
 
-  Connections {
+    function parseBridgeData(raw) {
+        if (typeof raw === "string") {
+            try { return JSON.parse(raw) } catch (e) { return {} }
+        }
+        return raw
+    }
+
+    Connections {
         target: webView
         onRecvAsyncMessage: {
-            if (name === "aurobore:ready") {
+            if (name === "aurobore:bridge") {
+                bridgeRouter.handleMessage(parseBridgeData(data))
+            } else if (name === "aurobore:ready") {
                 console.log("[aurobore-container] web ready signal")
                 console.log("[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works")
                 page.hideSplash()
             } else if (name === "aurobore:back") {
                 page.handleBackNavigation()
+            } else if (name === "aurobore:m2-ok") {
+                console.log("[aurobore-container] M2 OK: bridge invoke, events, stream verified")
             }
         }
     }
