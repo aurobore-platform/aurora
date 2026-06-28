@@ -13,7 +13,8 @@
 pnpm install
 pnpm --filter @aurobore/cli build
 aurobore doctor
-aurobore create MyApp --template vanilla
+aurobore create MyApp --template vanilla   # новый проект
+# или для существующего Vue/Vite: cd my-app && aurobore init
 cd MyApp && pnpm install && pnpm build:web
 aurobore build && aurobore run
 ```

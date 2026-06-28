@@ -35,7 +35,8 @@
     "docs:build": "vitepress build docs",
     "docs:build:full": "cross-env DOCS_AUDIENCE=full vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "gen-api-reference": "pnpm --filter @aurobore/build build && node packages/build/scripts/gen-api-reference.mjs"
+    "gen-api-reference": "pnpm --filter @aurobore/build build && node packages/build/scripts/gen-api-reference.mjs",
+    "publish": "node scripts/check-npm-publish.mjs && pnpm build && pnpm changeset publish"
   },
   "repository": {
     "type": "git",

@@ -28,6 +28,7 @@ const generatedPluginItems: SidebarItem[] = [
 const tutorialsSidebar: SidebarItem[] = [
   { text: "Обзор", link: "/tutorials/" },
   { text: "Быстрый старт", link: "/tutorials/quick-start" },
+  { text: "Демо: Vue/Vite сайт", link: "/tutorials/demo-existing-app" },
   { text: "Использование плагинов", link: "/tutorials/using-plugins" },
   { text: "События и lifecycle", link: "/tutorials/events-and-lifecycle" },
 ];

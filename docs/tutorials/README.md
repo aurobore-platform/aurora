@@ -7,6 +7,7 @@
 | Туториал | Результат |
 |---|---|
 | [Быстрый старт](quick-start.md) | CLI → create → build → run на эмуляторе |
+| [Демо: свой Vue/Vite сайт](demo-existing-app.md) | npm CLI → init → dist → эмулятор (без клонирования репо) |
 | [Использование плагинов](using-plugins.md) | plugin add, typed imports, обработка ошибок |
 | [События и lifecycle](events-and-lifecycle.md) | on/once, стримы, aurobore:ready |
 

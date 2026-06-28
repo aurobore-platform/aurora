@@ -14,17 +14,19 @@
 
 ## 1. Установка CLI
 
-Из корня монорепо Aurobore:
+**Из npm** (для приложений и демо — рекомендуется):
+
+```bash
+npm install -g @aurobore/cli
+aurobore doctor
+```
+
+**Из монорепо** (разработка платформы Aurobore):
 
 ```bash
 pnpm install
 pnpm --filter @aurobore/cli build
 pnpm link --global
-```
-
-Проверка окружения:
-
-```bash
 aurobore doctor
 ```
 
@@ -38,6 +40,31 @@ pnpm install
 
 Шаблон `vanilla` — TypeScript + `@aurobore/core` + typed plugin imports.
 Для минимального plain JS используйте `--template minimal`.
+
+### Существующий проект (Vue / Vite / свой сборщик)
+
+Подробная инструкция: **[demo-existing-app.md](demo-existing-app.md)**.
+
+Кратко — **`aurobore init`** вместо `create`: создаст `aurobore.config.json`, скрипты в `package.json`
+и `.aurobore/` в `.gitignore`:
+
+```bash
+cd my-vue-app
+aurobore init          # интерактивно
+# или без вопросов:
+aurobore init -y --id ru.example.myvue --name "My Vue App"
+```
+
+Затем соберите web как обычно и упакуйте в RPM:
+
+```bash
+pnpm build             # vite build → dist/
+pnpm build:aurora      # web + aurobore build (скрипт добавляет init)
+pnpm aurora:run
+```
+
+Для Vite проверьте `base: '/'` в `vite.config` (не путь вида `/repo-name/`).
+Aurobore не заменяет ваш сборщик — он только упаковывает каталог `web.root` (по умолчанию `dist`).
 
 ## 3. Сборка web-части
 

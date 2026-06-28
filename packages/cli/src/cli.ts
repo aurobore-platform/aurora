@@ -5,6 +5,7 @@ import { runBuildCommand } from "./commands/build.js";
 import { runConfigCommand } from "./commands/config.js";
 import { runRunCommand } from "./commands/run.js";
 import { runCreateCommand } from "./commands/create.js";
+import { runInitCommand } from "./commands/init.js";
 import { runDevCommand } from "./commands/dev.js";
 import { runPluginCommand } from "./commands/plugin.js";
 import { runGenerateCommand, runCleanCommand } from "./commands/clean.js";
@@ -13,6 +14,7 @@ import { formatReport, runDoctor } from "./doctor.js";
 
 const COMMANDS = [
   "create",
+  "init",
   "dev",
   "build",
   "run",
@@ -33,6 +35,7 @@ function printUsage(): void {
       "",
       "Команды:",
       "  create <name>     Создать проект из шаблона",
+      "  init              Подключить существующий web-проект",
       "  dev               Dev server + live reload",
       "  build             Собрать RPM-пакет",
       "  run               Установить и запустить на эмуляторе",
@@ -75,6 +78,9 @@ async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
       break;
     case "create":
       exitCode = runCreateCommand(rest);
+      break;
+    case "init":
+      exitCode = await runInitCommand(rest);
       break;
     case "dev":
       exitCode = await runDevCommand(rest);
