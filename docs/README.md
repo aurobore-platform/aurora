@@ -5,7 +5,20 @@
 > с доступом к нативным возможностям системы через типизированный мост и систему плагинов.
 > Аналог Cordova / Capacitor / Tauri, спроектированный с учётом особенностей Аврора (Qt/QML + C++).
 
-Документация описывает архитектуру и **операционные гайды** для разработки в монорепо (см. [dev/](dev/README.md)).
+Документация описывает архитектуру, **операционные гайды** для разработки в монорепо (см. [dev/](dev/README.md)) и **туториалы для авторов приложений** (см. [tutorials/](tutorials/README.md)).
+
+---
+
+## Для разработчиков приложений
+
+| Документ | Назначение |
+|---|---|
+| [tutorials/quick-start.md](tutorials/quick-start.md) | Установка CLI, create, build, run |
+| [tutorials/using-plugins.md](tutorials/using-plugins.md) | Плагины, импорты, ошибки |
+| [tutorials/events-and-lifecycle.md](tutorials/events-and-lifecycle.md) | События, стримы, lifecycle |
+| [api/README.md](api/README.md) | Справочник `@aurobore/core` и CLI |
+
+Пример: [`examples/hello-world/`](../examples/hello-world/).
 
 ---
 
@@ -81,7 +94,8 @@
 |---|---|
 | [adr/](adr/README.md) | Architecture Decision Records — зафиксированные решения |
 | [rfc/](rfc/README.md) | Request for Comments — предложения, ещё не принятые |
-| [tutorials/](tutorials/README.md) | Будущие практические руководства (план) |
+| [tutorials/](tutorials/README.md) | Практические руководства для разработчиков приложений |
+| [api/](api/README.md) | Справочник публичного SDK (MVP) |
 
 ---
 

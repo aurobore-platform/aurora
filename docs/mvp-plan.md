@@ -164,11 +164,11 @@ FR-S1…S3, FR-D1…D2.
 
 
 
-- [ ] `@aurobore/core`: публичный SDK-фасад для приложений (протокол/ошибки — M2, plugin wrappers — M3, lifecycle/events API — M5).
+- [x] `@aurobore/core`: публичный SDK-фасад для приложений (протокол/ошибки — M2, plugin wrappers — M3, lifecycle/events API — M5).
 
-- [ ] Шаблон `vanilla` + рабочий пример (`hello-world`/эхо-мост).
+- [x] Шаблон `vanilla` + рабочий пример (`hello-world`/эхо-мост).
 
-- [ ] Доки: быстрый старт, написание плагина, базовый API.
+- [x] Доки: быстрый старт, написание плагина, базовый API.
 
 
 

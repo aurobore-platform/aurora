@@ -10,5 +10,8 @@
       "types": "./generated/index.d.ts",
       "import": "./generated/index.js"
     }
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*"
   }
 }

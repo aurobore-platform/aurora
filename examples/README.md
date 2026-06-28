@@ -2,6 +2,5 @@
 
 | Пример | Назначение |
 |---|---|
-| `hello-world-stub/` | M4 фикстура для `aurobore build` / `aurobore run` |
-
-Полноценный `hello-world` с документацией — **M5**.
+| `hello-world/` | Полный walkthrough: Echo, lifecycle, Device, SDK-импорты |
+| `hello-world-stub/` | M4 фикстура для `aurobore build` / `aurobore run` (минимальный HTML) |

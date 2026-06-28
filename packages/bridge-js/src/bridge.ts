@@ -115,6 +115,15 @@ export class Bridge {
     this.eventHandlers.get(name)?.delete(handler);
   }
 
+  /** Одноразовая подписка на событие. */
+  once(name: string, handler: (data: unknown) => void): () => void {
+    const wrapped = (data: unknown): void => {
+      this.off(name, wrapped);
+      handler(data);
+    };
+    return this.on(name, wrapped);
+  }
+
   /** Эмит события JS→native. */
   emit(name: string, data?: unknown): void {
     try {

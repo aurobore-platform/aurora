@@ -6,14 +6,14 @@ import { flagBool, flagString, type ParsedArgs } from "../args.js";
 export function runCreateCommand(args: ParsedArgs): number {
   const name = args.positional[0];
   if (flagBool(args.flags, "help") || !name) {
-    console.log(`aurobore create <name> [--dir .] [--template minimal]
+    console.log(`aurobore create <name> [--dir .] [--template vanilla|minimal]
 
-Создаёт проект из шаблона templates/minimal.`);
+Создаёт проект из шаблона templates/vanilla (по умолчанию) или templates/minimal.`);
     return name ? 0 : 1;
   }
 
   const targetDir = path.resolve(flagString(args.flags, "dir") ?? name);
-  const template = flagString(args.flags, "template") ?? "minimal";
+  const template = flagString(args.flags, "template") ?? "vanilla";
 
   if (fs.existsSync(targetDir) && fs.readdirSync(targetDir).length > 0) {
     console.error(`[create] каталог не пуст: ${targetDir}`);

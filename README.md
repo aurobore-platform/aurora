@@ -4,8 +4,22 @@
 > (HTML/CSS/JS/TS) с доступом к нативным возможностям через типизированный мост и систему плагинов.
 > Аналог Cordova / Capacitor / Tauri, спроектированный с учётом особенностей Аврора (Qt/QML + C++).
 
-**Статус: этап проектирования.** Код пока не пишется — сначала фундамент-архитектура.
-Вся документация находится в каталоге [`docs/`](docs/README.md).
+**Статус: MVP (M0–M5).** Платформа включает runtime, мост, плагины, CLI, SDK и шаблоны.
+Документация — в [`docs/`](docs/README.md).
+
+## Быстрый старт
+
+```bash
+pnpm install
+pnpm --filter @aurobore/cli build
+aurobore doctor
+aurobore create MyApp --template vanilla
+cd MyApp && pnpm install && pnpm build:web
+aurobore build && aurobore run
+```
+
+Подробнее: [docs/tutorials/quick-start.md](docs/tutorials/quick-start.md).
+Пример: [`examples/hello-world/`](examples/hello-world/).
 
 ## С чего начать
 
@@ -20,8 +34,7 @@
 
 ## Требования к окружению разработчика
 
-> **Сейчас (этап Design) кода нет** — для работы с документацией достаточно **редактора + Git**.
-> Список ниже понадобится с началом реализации (MVP) и для сборки/запуска под ОС Аврора.
+> Для сборки и запуска под ОС Аврора нужны Node.js 20 LTS, pnpm, Аврора SDK (mb2), эмулятор и сертификаты подписи.
 > Подробности: [docs/aurora/sdk-overview.md](docs/aurora/sdk-overview.md),
 > [docs/aurora/build-and-packaging.md](docs/aurora/build-and-packaging.md).
 
@@ -56,6 +69,5 @@
 
 ### По приоритету
 
-1. **Сейчас (Design):** редактор + Git.
-2. **Старт реализации (MVP):** + Node.js (LTS) + pnpm.
-3. **Сборка/запуск под Аврору:** + Аврора SDK (mb2) + эмулятор + сертификаты подписи (+ на Windows: Git Bash и режим разработчика).
+1. **Разработка приложений:** Node.js (LTS) + pnpm + `aurobore` CLI.
+2. **Сборка/запуск под Аврору:** + Аврора SDK (mb2) + эмулятор + сертификаты подписи (+ на Windows: Git Bash и режим разработчика).

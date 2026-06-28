@@ -119,6 +119,14 @@
     off(name, handler) {
       this.eventHandlers.get(name)?.delete(handler);
     }
+    /** Одноразовая подписка на событие. */
+    once(name, handler) {
+      const wrapped = (data) => {
+        this.off(name, wrapped);
+        handler(data);
+      };
+      return this.on(name, wrapped);
+    }
     /** Эмит события JS→native. */
     emit(name, data) {
       try {
@@ -271,7 +279,9 @@
     invoke: (plugin, method, args, options) => bridge.invoke(plugin, method, args, options),
     on: (name, handler) => bridge.on(name, handler),
     off: (name, handler) => bridge.off(name, handler),
-    emit: (name, data) => bridge.emit(name, data)
+    once: (name, handler) => bridge.once(name, handler),
+    emit: (name, data) => bridge.emit(name, data),
+    __protocolVersion: BRIDGE_PROTOCOL_VERSION
   };
   console.log("[aurobore-bridge] M2 bridge initialized");
 })();

@@ -5,5 +5,14 @@
   "type": "module",
   "description": "Clipboard plugin for Aurobore",
   "license": "MIT",
-  "files": ["plugin.manifest", "generated/"]
+  "files": ["plugin.manifest", "generated/"],
+  "exports": {
+    ".": {
+      "types": "./generated/index.d.ts",
+      "import": "./generated/index.js"
+    }
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*"
+  }
 }

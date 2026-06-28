@@ -1,6 +1,7 @@
 /**
  * IIFE-бандл для runtime/container: window.Aurobore = { invoke, on, emit, off }.
  */
+import { BRIDGE_PROTOCOL_VERSION } from "@aurobore/core";
 import { Bridge } from "./bridge.js";
 import { WebViewTransport } from "./transport/webview.js";
 
@@ -12,7 +13,9 @@ declare global {
       invoke: Bridge["invoke"];
       on: Bridge["on"];
       off: Bridge["off"];
+      once: Bridge["once"];
       emit: Bridge["emit"];
+      __protocolVersion: number;
     };
   }
 }
@@ -21,7 +24,9 @@ window.Aurobore = {
   invoke: (plugin, method, args, options) => bridge.invoke(plugin, method, args, options),
   on: (name, handler) => bridge.on(name, handler),
   off: (name, handler) => bridge.off(name, handler),
+  once: (name, handler) => bridge.once(name, handler),
   emit: (name, data) => bridge.emit(name, data),
+  __protocolVersion: BRIDGE_PROTOCOL_VERSION,
 };
 
 console.log("[aurobore-bridge] M2 bridge initialized");

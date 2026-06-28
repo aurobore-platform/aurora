@@ -1,17 +1,18 @@
 // @generated — do not edit
 /** @typedef {import('./index.d.ts').Echo} EchoApi */
+import { getAurobore } from "@aurobore/core";
 
 export const Echo = {
   ping(args) {
-    return globalThis.Aurobore.invoke("Echo", "ping", args ?? {});
+    return getAurobore().invoke("Echo", "ping", args ?? {});
   },
   echo(args) {
-    return globalThis.Aurobore.invoke("Echo", "echo", args ?? {});
+    return getAurobore().invoke("Echo", "echo", args ?? {});
   },
   fail(args) {
-    return globalThis.Aurobore.invoke("Echo", "fail", args ?? {});
+    return getAurobore().invoke("Echo", "fail", args ?? {});
   },
   watchTicks(args) {
-    return globalThis.Aurobore.invoke("Echo", "watchTicks", args ?? {}, { stream: true });
+    return getAurobore().invoke("Echo", "watchTicks", args ?? {}, { stream: true });
   },
 };

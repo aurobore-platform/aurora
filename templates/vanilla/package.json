@@ -1,0 +1,19 @@
+{
+  "name": "aurobore-template-vanilla",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Vanilla TypeScript Aurobore project template",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/device": "workspace:*",
+    "@aurobore/echo": "workspace:*"
+  },
+  "devDependencies": {
+    "@aurobore/build": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}

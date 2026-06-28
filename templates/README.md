@@ -1,9 +1,13 @@
 # templates/ — шаблоны для `aurobore create`
 
-Минимальные рабочие каркасы проектов. MVP: `minimal` (M4).
+Рабочие каркасы проектов.
 
 ```bash
-aurobore create MyApp --template minimal
+aurobore create MyApp --template vanilla   # TypeScript + SDK (рекомендуется)
+aurobore create MyApp --template minimal   # plain JS + globals
 ```
 
-Полноценный `vanilla` с расширенным SDK — **M5**.
+| Шаблон | Назначение |
+|---|---|
+| `vanilla` | TypeScript, `@aurobore/core`, typed plugin imports |
+| `minimal` | Минимальный plain JS без сборщика |

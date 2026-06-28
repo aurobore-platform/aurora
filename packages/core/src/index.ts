@@ -1,8 +1,8 @@
 /**
- * @aurobore/core — публичный SDK Aurobore (скелет M0).
+ * @aurobore/core — публичный SDK Aurobore.
  *
- * На этапе M2 пакет содержит контракты протокола и ошибок. Публичный SDK-фасад для приложений
- * (lifecycle/events API, plugin wrappers) — M3/M5; см. docs/mvp-plan.md.
+ * Протокол/ошибки моста (M2), plugin wrappers через @aurobore/<plugin> (M3),
+ * lifecycle/events API (M5).
  */
 
 export {
@@ -38,3 +38,32 @@ export type {
   StreamMessage,
   StreamPhase,
 } from "./protocol.js";
+
+export {
+  assertBridgeReady,
+  bindAurobore,
+  emit,
+  getAurobore,
+  invoke,
+  off,
+  on,
+  once,
+  type AuroboreBridge,
+  type InvokeOptions,
+  type StreamSubscription,
+} from "./aurobore.js";
+
+export {
+  AuroboreError,
+  CancelledError,
+  InvalidArgsError,
+  MethodNotFoundError,
+  PermissionDeniedError,
+  PluginNotFoundError,
+  ProtocolMismatchError,
+  TimeoutError,
+  isAuroboreError,
+  wrapBridgeError,
+} from "./errors.js";
+
+export { checkBridgeProtocol, type BridgeProtocolCheckResult } from "./compat.js";

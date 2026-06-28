@@ -1,0 +1,19 @@
+{
+  "name": "@aurobore/example-hello-world",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hello World example — Echo bridge, lifecycle, Device plugin",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/device": "workspace:*",
+    "@aurobore/echo": "workspace:*"
+  },
+  "devDependencies": {
+    "@aurobore/build": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}

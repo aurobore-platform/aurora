@@ -55,5 +55,27 @@ export default [
       },
     },
   },
+  {
+    files: [
+      "templates/**/src/ts/**/*.ts",
+      "examples/**/src/ts/**/*.ts",
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+  {
+    files: [
+      "templates/**/scripts/**/*.mjs",
+      "examples/**/scripts/**/*.mjs",
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
   prettier,
 ];

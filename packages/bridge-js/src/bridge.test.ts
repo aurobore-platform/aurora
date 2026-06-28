@@ -77,6 +77,17 @@ describe("Bridge (loopback)", () => {
     });
   });
 
+  it("once вызывает handler один раз", async () => {
+    const { bridge } = setup();
+    const received = vi.fn();
+    bridge.once("app:echo", received);
+    bridge.emit("app:demo", { n: 1 });
+    bridge.emit("app:demo", { n: 2 });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(received).toHaveBeenCalledTimes(1);
+    expect(received).toHaveBeenCalledWith({ n: 1 });
+  });
+
   it("invalid JSON args reject до отправки", async () => {
     const { bridge } = setup();
     const circular: Record<string, unknown> = {};

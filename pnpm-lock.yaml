@@ -42,6 +42,25 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.0)
 
+  examples/hello-world:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@aurobore/device':
+        specifier: workspace:*
+        version: link:../../plugins/device
+      '@aurobore/echo':
+        specifier: workspace:*
+        version: link:../../plugins/echo
+    devDependencies:
+      '@aurobore/build':
+        specifier: workspace:*
+        version: link:../../packages/build
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/bridge-js:
     dependencies:
       '@aurobore/core':
@@ -57,6 +76,9 @@ importers:
       '@aurobore/core':
         specifier: workspace:*
         version: link:../core
+      esbuild:
+        specifier: ^0.24.2
+        version: 0.24.2
 
   packages/cli:
     dependencies:
@@ -70,6 +92,63 @@ importers:
   packages/core: {}
 
   packages/create-aurobore: {}
+
+  plugins/clipboard:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  plugins/device:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  plugins/echo:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  plugins/filesystem:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  plugins/network:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  plugins/storage:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  templates/minimal: {}
+
+  templates/vanilla:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@aurobore/device':
+        specifier: workspace:*
+        version: link:../../plugins/device
+      '@aurobore/echo':
+        specifier: workspace:*
+        version: link:../../plugins/echo
+    devDependencies:
+      '@aurobore/build':
+        specifier: workspace:*
+        version: link:../../packages/build
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
 
 packages:
 

@@ -33,7 +33,7 @@
 - [x] Документ по каждому компоненту существует и актуален. → [`architecture/`](architecture/README.md).
 - [x] Plugin API и каталог плагинов описаны. → [plugins/plugin-api.md](plugins/plugin-api.md), [plugins/standard-plugins.md](plugins/standard-plugins.md).
 - [x] ADR/RFC ведутся; есть шаблоны. → [adr/](adr/README.md), [rfc/](rfc/README.md) (шаблоны ADR-000/RFC-000).
-- [x] Туториалы (быстрый старт, первый плагин, публикация) запланированы/написаны. → [tutorials/README.md](tutorials/README.md) (план).
+- [x] Туториалы (быстрый старт, первый плагин, публикация) запланированы/написаны. → [tutorials/README.md](tutorials/README.md) (MVP: quick-start, using-plugins, events-and-lifecycle).
 - [ ] Справочник API генерируется из манифестов (FR-D4). → проектно покрыто ([ADR-008](adr/ADR-008-typescript-sdk-codegen.md), [typescript-sdk.md](architecture/typescript-sdk.md)); **реализация — MVP/Beta**, поэтому не отмечено на Design.
 - [x] Допущения об Аврора помечены как подлежащие верификации. → [aurora/verification-status.md](aurora/verification-status.md), [aurora/sources.md](aurora/sources.md).
 
@@ -76,9 +76,9 @@
 - [ ] (SHOULD) plugin create, generate, publish, migrate.
 
 ## 8. SDK чек-лист
-- [ ] `@aurobore/core` публикует API, события, модель ошибок, типы.
-- [ ] Пакеты плагинов генерируются и типизированы.
-- [ ] Совместимость SDK ↔ протокол/Runtime проверяется.
+- [x] `@aurobore/core` публикует API, события, модель ошибок, типы.
+- [x] Пакеты плагинов генерируются и типизированы.
+- [x] Совместимость SDK ↔ протокол/Runtime проверяется (`checkBridgeProtocol`).
 - [ ] (SHOULD) адаптеры для React/Vue/Svelte.
 - [ ] Семантическое версионирование и changelog.
 

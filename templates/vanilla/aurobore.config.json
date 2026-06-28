@@ -1,0 +1,18 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.example.myapp",
+    "name": "My App",
+    "version": "1.0.0",
+    "orientation": "portrait"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "devServer": {
+      "port": 5173
+    }
+  },
+  "permissions": ["Internet"],
+  "plugins": ["@aurobore/echo", "@aurobore/device"]
+}
