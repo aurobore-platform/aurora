@@ -36,7 +36,7 @@ jobs:
 
       - name: Build docs
         env:
-          DOCS_PUBLIC: "1"
+          DOCS_AUDIENCE: human
           DOCS_BASE: /${{ github.event.repository.name }}/
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: pnpm docs:build

@@ -31,7 +31,9 @@
     "container:emulator": "node tools/aurora/poc.mjs emulator container",
     "container:all": "node tools/aurora/poc.mjs all container",
     "docs:dev": "vitepress dev docs",
+    "docs:dev:full": "cross-env DOCS_AUDIENCE=full vitepress dev docs",
     "docs:build": "vitepress build docs",
+    "docs:build:full": "cross-env DOCS_AUDIENCE=full vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "gen-api-reference": "pnpm --filter @aurobore/build build && node packages/build/scripts/gen-api-reference.mjs"
   },
@@ -41,6 +43,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
+    "cross-env": "^7.0.3",
     "@eslint/js": "^9.17.0",
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.18.0",

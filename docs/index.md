@@ -4,33 +4,30 @@ layout: home
 hero:
   name: Aurobore
   text: WebView-платформа для ОС Аврора
-  tagline: Открытая платформа для разработки приложений на HTML/CSS/JS с типизированным мостом и системой плагинов. Аналог Cordova / Capacitor, спроектированный под Qt/QML + C++.
+  tagline: Разрабатывайте приложения на HTML/CSS/JS с типизированным мостом и системой плагинов — аналог Cordova / Capacitor для ОС Аврора.
   actions:
     - theme: brand
-      text: Разработчик приложений
+      text: Быстрый старт
       link: /tutorials/quick-start
     - theme: alt
-      text: Автор плагина
-      link: /dev/native-plugin-guide
-    - theme: alt
-      text: Contributor
-      link: /architecture/
+      text: Справочник плагинов
+      link: /plugins/
 
 features:
-  - title: Tutorials & API
-    details: Быстрый старт, использование плагинов, справочник @aurobore/core и CLI.
+  - title: Tutorials
+    details: Установка CLI, создание проекта, build, run на эмуляторе. Плагины, события и lifecycle.
     link: /tutorials/
     linkText: Начать →
   - title: Плагины
     details: Справочник MVP-плагинов — методы, типы, события и коды ошибок.
     link: /plugins/
     linkText: Справочник →
-  - title: Архитектура & Aurora
-    details: Runtime, Bridge, сборка, ADR и выжимка официальной документации ОС Аврора.
-    link: /architecture/
-    linkText: Обзор →
+  - title: Aurora OS
+    details: Сборка и запуск на эмуляторе, песочница и разрешения приложения.
+    link: /aurora/app-development
+    linkText: Подробнее →
 ---
 
-## Полная карта
+## Исходники
 
-Все документы сгруппированы в [карте документации](/README) — рекомендуемый порядок чтения для новых участников проекта.
+Платформа с открытым кодом: [GitHub](https://github.com/aurobore/aurora).

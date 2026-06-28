@@ -1,4 +1,5 @@
 import type { DefaultTheme } from "vitepress";
+import type { DocsAudience } from "./audience";
 
 type SidebarItem = DefaultTheme.SidebarItem;
 
@@ -24,15 +25,33 @@ const generatedPluginItems: SidebarItem[] = [
   { text: "Network", link: "/api/plugins/network" },
 ];
 
+const tutorialsSidebar: SidebarItem[] = [
+  { text: "Обзор", link: "/tutorials/" },
+  { text: "Быстрый старт", link: "/tutorials/quick-start" },
+  { text: "Использование плагинов", link: "/tutorials/using-plugins" },
+  { text: "События и lifecycle", link: "/tutorials/events-and-lifecycle" },
+];
+
+const humanAuroraSidebar: SidebarItem[] = [
+  { text: "Разработка приложений", link: "/aurora/app-development" },
+  { text: "Песочница и разрешения", link: "/aurora/sandbox-and-permissions" },
+];
+
+const humanRootSidebar: SidebarItem[] = [
+  {
+    text: "Начало",
+    items: [
+      { text: "Быстрый старт", link: "/tutorials/quick-start" },
+      { text: "Справочник API", link: "/api/" },
+      { text: "Плагины", link: "/plugins/" },
+    ],
+  },
+];
+
 export const appSidebar: SidebarItem[] = [
   {
     text: "Tutorials",
-    items: [
-      { text: "Обзор", link: "/tutorials/" },
-      { text: "Быстрый старт", link: "/tutorials/quick-start" },
-      { text: "Использование плагинов", link: "/tutorials/using-plugins" },
-      { text: "События и lifecycle", link: "/tutorials/events-and-lifecycle" },
-    ],
+    items: tutorialsSidebar,
   },
   {
     text: "API Reference",
@@ -155,10 +174,18 @@ export function internalSidebar(repoUrl: string): SidebarItem[] {
   ];
 }
 
-export function buildSidebar(isPublic: boolean, repoUrl: string): DefaultTheme.Sidebar {
-  const rootSidebar = isPublic
-    ? projectSidebar
-    : [...projectSidebar, ...internalSidebar(repoUrl)];
+function buildHumanSidebar(): DefaultTheme.Sidebar {
+  return {
+    "/tutorials/": [{ text: "Tutorials", items: tutorialsSidebar }],
+    "/api/": [{ text: "API Reference", link: "/api/" }],
+    "/plugins/": [{ text: "Plugins", items: pluginItems }],
+    "/aurora/": [{ text: "Aurora OS", items: humanAuroraSidebar }],
+    "/": humanRootSidebar,
+  };
+}
+
+function buildFullSidebar(repoUrl: string): DefaultTheme.Sidebar {
+  const rootSidebar = [...projectSidebar, ...internalSidebar(repoUrl)];
 
   return {
     "/tutorials/": appSidebar,
@@ -173,4 +200,8 @@ export function buildSidebar(isPublic: boolean, repoUrl: string): DefaultTheme.S
     "/checklists": internalSidebar(repoUrl),
     "/": rootSidebar,
   };
+}
+
+export function buildSidebar(audience: DocsAudience, repoUrl: string): DefaultTheme.Sidebar {
+  return audience === "human" ? buildHumanSidebar() : buildFullSidebar(repoUrl);
 }

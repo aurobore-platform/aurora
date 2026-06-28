@@ -2,6 +2,12 @@ import { defineConfig } from "vitepress";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import {
+  FULL_README_INDEX_DIRS,
+  HUMAN_README_INDEX_DIRS,
+  HUMAN_SRC_EXCLUDE,
+  resolveAudience,
+} from "./audience";
 import { buildSidebar } from "./sidebar";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -23,34 +29,40 @@ function readRepoUrl(): string {
   }
 }
 
-const isPublic = process.env.DOCS_PUBLIC === "1";
+const audience = resolveAudience();
 const repoUrl =
   process.env.GITHUB_REPOSITORY != null
     ? `https://github.com/${process.env.GITHUB_REPOSITORY}`
     : readRepoUrl();
 
-const srcExclude = ["**/task.txt"];
-if (isPublic) {
-  srcExclude.push("agents/**", "checklists.md");
-}
+const srcExclude = audience === "human" ? [...HUMAN_SRC_EXCLUDE] : ["**/task.txt"];
 
-/** README.md в подпапках → index маршрут (/tutorials/, /plugins/, …). */
-const readmeIndexDirs = [
-  "tutorials",
-  "plugins",
-  "api",
-  "api/plugins",
-  "architecture",
-  "dev",
-  "adr",
-  "rfc",
-  "aurora",
-  "agents",
-] as const;
+const readmeIndexDirs =
+  audience === "human" ? HUMAN_README_INDEX_DIRS : FULL_README_INDEX_DIRS;
 
 const rewrites = Object.fromEntries(
   readmeIndexDirs.map((dir) => [`${dir}/README.md`, `${dir}/index.md`]),
 );
+
+const humanNav = [
+  { text: "Начало", link: "/tutorials/", activeMatch: "/tutorials/" },
+  { text: "API", link: "/api/", activeMatch: "/api/" },
+  { text: "Плагины", link: "/plugins/", activeMatch: "/plugins/" },
+  {
+    text: "Aurora",
+    link: "/aurora/app-development",
+    activeMatch: "/aurora/",
+  },
+];
+
+const fullNav = [
+  { text: "Начало", link: "/tutorials/", activeMatch: "/tutorials/" },
+  { text: "API", link: "/api/", activeMatch: "/api/" },
+  { text: "Плагины", link: "/plugins/", activeMatch: "/plugins/" },
+  { text: "Архитектура", link: "/architecture/", activeMatch: "/architecture/" },
+  { text: "Aurora", link: "/aurora/", activeMatch: "/aurora/" },
+  { text: "Internal", link: "/agents/", activeMatch: "/agents/|/checklists" },
+];
 
 export default defineConfig({
   lang: "ru-RU",
@@ -68,18 +80,9 @@ export default defineConfig({
     siteTitle: "Aurobore",
     externalLinkIcon: true,
 
-    nav: [
-      { text: "Начало", link: "/tutorials/", activeMatch: "/tutorials/" },
-      { text: "API", link: "/api/", activeMatch: "/api/" },
-      { text: "Плагины", link: "/plugins/", activeMatch: "/plugins/" },
-      { text: "Архитектура", link: "/architecture/", activeMatch: "/architecture/" },
-      { text: "Aurora", link: "/aurora/", activeMatch: "/aurora/" },
-      ...(isPublic
-        ? []
-        : [{ text: "Internal", link: "/agents/", activeMatch: "/agents/|/checklists" }]),
-    ],
+    nav: audience === "human" ? humanNav : fullNav,
 
-    sidebar: buildSidebar(isPublic, repoUrl),
+    sidebar: buildSidebar(audience, repoUrl),
 
     search: {
       provider: "local",
