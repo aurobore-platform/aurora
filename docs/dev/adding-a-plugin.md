@@ -18,9 +18,17 @@
   "permissions": [],
   "methods": {
     "bar": { "args": {}, "result": "void" }
+  },
+  "errors": {
+    "FOO_BAR_FAILED": {
+      "message": "bar operation failed",
+      "description": "Когда и почему возникает — для документации и аудита"
+    }
   }
 }
 ```
+
+Каждый код в `errors` должен совпадать с `QStringLiteral("FOO_...")` в native `.cpp` (проверяется тестом `errors-audit.test.ts`).
 
 Проверка без эмулятора: `pnpm test` (пакет `@aurobore/build`, тесты manifest/codegen).
 

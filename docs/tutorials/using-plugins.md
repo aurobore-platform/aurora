@@ -38,11 +38,34 @@ const info = await Device.getInfo({});
 ## Разрешения
 
 Разрешения плагина должны быть в `permissions` конфига приложения.
-Список стандартных плагинов: [standard-plugins.md](../plugins/standard-plugins.md).
+Справочник плагинов: [plugins/README.md](../plugins/README.md).
 
 ## Обработка ошибок
 
+Коды ошибок объявлены в `plugin.manifest` каждого плагина (например `FILESYSTEM_INVALID_PATH`).
+Полные таблицы — на странице reference плагина.
+
 Ошибки моста оборачиваются в типизированные классы SDK:
+
+```typescript
+import { FileSystem } from "@aurobore/filesystem";
+import { isAuroboreError, wrapBridgeError } from "@aurobore/core";
+
+try {
+  await FileSystem.readText({ path: "../outside" });
+} catch (err) {
+  const error = isAuroboreError(err)
+    ? err
+    : wrapBridgeError(err as { code: string; message: string });
+
+  if (error.code === "FILESYSTEM_INVALID_PATH") {
+    // путь вне песочницы или содержит ..
+  }
+  console.error(error.code, error.message);
+}
+```
+
+Пример с Echo.fail и `PermissionDeniedError`:
 
 ```typescript
 import { Echo } from "@aurobore/echo";
@@ -72,6 +95,8 @@ try {
 | `@aurobore/filesystem` | FileSystem | Файловая система |
 | `@aurobore/clipboard` | Clipboard | Буфер обмена |
 | `@aurobore/network` | Network | Сетевой статус |
+
+Подробнее по каждому: [plugins/README.md](../plugins/README.md).
 
 ## Написание своего плагина
 

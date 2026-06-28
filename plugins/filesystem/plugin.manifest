@@ -18,5 +18,27 @@
     "mkdir": { "args": { "path": "string" }, "result": "void" },
     "delete": { "args": { "path": "string" }, "result": "void" },
     "list": { "args": { "path": "string" }, "result": "FsList" }
+  },
+  "errors": {
+    "FILESYSTEM_INVALID_PATH": {
+      "message": "Invalid or blocked path",
+      "description": "Пустой path или содержит `..`"
+    },
+    "FILESYSTEM_UNAVAILABLE": {
+      "message": "App data directory unavailable",
+      "description": "Не удалось получить или создать каталог AppDataLocation"
+    },
+    "FILESYSTEM_PERMISSION_DENIED": {
+      "message": "Path outside app data scope",
+      "description": "Разрешённый путь выходит за пределы песочницы appData"
+    },
+    "FILESYSTEM_NOT_FOUND": {
+      "message": "File or directory not found",
+      "description": "readText: файл не существует; list: каталог не существует"
+    },
+    "FILESYSTEM_IO_ERROR": {
+      "message": "Filesystem I/O error",
+      "description": "Ошибка чтения, записи, создания каталога или удаления"
+    }
   }
 }

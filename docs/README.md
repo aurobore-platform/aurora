@@ -17,6 +17,7 @@
 | [tutorials/using-plugins.md](tutorials/using-plugins.md) | Плагины, импорты, ошибки |
 | [tutorials/events-and-lifecycle.md](tutorials/events-and-lifecycle.md) | События, стримы, lifecycle |
 | [api/README.md](api/README.md) | Справочник `@aurobore/core` и CLI |
+| [plugins/README.md](plugins/README.md) | Справочник MVP-плагинов (методы, ошибки) |
 
 Пример: [`examples/hello-world/`](../examples/hello-world/).
 
@@ -76,6 +77,7 @@
 ### Плагины (`plugins/`)
 | Документ | Назначение |
 |---|---|
+| [plugins/README.md](plugins/README.md) | Справочник API MVP-плагинов (методы, ошибки) |
 | [plugins/plugin-api.md](plugins/plugin-api.md) | Архитектура Plugin API (что такое плагин, сущности, контракт) |
 | [plugins/standard-plugins.md](plugins/standard-plugins.md) | Каталог стандартных плагинов и их зоны ответственности |
 

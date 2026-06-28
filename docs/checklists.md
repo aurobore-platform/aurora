@@ -65,7 +65,7 @@
 - [ ] Проверка совместимости плагина при загрузке.
 - [ ] Native SDK предоставляет контракты методов/событий/стримов/ошибок.
 - [ ] Conformance-тесты для плагина проходят (FR-T1).
-- [ ] Документация и пример к плагину есть.
+- [ ] Документация и пример к плагину есть. → [plugins/README.md](plugins/README.md), [plugins/*.md](plugins/), [hello-world](../../examples/hello-world/).
 
 ## 7. CLI чек-лист
 - [ ] Команды create/dev/build/run/plugin/doctor работают (FR-C1…C6).

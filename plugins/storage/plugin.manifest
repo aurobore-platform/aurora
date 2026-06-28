@@ -15,5 +15,11 @@
     "remove": { "args": { "key": "string" }, "result": "void" },
     "keys": { "args": {}, "result": "StorageKeys" },
     "clear": { "args": {}, "result": "void" }
+  },
+  "errors": {
+    "STORAGE_INVALID_ARGS": {
+      "message": "key required",
+      "description": "Методы get, set, remove вызваны без непустого аргумента key"
+    }
   }
 }

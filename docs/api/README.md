@@ -67,6 +67,8 @@ import { Device } from "@aurobore/device";
 import { Echo } from "@aurobore/echo";
 ```
 
+**Справочник:** [plugins/README.md](../plugins/README.md) — методы, типы, события, коды ошибок (`FILESYSTEM_*`, `STORAGE_*`, …).
+
 Каталог: [standard-plugins.md](../plugins/standard-plugins.md).
 Контракт плагина: [plugin-api.md](../plugins/plugin-api.md).
 

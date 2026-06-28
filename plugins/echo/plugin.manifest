@@ -13,5 +13,11 @@
     "echo": { "args": "object", "result": "object" },
     "fail": { "args": {}, "result": "void" },
     "watchTicks": { "args": {}, "result": "void", "stream": true }
+  },
+  "errors": {
+    "ECHO_TEST_ERROR": {
+      "message": "demo error",
+      "description": "Метод fail() — conformance-stub для проверки reject в приложении"
+    }
   }
 }

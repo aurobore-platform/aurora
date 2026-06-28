@@ -11,5 +11,11 @@
   "methods": {
     "copy": { "args": { "text": "string" }, "result": "void" },
     "paste": { "args": {}, "result": "ClipboardText" }
+  },
+  "errors": {
+    "CLIPBOARD_UNAVAILABLE": {
+      "message": "Clipboard not available",
+      "description": "QClipboard недоступен в текущем окружении (headless, ранний старт)"
+    }
   }
 }
