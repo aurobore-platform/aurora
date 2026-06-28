@@ -72,7 +72,7 @@
 - [ ] Понятные ошибки и подсказки; `doctor` даёт actionable-советы (NFR-6).
 - [ ] Валидация конфига на каждом запуске.
 - [ ] dev: live reload (и hot reload на Alpha+).
-- [ ] plugin add/remove/list корректно меняют артефакты без ручной правки.
+- [x] plugin add/remove/list корректно меняют артефакты без ручной правки.
 - [ ] (SHOULD) plugin create, generate, publish, migrate.
 
 ## 8. SDK чек-лист

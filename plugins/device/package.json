@@ -1,0 +1,9 @@
+{
+  "name": "@aurobore/device",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Device plugin for Aurobore",
+  "license": "MIT",
+  "files": ["plugin.manifest", "generated/"]
+}
