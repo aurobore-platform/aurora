@@ -4,6 +4,7 @@
  * Кросс-платформенный оркестратор; конфиг — tools/aurora/local.env (см. local.env.example).
  */
 import { spawn, spawnSync } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import net from "node:net";
 import os from "node:os";
@@ -12,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
+const CODEGEN_STAMP_FILE = path.join(REPO_ROOT, ".codegen-plugins.stamp");
 
 /** @type {Record<string, { source: string; rpmGlob: string; runScript: string; deployRpmName: string; stagingName: string }>} */
 const PROJECTS = {
@@ -231,7 +233,61 @@ function cmdSync() {
   }
 }
 
+function collectCodegenInputFiles() {
+  /** @type {string[]} */
+  const files = [];
+  const buildSrc = path.join(REPO_ROOT, "packages", "build", "src");
+  for (const sub of ["codegen", "manifest"]) {
+    const dir = path.join(buildSrc, sub);
+    if (!fs.existsSync(dir)) continue;
+    for (const entry of fs.readdirSync(dir, { recursive: true })) {
+      const name = String(entry);
+      const full = path.join(dir, name);
+      if (fs.statSync(full).isFile()) files.push(full);
+    }
+  }
+  const codegenScript = path.join(REPO_ROOT, "packages", "build", "scripts", "codegen-plugins.mjs");
+  if (fs.existsSync(codegenScript)) files.push(codegenScript);
+
+  const pluginsDir = path.join(REPO_ROOT, "plugins");
+  if (fs.existsSync(pluginsDir)) {
+    for (const ent of fs.readdirSync(pluginsDir, { withFileTypes: true })) {
+      if (!ent.isDirectory()) continue;
+      const manifest = path.join(pluginsDir, ent.name, "plugin.manifest");
+      if (fs.existsSync(manifest)) files.push(manifest);
+    }
+  }
+  return files.sort();
+}
+
+function codegenFingerprint() {
+  const hash = crypto.createHash("sha256");
+  for (const file of collectCodegenInputFiles()) {
+    const st = fs.statSync(file);
+    hash.update(path.relative(REPO_ROOT, file).replace(/\\/g, "/"));
+    hash.update(String(st.mtimeMs));
+    hash.update(String(st.size));
+  }
+  return hash.digest("hex");
+}
+
+function readCodegenStamp() {
+  if (!fs.existsSync(CODEGEN_STAMP_FILE)) return null;
+  return fs.readFileSync(CODEGEN_STAMP_FILE, "utf8").trim();
+}
+
+function writeCodegenStamp(fingerprint) {
+  fs.writeFileSync(CODEGEN_STAMP_FILE, `${fingerprint}\n`, "utf8");
+}
+
 function runCodegenPlugins() {
+  const fingerprint = codegenFingerprint();
+  const saved = readCodegenStamp();
+  if (saved === fingerprint) {
+    log("codegen: skip (unchanged)");
+    return;
+  }
+
   log("codegen: plugins");
   const res = spawnSync("pnpm", ["codegen:plugins"], {
     cwd: REPO_ROOT,
@@ -242,6 +298,7 @@ function runCodegenPlugins() {
   if (res.status !== 0) {
     fail(`codegen:plugins завершился с кодом ${res.status}`);
   }
+  writeCodegenStamp(fingerprint);
 }
 
 function cmdBuild() {

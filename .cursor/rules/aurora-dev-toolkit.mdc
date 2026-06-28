@@ -1,12 +1,14 @@
 ---
 description: Сборка и прогон PoC/нативного runtime на эмуляторе Aurora (M0.5 dev-toolkit)
-globs: runtime/**,tools/aurora/**
+globs: runtime/**,tools/aurora/**,plugins/**
 alwaysApply: false
 ---
 
-# Aurora dev-toolkit (PoC / M1 container / эмулятор)
+# Aurora dev-toolkit (PoC / M1–M3 container / эмулятор)
 
 Продуктового `aurobore build/run` ещё нет (M4). Для проверки нативного кода используй **dev-toolkit**, не ручной robocopy/sfdk/scp.
+
+Операционный гайд M3: `docs/dev/native-plugin-guide.md`. Чеклист нового плагина: `docs/dev/adding-a-plugin.md`.
 
 ## Команды (из корня репо)
 
@@ -21,37 +23,46 @@ pnpm poc:all       # build → deploy → run (полная проверка)
 pnpm poc:emulator  # только поднять/дождаться эмулятор
 ```
 
-### M1 container
+### Container (M1/M2/M3)
 
 ```powershell
+pnpm codegen:plugins          # вручную при смене manifest/генератора
 pnpm container:sync | build | deploy | run | emulator | all
 ```
+
+`container:build` вызывает codegen автоматически (пропуск, если fingerprint в `.codegen-plugins.stamp` не изменился).
 
 Эквивалент: `node tools/aurora/poc.mjs <команда> [poc-bridge|container]`. Подробности: `tools/aurora/README.md`.
 
 ## Обязательно для агента
 
 - **Не** вызывай `sfdk build` из `runtime/poc-bridge` на Windows — Docker build engine не видит пути вне `%USERPROFILE%` и `C:\AuroraOS`. Оркестратор сам sync-ит в staging.
-- **Не** дублируй robocopy/scp/ssh/rpm вручную, если задача — проверить PoC; используй `pnpm poc:*`.
+- **Не** дублируй robocopy/scp/ssh/rpm вручную, если задача — проверить PoC; используй `pnpm poc:*` / `pnpm container:*`.
 - Перед первым прогоном убедись, что есть `tools/aurora/local.env` (копия из `local.env.example`). Defaults SDK подставляются автоматически на типичной установке.
 - Эмулятор: оркестратор сам проверяет SSH на `:2223` и при необходимости запускает `sfdk emulator start`.
 - `LD_LIBRARY_PATH=/usr/lib/cef` уже в `tools/aurora/run-poc.sh` — не забывай его при любом **своем** ручном запуске.
+- При изменении `plugin.manifest` или `@aurobore/build` codegen: `pnpm codegen:plugins` (или `container:build`).
+- **Не** редактировать `generated/` и `PluginRegistry.*` вручную; **не** писать `new XxxPlugin` в registry — только factory `createXxxPlugin` в `.cpp` плагина.
+- Staging container: `%USERPROFILE%\aurobore-spike\` — siblings `aurobore-container`, `bridge-native`, `native-sdk`, `plugins`. CMake: `../plugins`, не `../../plugins`.
 
 ## Когда что запускать
 
 | Задача | Команда |
 |--------|---------|
 | Изменил C++/QML/html PoC, нужна полная проверка | `pnpm poc:all` |
-| Изменил `runtime/container` (M1) | `pnpm container:all` |
-| Только пересборка RPM | `pnpm poc:build` |
-| RPM уже собран, нужен деплой/запуск | `pnpm poc:deploy` / `pnpm poc:run` |
+| Изменил container / plugins / native-sdk | `pnpm container:build` или `container:all` |
+| Только manifest / генератор | `pnpm test` + `pnpm codegen:plugins` |
+| Только пересборка RPM | `pnpm container:build` |
+| RPM уже собран, нужен деплой/запуск | `pnpm container:deploy` / `pnpm container:run` |
 | Правишь сам `tools/aurora/poc.mjs` | тестируй затронутую подкоманду |
 | Только JS/TS монорепо | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm doctor` |
 
 ## Успех прогона
 
 - PoC: journal `[poc-native] PoC OK: round-trip подтверждён`
-- M1 container: journal `[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works`
+- Container M1: `[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works`
+- Container M2: `[aurobore-container] M2 OK: bridge invoke, events, stream verified`
+- Container M3: `[aurobore-container] M3 OK: plugins registered, Device + Storage verified`
 
 ## Отладка toolkit
 

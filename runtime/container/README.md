@@ -1,6 +1,8 @@
-# M1/M2: Aurobore runtime-контейнер
+# M1/M2/M3: Aurobore runtime-контейнер
 
 Нативный контейнер (C++/QML) для платформы Aurobore. Прогон: **SDK 5.2.1.200**.
+
+Операционный гайд по плагинам и staging: [docs/dev/native-plugin-guide.md](../../docs/dev/native-plugin-guide.md).
 
 ## Возможности M1
 
@@ -17,11 +19,22 @@
 
 | FR | Реализация |
 |---|---|
-| FR-B1…B4 | `@aurobore/bridge-js` invoke→Promise; `runtime/bridge-native/BridgeRouter` + Echo stub |
+| FR-B1…B4 | `@aurobore/bridge-js` invoke→Promise; `runtime/bridge-native/BridgeRouter` |
 | FR-B5 | События через `{type:"event"}`; lifecycle + `app:demo` ↔ `app:echo` |
 | FR-B6 | `Echo.watchTicks` stream (5 ticks @ 200ms) |
 
 Канал: `aurobore:bridge`. Сборка JS-бандла: `pnpm --filter @aurobore/bridge-js build`.
+
+## M3 Plugins (FR-P1…P5)
+
+| FR | Реализация |
+|---|---|
+| FR-P1 | `plugin.manifest` + валидация в `@aurobore/build` |
+| FR-P2/P4 | `PluginManager` + кодоген `PluginRegistry` |
+| FR-P3 | `aurobore-plugins.js` → `Aurobore.<Plugin>.<method>()`, `Aurobore.__plugins` |
+| FR-P5 | MVP: Device, Storage, FileSystem, Clipboard, Network + Echo |
+
+Кодоген: `pnpm codegen:plugins`. Плагины: `plugins/*/`, native SDK: `runtime/native-sdk/`.
 
 ## Сборка и запуск
 
@@ -31,32 +44,34 @@ pnpm container:all
 
 Отдельные шаги: `container:sync|build|deploy|run`. См. [tools/aurora/README.md](../../tools/aurora/README.md).
 
-Staging по умолчанию: `%USERPROFILE%\aurobore-spike\aurobore-container`.
+Staging по умолчанию: `%USERPROFILE%\aurobore-spike\aurobore-container` (+ siblings `bridge-native`, `native-sdk`, `plugins`).
 
 ## Успех прогона
 
-В journal эмулятора (M2):
-
-```
-[aurobore-container] M2 OK: bridge invoke, events, stream verified
-```
-
-Также сохраняется M1 marker:
+В journal эмулятора:
 
 ```
 [aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works
+[aurobore-container] M2 OK: bridge invoke, events, stream verified
+[aurobore-container] M3 OK: plugins registered, Device + Storage verified
 ```
+
+Также при старте: `[aurobore-plugin] registered <Name> v…`.
 
 ## Структура
 
 | Путь | Назначение |
 |---|---|
-| `src/main.cpp` | Bootstrap: `InitBrowser`, контекст QML |
+| `src/main.cpp` | Bootstrap: `InitBrowser`, PluginManager init, контекст QML |
 | `src/AssetResolver.*` | Маппинг `aurobore-app://` → файлы в `html/` |
 | `src/AssetSchemeServer.*` | Loopback HTTP (аналог Capacitor `https://localhost`); см. § Asset loader |
 | `src/LifecycleBridge.*` | pause/resume из `applicationStateChanged` |
-| `qml/pages/WebAppPage.qml` | WebView, splash, URL filtering |
-| `html/` | Self-test SPA |
+| `generated/PluginRegistry.*` | Кодоген: реестр плагинов (не редактировать) |
+| `../bridge-native/` | BridgeRouter (staging sibling) |
+| `../native-sdk/` | IPlugin, PluginManager |
+| `../plugins/` | Нативные реализации плагинов |
+| `qml/pages/WebAppPage.qml` | WebView, splash, URL filtering, `trustedOrigin` |
+| `html/` | Demo SPA + `aurobore-bridge.js` + `aurobore-plugins.js` |
 
 ## Источники паттернов
 
