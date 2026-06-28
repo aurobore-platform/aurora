@@ -3,7 +3,7 @@ Summary:    Aurobore M1 — минимальный runtime-контейнер (W
 Version:    0.1.0
 Release:    1
 License:    MIT
-URL:        https://github.com/aurobore/aurobore
+URL:        https://github.com/aurobore-platform/aurora
 Source0:    %{name}-%{version}.tar.bz2
 
 BuildRequires:  cmake

@@ -23,9 +23,9 @@ function readRepoUrl(): string {
     if (url.startsWith("git@github.com:")) {
       return `https://github.com/${url.slice("git@github.com:".length)}`;
     }
-    return url || "https://github.com/aurobore/aurora";
+    return url || "https://github.com/aurobore-platform/aurora";
   } catch {
-    return "https://github.com/aurobore/aurora";
+    return "https://github.com/aurobore-platform/aurora";
   }
 }
 

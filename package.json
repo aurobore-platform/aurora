@@ -39,7 +39,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aurobore/aurora.git"
+    "url": "https://github.com/aurobore-platform/aurora.git"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",

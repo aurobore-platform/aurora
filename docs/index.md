@@ -30,4 +30,4 @@ features:
 
 ## Исходники
 
-Платформа с открытым кодом: [GitHub](https://github.com/aurobore/aurora).
+Платформа с открытым кодом: [GitHub](https://github.com/aurobore-platform/aurora).
