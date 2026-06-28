@@ -24,6 +24,8 @@ import { FileSystem } from "@aurobore/filesystem";
 
 Типы и методы генерируются из `plugin.manifest` (ADR-008). Коды ошибок объявлены в манифесте как single source of truth.
 
+> **Автогенерируемая версия:** [api/plugins/](../api/plugins/) — из манифестов (`pnpm gen-api-reference`).
+
 ## Обработка ошибок
 
 Вызов метода плагина возвращает `Promise`. При ошибке Promise **reject** с объектом `BridgeError`:

@@ -34,3 +34,7 @@ Thumbs.db
 .env
 .env.local
 tools/aurora/local.env
+
+# VitePress
+docs/.vitepress/cache
+docs/.vitepress/dist

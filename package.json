@@ -29,7 +29,15 @@
     "container:deploy": "node tools/aurora/poc.mjs deploy container",
     "container:run": "node tools/aurora/poc.mjs run container",
     "container:emulator": "node tools/aurora/poc.mjs emulator container",
-    "container:all": "node tools/aurora/poc.mjs all container"
+    "container:all": "node tools/aurora/poc.mjs all container",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "gen-api-reference": "pnpm --filter @aurobore/build build && node packages/build/scripts/gen-api-reference.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aurobore/aurora.git"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
@@ -42,6 +50,7 @@
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
+    "vitepress": "^1.6.3",
     "vitest": "^2.1.8"
   }
 }

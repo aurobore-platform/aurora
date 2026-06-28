@@ -13,6 +13,8 @@ export default [
       "**/coverage/**",
       "**/*.d.ts",
       "runtime/**",
+      "docs/.vitepress/cache/**",
+      "docs/.vitepress/dist/**",
     ],
   },
   js.configs.recommended,
