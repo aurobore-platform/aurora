@@ -60,8 +60,7 @@ int main(int argc, char *argv[])
 
     LifecycleBridge lifecycleBridge;
     BridgeRouter bridgeRouter;
-    bridgeRouter.setGrantedPermissions(
-        QStringList() << QStringLiteral("Internet"));
+    bridgeRouter.setGrantedPermissions(Aurobore::AppConfig::grantedPermissions());
     if (!bridgeRouter.initializePlugins()) {
         qWarning("[aurobore-container] no plugins registered");
     }

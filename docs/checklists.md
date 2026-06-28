@@ -44,8 +44,9 @@
 - [x] Lifecycle-события прокидываются в JS (ready/pause/resume/backbutton/…).
 - [x] Навигация SPA + аппаратная «назад» обрабатываются (аппаратная — симуляция на SDK 5.2.1.200, V-14).
 - [x] Asset Loader: loopback HTTP origin (`http://127.0.0.1:<port>/`) + логический ключ `aurobore-app://localhost/…`; не `file://` для entry (V-13; см. [runtime/container/README.md](../runtime/container/README.md)).
-- [ ] Разрешения сопоставляются с конфигом; deep links обрабатываются (→ M3/M4).
-- [ ] Исключение в плагине не роняет Runtime (NFR-7).
+- [x] Разрешения сопоставляются с конфигом (`AppConfig::grantedPermissions()` ← `config/defaults.json`; см. [`runtime/container/src/AppConfig.cpp`](../runtime/container/src/AppConfig.cpp)).
+- [ ] Deep links обрабатываются (→ Alpha, FR-R8).
+- [x] Исключение в плагине не роняет Runtime (NFR-7): `PluginManager::dispatchInvoke` try/catch → `RUNTIME_PLUGIN_ERROR`.
 
 ## 5. Bridge чек-лист
 - [x] Формат сообщений (invoke/response/event/stream) и версия протокола зафиксированы.
@@ -58,20 +59,20 @@
 - [x] Транспорт на WebView async API + loopback для тестов; шов тонкий.
 
 ## 6. Plugin API чек-лист
-- [ ] Формат манифеста определён (методы/события/типы/разрешения/nativeDeps/compat).
-- [ ] Кодоген JS-обёртки и TS-типов из манифеста работает.
-- [ ] Статическая регистрация (build-time) + инициализация (runtime) описаны/реализованы.
+- [x] Формат манифеста определён (методы/события/типы/разрешения/nativeDeps/compat). → [`plugins/plugin-api.md`](plugins/plugin-api.md), [`packages/build/src/manifest/`](../packages/build/src/manifest/).
+- [x] Кодоген JS-обёртки и TS-типов из манифеста работает. → `pnpm codegen:plugins`, [`packages/build/src/codegen/`](../packages/build/src/codegen/).
+- [x] Статическая регистрация (build-time) + инициализация (runtime) описаны/реализованы. → [`architecture/plugin-loader.md`](architecture/plugin-loader.md), `PluginRegistry`.
 - [x] **Plugin Manager** на native вместо hardcode `Echo` в `BridgeRouter` (→ M3).
-- [ ] Проверка совместимости плагина при загрузке.
-- [ ] Native SDK предоставляет контракты методов/событий/стримов/ошибок.
-- [ ] Conformance-тесты для плагина проходят (FR-T1).
-- [ ] Документация и пример к плагину есть. → [plugins/README.md](plugins/README.md), [plugins/*.md](plugins/), [hello-world](../../examples/hello-world/).
+- [x] Проверка совместимости плагина при загрузке (`bridgeProtocol`, `checkPluginCompat` в CLI). → [`PluginManager.cpp`](../runtime/native-sdk/PluginManager.cpp), [`packages/build/src/plugins/resolve.ts`](../packages/build/src/plugins/resolve.ts).
+- [x] Native SDK предоставляет контракты методов/событий/стримов/ошибок. → [`runtime/native-sdk/README.md`](../runtime/native-sdk/README.md).
+- [ ] Conformance-тесты для плагина проходят (FR-T1). → Beta.
+- [x] Документация и пример к плагину есть. → [plugins/README.md](plugins/README.md), [plugins/*.md](plugins/), [hello-world](../../examples/hello-world/).
 
 ## 7. CLI чек-лист
-- [ ] Команды create/dev/build/run/plugin/doctor работают (FR-C1…C6).
-- [ ] Понятные ошибки и подсказки; `doctor` даёт actionable-советы (NFR-6).
-- [ ] Валидация конфига на каждом запуске.
-- [ ] dev: live reload (и hot reload на Alpha+).
+- [x] Команды create/dev/build/run/plugin/doctor работают (FR-C1…C6). → [`packages/cli/src/cli.ts`](../packages/cli/src/cli.ts).
+- [x] Понятные ошибки и подсказки; `doctor` даёт actionable-советы (NFR-6). → [`packages/cli/src/doctor.ts`](../packages/cli/src/doctor.ts).
+- [x] Валидация конфига на каждом запуске. → `loadConfig` / `config validate`.
+- [x] dev: live reload (и hot reload на Alpha+).
 - [x] plugin add/remove/list корректно меняют артефакты без ручной правки.
 - [ ] (SHOULD) plugin create, generate, publish, migrate.
 

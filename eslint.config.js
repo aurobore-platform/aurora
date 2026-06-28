@@ -56,10 +56,7 @@ export default [
     },
   },
   {
-    files: [
-      "templates/**/src/ts/**/*.ts",
-      "examples/**/src/ts/**/*.ts",
-    ],
+    files: ["templates/**/src/ts/**/*.ts", "examples/**/src/ts/**/*.ts"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -67,13 +64,27 @@ export default [
     },
   },
   {
-    files: [
-      "templates/**/scripts/**/*.mjs",
-      "examples/**/scripts/**/*.mjs",
-    ],
+    files: ["templates/**/scripts/**/*.mjs", "examples/**/scripts/**/*.mjs"],
     languageOptions: {
       globals: {
         ...globals.node,
+      },
+    },
+  },
+  {
+    files: ["tools/aurora/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
+    files: ["templates/**/src/js/**/*.js", "examples/**/src/js/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        Aurobore: "readonly",
       },
     },
   },

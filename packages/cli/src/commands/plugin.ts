@@ -1,11 +1,6 @@
 import process from "node:process";
-import {
-  addPlugin,
-  formatPluginList,
-  listPlugins,
-  removePlugin,
-} from "@aurobore/build";
-import { flagBool, flagString, type ParsedArgs } from "../args.js";
+import { addPlugin, formatPluginList, listPlugins, removePlugin } from "@aurobore/build";
+import { flagBool, type ParsedArgs } from "../args.js";
 
 export function runPluginCommand(args: ParsedArgs): number {
   const sub = args.positional[0];
@@ -35,7 +30,9 @@ export function runPluginCommand(args: ParsedArgs): number {
         const entry = addPlugin(projectRoot, name, {
           forceExternal: flagBool(args.flags, "external"),
         });
-        console.log(`[plugin] added ${entry.ref} (${entry.source}) v${entry.version} [${entry.status}]`);
+        console.log(
+          `[plugin] added ${entry.ref} (${entry.source}) v${entry.version} [${entry.status}]`,
+        );
         console.log("[plugin] run `aurobore build` to rebuild RPM");
         return 0;
       }

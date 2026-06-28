@@ -37,7 +37,7 @@
   ключевой техриск — мост на Авроре (V-1) — **закрыт** (API подтверждён офиц. демо, см.
   [aurora/webview.md](aurora/webview.md) §5, [aurora/verification-status.md](aurora/verification-status.md)).
 
-## Этап 2 — MVP 🟢 текущий
+## Этап 2 — MVP ✅ завершён (2026-06-28)
 Цель — сквозной путь «от веб-приложения до запуска на Аврора». Детальный план — [mvp-plan.md](mvp-plan.md).
 - **Runtime:** контейнер + WebView (целевой движок), bootstrap, splash, lifecycle, asset loader, навигация
   (FR-R1…R6).
@@ -50,9 +50,9 @@
   (FR-CF1…CF3, NFR-11).
 - **Docs:** быстрый старт, написание плагина, базовый API; 1 шаблон (vanilla) + 1 пример (FR-D1, FR-D2).
 - **NFR:** базовые производительность, безопасность, устойчивость, DX (NFR-1,2,6,7).
-- **Критерий выхода:** см. «Критерии приёмки MVP» в [requirements.md](requirements.md).
+- **Критерий выхода:** см. «Критерии приёмки MVP» в [requirements.md](requirements.md). Sign-off: permissions из `defaults.json`, NFR-7, lint, `pnpm container:all` (M1/M2/M3 OK).
 
-## Этап 3 — Alpha
+## Этап 3 — Alpha 🟢 текущий
 - **Bridge+:** стримы с backpressure, эффективная передача бинарных данных/ссылок на ресурсы (FR-B6…B8).
 - **Плагины+:** Camera, Geolocation, Notifications (local), Share, Sensors (FR-P6).
 - **CLI+:** dev с Hot Reload, plugin create (FR-C7, FR-C8).

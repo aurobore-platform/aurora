@@ -7,6 +7,8 @@
 
 #include <QtCore/QDebug>
 
+#include <exception>
+
 PluginManager::PluginManager(BridgeRouter *router, QObject *parent)
     : QObject(parent)
     , m_router(router)
@@ -84,53 +86,83 @@ QVariant PluginManager::permissionDenied(const QString &plugin, const QString &i
 QVariant PluginManager::dispatchInvoke(const QString &plugin, const QString &method,
                                          const QVariant &args, const QString &id, bool isStream)
 {
+    auto emitAndReturn = [this](const QVariant &response) -> QVariant {
+        if (response.isValid())
+            m_router->emitOutbound(response);
+        return response;
+    };
+
     IPlugin *instance = m_plugins.value(plugin, nullptr);
     if (!instance) {
-        return m_router->makeErrorResponse(id, QStringLiteral("BRIDGE_PLUGIN_NOT_FOUND"),
-                                         QStringLiteral("Unknown plugin: ") + plugin);
+        return emitAndReturn(m_router->makeErrorResponse(id, QStringLiteral("BRIDGE_PLUGIN_NOT_FOUND"),
+                                                         QStringLiteral("Unknown plugin: ") + plugin));
     }
 
     const PluginDescriptor descriptor = m_descriptors.value(plugin);
     if (!isMethodAllowed(descriptor, method)) {
-        return m_router->makeErrorResponse(id, QStringLiteral("BRIDGE_METHOD_NOT_FOUND"),
-                                           QStringLiteral("Unknown method: ") + method);
+        return emitAndReturn(m_router->makeErrorResponse(id, QStringLiteral("BRIDGE_METHOD_NOT_FOUND"),
+                                                         QStringLiteral("Unknown method: ") + method));
     }
 
     if (!hasRequiredPermissions(descriptor)) {
-        return permissionDenied(plugin, id);
+        return emitAndReturn(permissionDenied(plugin, id));
     }
 
-    const QVariant result = instance->invoke(method, args, id, isStream);
-    if (result.type() == QVariant::Map) {
-        const QVariantMap resultMap = result.toMap();
-        if (resultMap.contains(QStringLiteral("code"))
-            && resultMap.contains(QStringLiteral("message"))) {
-            return m_router->makeErrorResponse(
-                id,
-                resultMap.value(QStringLiteral("code")).toString(),
-                resultMap.value(QStringLiteral("message")).toString(),
-                resultMap.value(QStringLiteral("data")));
+    try {
+        const QVariant result = instance->invoke(method, args, id, isStream);
+        if (result.type() == QVariant::Map) {
+            const QVariantMap resultMap = result.toMap();
+            if (resultMap.contains(QStringLiteral("code"))
+                && resultMap.contains(QStringLiteral("message"))) {
+                return emitAndReturn(m_router->makeErrorResponse(
+                    id,
+                    resultMap.value(QStringLiteral("code")).toString(),
+                    resultMap.value(QStringLiteral("message")).toString(),
+                    resultMap.value(QStringLiteral("data"))));
+            }
         }
-    }
 
-    if (isStream && result.isNull()) {
+        if (isStream && result.isNull()) {
+            return QVariant();
+        }
+
+        if (result.isValid()) {
+            return emitAndReturn(m_router->makeOkResponse(id, result));
+        }
+
         return QVariant();
+    } catch (const std::exception &ex) {
+        qWarning("[aurobore-plugin] %s.%s exception: %s",
+                 qPrintable(plugin), qPrintable(method), ex.what());
+        return emitAndReturn(m_router->makeErrorResponse(
+            id,
+            QStringLiteral("RUNTIME_PLUGIN_ERROR"),
+            QString::fromUtf8(ex.what())));
+    } catch (...) {
+        qWarning("[aurobore-plugin] %s.%s unhandled exception",
+                 qPrintable(plugin), qPrintable(method));
+        return emitAndReturn(m_router->makeErrorResponse(
+            id,
+            QStringLiteral("RUNTIME_PLUGIN_ERROR"),
+            QStringLiteral("Unhandled native exception")));
     }
-
-    if (result.isValid()) {
-        const QVariant response = m_router->makeOkResponse(id, result);
-        m_router->emitOutbound(response);
-        return response;
-    }
-
-    return QVariant();
 }
 
 void PluginManager::dispatchCancel(const QString &plugin, const QString &id)
 {
     IPlugin *instance = m_plugins.value(plugin, nullptr);
-    if (instance)
+    if (!instance)
+        return;
+
+    try {
         instance->cancel(id);
+    } catch (const std::exception &ex) {
+        qWarning("[aurobore-plugin] %s cancel exception: %s",
+                 qPrintable(plugin), ex.what());
+    } catch (...) {
+        qWarning("[aurobore-plugin] %s cancel unhandled exception",
+                 qPrintable(plugin));
+    }
 }
 
 QStringList PluginManager::registeredPlugins() const

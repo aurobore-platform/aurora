@@ -3,7 +3,7 @@
  * Dev-toolkit PoC: sync → build → deploy → run (M0.5).
  * Thin wrapper над @aurobore/build; конфиг — tools/aurora/local.env
  */
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
@@ -131,7 +131,8 @@ async function main() {
 
   const build = await loadBuild();
   const env = build.loadAuroraEnv({ stagingName: projectCfg.stagingName });
-  env.POC_BUILD_DIR = env.POC_BUILD_DIR || path.join(os.homedir(), "aurobore-spike", projectCfg.stagingName);
+  env.POC_BUILD_DIR =
+    env.POC_BUILD_DIR || path.join(os.homedir(), "aurobore-spike", projectCfg.stagingName);
 
   if (cmd === "sync" || cmd === "build" || cmd === "all") {
     if (project === "container" && (cmd === "build" || cmd === "all")) {
