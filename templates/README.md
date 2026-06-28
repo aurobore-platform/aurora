@@ -1,4 +1,9 @@
-# templates/ — шаблоны для `create`
+# templates/ — шаблоны для `aurobore create`
 
-Минимальные рабочие каркасы проектов (`aurobore.config` + базовый веб-каркас). Реализуются в M5.
-MVP: `vanilla`.
+Минимальные рабочие каркасы проектов. MVP: `minimal` (M4).
+
+```bash
+aurobore create MyApp --template minimal
+```
+
+Полноценный `vanilla` с расширенным SDK — **M5**.

@@ -150,11 +150,11 @@ FR-C1…C6, FR-CF1…CF3. См. [architecture/cli.md](architecture/cli.md), [arc
 
 
 
-- [ ] `aurobore.config` + валидация.
+- [x] `aurobore.config` + валидация.
 
-- [ ] Детерминированная генерация нативного проекта: **CMake + `.spec` + `.desktop`** (разрешения из конфига).
+- [x] Детерминированная генерация нативного проекта: **CMake + `.spec` + `.desktop`** (разрешения из конфига).
 
-- [ ] Команды: `create`, `dev` (live reload), `build` (→ `mb2`/RPM + подпись), `run`, `plugin add/remove/list`, `doctor`.
+- [x] Команды: `create`, `dev` (live reload), `build` (→ `mb2`/RPM + подпись), `run`, `plugin add/remove/list`, `doctor`.
 
 
 

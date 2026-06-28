@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 /**
- * create-aurobore — генератор проектов (скелет M0).
- *
- * Полная реализация (копирование шаблона из templates/, заполнение aurobore.config) — в M5.
+ * create-aurobore — делегирует в aurobore create (M4).
  */
+import { spawnSync } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const cliPath = path.resolve(__dirname, "../../cli/dist/cli.js");
 
 export function main(argv: string[] = process.argv.slice(2)): void {
   const target = argv[0] ?? ".";
-  console.log(
-    `create-aurobore (скелет M0): создание проекта в "${target}" будет реализовано в M5.`,
-  );
+  const res = spawnSync(process.execPath, [cliPath, "create", target, ...argv.slice(1)], {
+    stdio: "inherit",
+  });
+  process.exit(res.status ?? 1);
 }
 
 main();

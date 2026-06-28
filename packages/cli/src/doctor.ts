@@ -1,18 +1,15 @@
-import { spawnSync } from "node:child_process";
 import process from "node:process";
-
-export type CheckStatus = "ok" | "warn" | "fail";
-
-export interface DoctorCheck {
-  name: string;
-  status: CheckStatus;
-  detail: string;
-}
-
-export interface DoctorReport {
-  checks: DoctorCheck[];
-  ok: boolean;
-}
+import {
+  findConfigFile,
+  findMonorepoRoot,
+  loadAuroraEnv,
+  loadConfig,
+  resolvePluginManifests,
+  validateConfig,
+} from "@aurobore/build";
+import fs from "node:fs";
+import { spawnSync } from "node:child_process";
+import type { CheckStatus, DoctorCheck, DoctorReport } from "./doctor-types.js";
 
 const MIN_NODE_MAJOR = 20;
 
@@ -43,7 +40,7 @@ function checkNode(): DoctorCheck {
   return {
     name: "Node.js",
     status: "fail",
-    detail: `v${process.versions.node}; требуется >= ${MIN_NODE_MAJOR} (см. README §требования)`,
+    detail: `v${process.versions.node}; требуется >= ${MIN_NODE_MAJOR}`,
   };
 }
 
@@ -55,7 +52,7 @@ function checkPnpm(): DoctorCheck {
   return {
     name: "pnpm",
     status: "fail",
-    detail: "не найден; включите через `corepack enable` (см. README §требования)",
+    detail: "не найден; включите через `corepack enable`",
   };
 }
 
@@ -71,15 +68,74 @@ function checkAuroraSdk(): DoctorCheck {
   return {
     name: "Aurora SDK (sfdk/mb2)",
     status: "warn",
-    detail:
-      "не найден на PATH; нужен для сборки/запуска под Аврору (см. docs/adr/ADR-007-packaging-build.md). " +
-      "На Windows запускайте из Git Bash.",
+    detail: "не найден на PATH; нужен для build/run под Аврору",
   };
 }
 
-/** Выполняет проверки окружения разработчика Aurobore (FR-C: команда `doctor`). */
-export function runDoctor(): DoctorReport {
-  const checks = [checkNode(), checkPnpm(), checkAuroraSdk()];
+function checkProjectConfig(cwd: string): DoctorCheck {
+  const configPath = findConfigFile(cwd);
+  if (!configPath) {
+    return {
+      name: "aurobore.config",
+      status: "warn",
+      detail: "не найден в текущем каталоге (нормально вне проекта приложения)",
+    };
+  }
+
+  try {
+    const raw = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const errors = validateConfig(raw);
+    if (errors.length > 0) {
+      return {
+        name: "aurobore.config",
+        status: "fail",
+        detail: errors.map((e) => `${e.path}: ${e.message}`).join("; "),
+      };
+    }
+
+    const { config } = loadConfig(cwd);
+    const pluginRefs = config.plugins ?? [];
+    if (pluginRefs.length === 0) {
+      return {
+        name: "aurobore.config",
+        status: "ok",
+        detail: `${config.app.id} — плагины не указаны (будет echo stub)`,
+      };
+    }
+
+    const monorepo = findMonorepoRoot(cwd) ?? undefined;
+    resolvePluginManifests(cwd, pluginRefs, monorepo);
+    return {
+      name: "aurobore.config",
+      status: "ok",
+      detail: `${config.app.id} — ${pluginRefs.length} plugin(s)`,
+    };
+  } catch (err) {
+    return {
+      name: "aurobore.config",
+      status: "fail",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+function checkSfdkTarget(cwd: string): DoctorCheck {
+  const env = loadAuroraEnv({ projectRoot: cwd });
+  if (!env.SFDK_TARGET) {
+    return { name: "SFDK target", status: "warn", detail: "SFDK_TARGET не задан" };
+  }
+  return { name: "SFDK target", status: "ok", detail: env.SFDK_TARGET };
+}
+
+/** Выполняет проверки окружения разработчика Aurobore. */
+export function runDoctor(cwd: string = process.cwd()): DoctorReport {
+  const checks = [
+    checkNode(),
+    checkPnpm(),
+    checkAuroraSdk(),
+    checkProjectConfig(cwd),
+    checkSfdkTarget(cwd),
+  ];
   const ok = checks.every((c) => c.status !== "fail");
   return { checks, ok };
 }

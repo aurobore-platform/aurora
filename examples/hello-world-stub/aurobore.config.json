@@ -1,0 +1,15 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.hello_stub",
+    "name": "Hello Stub",
+    "version": "0.1.0",
+    "orientation": "portrait"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html"
+  },
+  "permissions": ["Internet"],
+  "plugins": ["@aurobore/echo", "@aurobore/device", "@aurobore/storage"]
+}
