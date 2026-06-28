@@ -3,7 +3,7 @@
     "/": {
       title: "Главная",
       html:
-        "<p>Локальное SPA через loopback origin (<code>http://127.0.0.1</code>).</p>" +
+        "<p>Локальное SPA через loopback origin (<code>https://127.0.0.1</code>).</p>" +
         "<p id=\"m3-device\">Device: …</p>" +
         "<p id=\"m3-storage\">Storage: …</p>",
     },
@@ -213,7 +213,8 @@
         console.log("[aurobore-web] sendAsyncMessage unavailable");
       }
       console.log(
-        "[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works"
+        "[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works" +
+          (window.isSecureContext ? ", secure context" : ", insecure context")
       );
       setTimeout(function () {
         runM2Checks();

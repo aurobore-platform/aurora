@@ -123,7 +123,8 @@ Page {
         KeyboardInput { enabled: true }
 
         onLoadingChanged: {
-            if (!loading && webView.url.indexOf("127.0.0.1") !== -1)
+            if (!loading && assetServerOrigin && assetServerOrigin.length > 0
+                    && webView.url.indexOf(assetServerOrigin) === 0)
                 pageLoadProbeTimer.start()
         }
 

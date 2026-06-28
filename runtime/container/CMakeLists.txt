@@ -26,6 +26,7 @@ add_executable(${PROJECT_NAME}
     src/AppConfig.cpp
     src/AssetResolver.cpp
     src/AssetSchemeServer.cpp
+    src/LoopbackTlsCredentials.cpp
     src/LifecycleBridge.cpp
     generated/PluginRegistry.cpp
     ${BRIDGE_NATIVE_DIR}/BridgeRouter.cpp
@@ -66,4 +67,5 @@ install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(DIRECTORY html DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY qml DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY tls DESTINATION share/${PROJECT_NAME})
 install(FILES ${PROJECT_NAME}.desktop DESTINATION share/applications)

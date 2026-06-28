@@ -9,7 +9,7 @@
 | FR | Реализация |
 |---|---|
 | FR-R1 | `ApplicationWindow` + fullscreen `WebView` |
-| FR-R2/R6 | Loopback `AssetSchemeServer` (`http://127.0.0.1:<port>/`) — единый origin для SPA; конфиг `aurobore-app://` как логический ключ |
+| FR-R2/R6 | Loopback `AssetSchemeServer` (`https://127.0.0.1:<port>/`) — единый origin для SPA; конфиг `aurobore-app://` как логический ключ |
 | FR-R3 | Demo SPA (History API) + `aurobore:back` / `__auroboreSpaBack` |
 | FR-R4 | `SplashScreen.qml` + `aurobore:ready` + таймаут |
 | FR-R5 | `aurobore-bridge.js` + `LifecycleBridge` → `BridgeRouter.emitEvent` |
@@ -64,7 +64,9 @@ Staging по умолчанию: `%USERPROFILE%\aurobore-spike\aurobore-containe
 |---|---|
 | `src/main.cpp` | Bootstrap: `InitBrowser`, PluginManager init, контекст QML |
 | `src/AssetResolver.*` | Маппинг `aurobore-app://` → файлы в `html/` |
-| `src/AssetSchemeServer.*` | Loopback HTTP (аналог Capacitor `https://localhost`); см. § Asset loader |
+| `src/AssetSchemeServer.*` | Loopback HTTPS (аналог Capacitor `https://localhost`); см. § Asset loader |
+| `src/LoopbackTlsCredentials.*` | Встроенный TLS cert/key + SPKI fingerprint для `InitBrowser` |
+| `tls/` | PEM-сертификат loopback (генерируется `tools/aurora/gen-loopback-tls.mjs`) |
 | `src/LifecycleBridge.*` | pause/resume из `applicationStateChanged` |
 | `generated/PluginRegistry.*` | Кодоген: реестр плагинов (не редактировать) |
 | `../bridge-native/` | BridgeRouter (staging sibling) |
@@ -86,9 +88,10 @@ Staging по умолчанию: `%USERPROFILE%\aurobore-spike\aurobore-containe
 редirect на `file://` ломает subresources и History API. Флаг `nativeSchemeHandling` не заменяет
 scheme handler с отдачей тела ответа.
 
-**Текущая реализация:** `AssetSchemeServer` — минимальный HTTP на `127.0.0.1:<port>`, маппинг путей через
-`AssetResolver` (логически `aurobore-app://localhost/<path>`). WebView грузит `http://127.0.0.1:…/index.html`;
-CSS/JS — относительные URL; path-based History API работает без hash-workaround.
+**Текущая реализация:** `AssetSchemeServer` — минимальный HTTPS на `127.0.0.1:<port>`, маппинг путей через
+`AssetResolver` (логически `aurobore-app://localhost/<path>`). WebView грузит `https://127.0.0.1:…/index.html`;
+самоподписанный сертификат доверяется автоматически через `InitBrowser(ignore-certificate-errors=<SPKI>)` —
+без действий пользователя. CSS/JS — относительные URL; path-based History API работает без hash-workaround.
+При недоступности Qt SSL — fallback на HTTP.
 
-**Дальше (post-M1):** spike прямой регистрации scheme в libcef (если OMP откроет API) или HTTPS loopback
-с локальным сертификатом для secure context.
+**Дальше (post-M1):** spike прямой регистрации scheme в libcef (если OMP откроет API).

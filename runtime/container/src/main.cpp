@@ -7,6 +7,7 @@
 #include <string>
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QDebug>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickView>
@@ -19,6 +20,7 @@
 #include "AssetSchemeServer.h"
 #include "LifecycleBridge.h"
 #include "BridgeRouter.h"
+#include "LoopbackTlsCredentials.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,10 +29,6 @@ int main(int argc, char *argv[])
     QScopedPointer<QGuiApplication> application(Aurora::Application::application(argc, argv));
     QScopedPointer<QQuickView> view(Aurora::Application::createView());
     view->setResizeMode(QQuickView::SizeRootObjectToView);
-
-    Aurora::WebView::WebEngineContext::InitBrowser(
-        argc, argv,
-        std::vector<std::string>{"--default-encoding=UTF-8"});
 
     AssetResolver assetResolver;
     const QUrl htmlRootUrl = Aurora::Application::pathTo(QStringLiteral("html"));
@@ -48,9 +46,21 @@ int main(int argc, char *argv[])
     }
     assetResolver.setWebRoot(htmlRoot);
 
+    LoopbackTlsCredentials tlsCredentials;
+    tlsCredentials.loadFromPackage();
+
+    std::vector<std::string> browserArgs = {"--default-encoding=UTF-8"};
+    if (tlsCredentials.isValid()) {
+        const std::string fingerprint = tlsCredentials.spkiFingerprintBase64().toStdString();
+        browserArgs.push_back("--ignore-certificate-errors=" + fingerprint);
+        qInfo("[aurobore-container] InitBrowser: trust loopback SPKI fingerprint");
+    }
+
+    Aurora::WebView::WebEngineContext::InitBrowser(argc, argv, browserArgs);
+
     AssetSchemeServer assetServer;
     QString entryUrl;
-    if (assetServer.start(&assetResolver)) {
+    if (assetServer.start(&assetResolver, &tlsCredentials)) {
         entryUrl = assetServer.baseUrl() + QStringLiteral("/index.html");
     } else {
         entryUrl = QString::fromLatin1(Aurobore::AppConfig::kEntryUrl);

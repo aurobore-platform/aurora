@@ -3,7 +3,7 @@
  * Dev-toolkit PoC: sync → build → deploy → run (M0.5).
  * Thin wrapper над @aurobore/build; конфиг — tools/aurora/local.env
  */
-import { spawnSync } from "node:child_process";
+import { spawnSync, execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
@@ -137,6 +137,12 @@ async function main() {
   if (cmd === "sync" || cmd === "build" || cmd === "all") {
     if (project === "container" && (cmd === "build" || cmd === "all")) {
       runCodegenPlugins();
+      const genTls = path.join(REPO_ROOT, "tools", "aurora", "gen-loopback-tls.mjs");
+      const tlsCrt = path.join(REPO_ROOT, "runtime", "container", "tls", "loopback.crt");
+      if (!fs.existsSync(tlsCrt)) {
+        log("gen-loopback-tls: generating TLS assets");
+        execFileSync(process.execPath, [genTls], { stdio: "inherit", cwd: REPO_ROOT });
+      }
     }
     if (cmd === "sync" || cmd === "build" || cmd === "all") {
       build.syncProject({

@@ -2,14 +2,20 @@
 
 #include "AppConfig.h"
 #include "AssetResolver.h"
+#include "LoopbackTlsCredentials.h"
 
 #include <QByteArray>
-#include <QDir>
 #include <QFile>
-#include <QFileInfo>
 #include <QHostAddress>
+#include <QIODevice>
+#include <QAbstractSocket>
+#include <QSslCertificate>
+#include <QSslKey>
+#include <QSslSocket>
+#include <QTcpServer>
 #include <QTcpSocket>
 #include <QUrl>
+#include <QDebug>
 
 namespace {
 
@@ -29,7 +35,7 @@ QString httpStatusText(int code)
     }
 }
 
-void writeResponse(QTcpSocket *socket, int code, const QByteArray &body, const QByteArray &contentType)
+void writeResponse(QIODevice *socket, int code, const QByteArray &body, const QByteArray &contentType)
 {
     const QByteArray status = httpStatusText(code).toUtf8();
     QByteArray response;
@@ -41,48 +47,105 @@ void writeResponse(QTcpSocket *socket, int code, const QByteArray &body, const Q
     response += "\r\n";
     response += body;
     socket->write(response);
-    socket->flush();
-    socket->disconnectFromHost();
+    if (auto *abstract = qobject_cast<QAbstractSocket *>(socket)) {
+        abstract->flush();
+        abstract->disconnectFromHost();
+    }
 }
+
+class TlsTcpServer : public QTcpServer
+{
+public:
+    explicit TlsTcpServer(QObject *parent = nullptr)
+        : QTcpServer(parent)
+    {
+    }
+
+    void setTlsCredentials(const QSslCertificate &cert, const QSslKey &key, bool enabled)
+    {
+        m_cert = cert;
+        m_key = key;
+        m_tlsEnabled = enabled && !cert.isNull() && !key.isNull();
+    }
+
+protected:
+    void incomingConnection(qintptr socketDescriptor) override
+    {
+        if (!m_tlsEnabled) {
+            QTcpServer::incomingConnection(socketDescriptor);
+            return;
+        }
+
+        auto *socket = new QSslSocket(this);
+        socket->setLocalCertificate(m_cert);
+        socket->setPrivateKey(m_key);
+        socket->setSocketDescriptor(socketDescriptor);
+        addPendingConnection(socket);
+        socket->startServerEncryption();
+    }
+
+private:
+    QSslCertificate m_cert;
+    QSslKey m_key;
+    bool m_tlsEnabled = false;
+};
 
 } // namespace
 
 AssetSchemeServer::AssetSchemeServer(QObject *parent)
     : QObject(parent)
+    , m_server(new TlsTcpServer(this))
 {
-    connect(&m_server, &QTcpServer::newConnection, this, &AssetSchemeServer::onNewConnection);
+    connect(m_server, &TlsTcpServer::newConnection, this, &AssetSchemeServer::onNewConnection);
 }
 
-bool AssetSchemeServer::start(AssetResolver *resolver)
+AssetSchemeServer::~AssetSchemeServer() = default;
+
+bool AssetSchemeServer::start(AssetResolver *resolver, const LoopbackTlsCredentials *tls)
 {
     if (!resolver || resolver->webRoot().isEmpty())
         return false;
 
     m_resolver = resolver;
+    m_usesTls = false;
 
-    if (m_server.isListening())
-        m_server.close();
+    if (m_server->isListening())
+        m_server->close();
 
-    if (!m_server.listen(QHostAddress::LocalHost, 0)) {
+    const bool wantTls = tls && tls->isValid() && QSslSocket::supportsSsl();
+    if (wantTls) {
+        static_cast<TlsTcpServer *>(m_server)->setTlsCredentials(tls->certificate(), tls->privateKey(), true);
+        m_usesTls = true;
+    } else {
+        if (tls && tls->isValid() && !QSslSocket::supportsSsl())
+            qWarning("[aurobore-container] AssetSchemeServer: QSslSocket unavailable, HTTP fallback");
+        else if (!tls || !tls->isValid())
+            qWarning("[aurobore-container] AssetSchemeServer: TLS credentials missing, HTTP fallback");
+        static_cast<TlsTcpServer *>(m_server)->setTlsCredentials(QSslCertificate(), QSslKey(), false);
+    }
+
+    if (!m_server->listen(QHostAddress::LocalHost, 0)) {
         qWarning("[aurobore-container] AssetSchemeServer: listen failed");
         return false;
     }
 
-    const quint16 port = m_server.serverPort();
-    m_baseUrl = QStringLiteral("http://127.0.0.1:%1").arg(port);
+    const quint16 port = m_server->serverPort();
+    const QString scheme = m_usesTls ? QStringLiteral("https") : QStringLiteral("http");
+    m_baseUrl = scheme + QStringLiteral("://127.0.0.1:") + QString::number(port);
     m_origin = m_baseUrl;
     emit baseUrlChanged();
 
-    qInfo("[aurobore-container] AssetSchemeServer: %s (webRoot=%s)",
+    qInfo("[aurobore-container] AssetSchemeServer: %s (webRoot=%s, tls=%s)",
           qPrintable(m_baseUrl),
-          qPrintable(resolver->webRoot()));
+          qPrintable(resolver->webRoot()),
+          m_usesTls ? "yes" : "no");
     return true;
 }
 
 void AssetSchemeServer::stop()
 {
-    if (m_server.isListening())
-        m_server.close();
+    if (m_server->isListening())
+        m_server->close();
 }
 
 bool AssetSchemeServer::isAllowedUrl(const QString &urlString) const
@@ -94,14 +157,22 @@ bool AssetSchemeServer::isAllowedUrl(const QString &urlString) const
 
 void AssetSchemeServer::onNewConnection()
 {
-    while (m_server.hasPendingConnections()) {
-        QTcpSocket *socket = m_server.nextPendingConnection();
-        if (socket)
+    while (m_server->hasPendingConnections()) {
+        QAbstractSocket *socket = m_server->nextPendingConnection();
+        if (!socket)
+            continue;
+
+        if (auto *sslSocket = qobject_cast<QSslSocket *>(socket)) {
+            connect(sslSocket, &QSslSocket::encrypted, socket, [this, sslSocket]() {
+                handleClient(sslSocket);
+            });
+        } else {
             handleClient(socket);
+        }
     }
 }
 
-void AssetSchemeServer::handleClient(QTcpSocket *socket)
+void AssetSchemeServer::handleClient(QAbstractSocket *socket)
 {
     if (!socket || !m_resolver) {
         if (socket)
@@ -109,7 +180,7 @@ void AssetSchemeServer::handleClient(QTcpSocket *socket)
         return;
     }
 
-    connect(socket, &QTcpSocket::readyRead, socket, [this, socket]() {
+    connect(socket, &QIODevice::readyRead, socket, [this, socket]() {
         const QByteArray request = socket->peek(4096);
         const int headerEnd = request.indexOf("\r\n\r\n");
         if (headerEnd < 0)
@@ -149,10 +220,10 @@ void AssetSchemeServer::handleClient(QTcpSocket *socket)
         socket->deleteLater();
     });
 
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
+    connect(socket, &QAbstractSocket::disconnected, socket, &QAbstractSocket::deleteLater);
 }
 
-bool AssetSchemeServer::sendFile(QTcpSocket *socket, const QString &localPath)
+bool AssetSchemeServer::sendFile(QAbstractSocket *socket, const QString &localPath)
 {
     QFile file(localPath);
     if (!file.open(QIODevice::ReadOnly)) {

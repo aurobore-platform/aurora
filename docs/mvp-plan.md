@@ -98,7 +98,8 @@ FR-R1…R6. См. [architecture/runtime.md](architecture/runtime.md), [ADR-001](
 
 - [x] Нативный контейнер (C++/QML) + WebView во весь экран, bootstrap, инициализация WebEngineContext.
 
-- [x] Asset Loader: loopback HTTP origin (`http://127.0.0.1:<port>/`) через `AssetSchemeServer` +
+- [x] Asset Loader: loopback HTTPS origin (`https://127.0.0.1:<port>/`) через `AssetSchemeServer` +
+      `LoopbackTlsCredentials` (auto-trust SPKI в `InitBrowser`) +
 
       `AssetResolver`; логический ключ в конфиге — `aurobore-app://localhost/…`; entry не через `file://`
 

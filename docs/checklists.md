@@ -43,7 +43,7 @@
 - [x] Splash показывается/скрывается (по сигналу готовности + таймаут-fallback).
 - [x] Lifecycle-события прокидываются в JS (ready/pause/resume/backbutton/…).
 - [x] Навигация SPA + аппаратная «назад» обрабатываются (аппаратная — симуляция на SDK 5.2.1.200, V-14).
-- [x] Asset Loader: loopback HTTP origin (`http://127.0.0.1:<port>/`) + логический ключ `aurobore-app://localhost/…`; не `file://` для entry (V-13; см. [runtime/container/README.md](../runtime/container/README.md)).
+- [x] Asset Loader: loopback HTTPS origin (`https://127.0.0.1:<port>/`) + логический ключ `aurobore-app://localhost/…`; не `file://` для entry (V-13; см. [runtime/container/README.md](../runtime/container/README.md)).
 - [x] Разрешения сопоставляются с конфигом (`AppConfig::grantedPermissions()` ← `config/defaults.json`; см. [`runtime/container/src/AppConfig.cpp`](../runtime/container/src/AppConfig.cpp)).
 - [ ] Deep links обрабатываются (→ Alpha, FR-R8).
 - [x] Исключение в плагине не роняет Runtime (NFR-7): `PluginManager::dispatchInvoke` try/catch → `RUNTIME_PLUGIN_ERROR`.
