@@ -3,6 +3,7 @@ import {
   loadConfig,
   resolveEffectiveConfig,
   resolvePluginManifests,
+  resolvePluginRefs,
   validateConfig,
   findMonorepoRoot,
 } from "@aurobore/build";
@@ -49,8 +50,7 @@ export function runConfigCommand(args: ParsedArgs): number {
   }
 
   const { config } = loadConfig(process.cwd());
-  const pluginRefs = config.plugins ?? [];
-  const pluginsForCodegen = pluginRefs.length > 0 ? pluginRefs : ["@aurobore/echo"];
+  const pluginsForCodegen = resolvePluginRefs(config.plugins);
   let effective;
   try {
     const monorepo = findMonorepoRoot(process.cwd()) ?? undefined;

@@ -4,6 +4,17 @@
 
 ## Добавление плагина
 
+Все built-in плагины доступны в npm (с `@aurobore/cli@^0.0.2`):
+
+| Пакет | Плагин |
+|-------|--------|
+| `@aurobore/echo` | Echo (conformance) |
+| `@aurobore/device` | Device |
+| `@aurobore/storage` | Storage |
+| `@aurobore/filesystem` | FileSystem |
+| `@aurobore/clipboard` | Clipboard |
+| `@aurobore/network` | Network |
+
 Плагины перечисляются в `aurobore.config.json`:
 
 ```json
@@ -19,7 +30,7 @@ aurobore plugin add device
 aurobore plugin list
 ```
 
-CLI обновляет конфиг, перегенерирует native registry и `aurobore-plugins.js`.
+CLI обновляет конфиг, ставит npm-пакет (для built-in), перегенерирует native registry и `aurobore-plugins.js`. Работает **без клонирования монорепо Aurobore**.
 
 ## Импорт в коде
 

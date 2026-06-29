@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { runProjectCodegenFromConfig, loadConfig } from "@aurobore/build";
+import { runProjectCodegenFromConfig, loadConfig, resolvePluginRefs } from "@aurobore/build";
 import { flagBool, type ParsedArgs } from "../args.js";
 
 export function runGenerateCommand(args: ParsedArgs): number {
@@ -11,7 +11,7 @@ export function runGenerateCommand(args: ParsedArgs): number {
 
   try {
     const { config } = loadConfig(process.cwd());
-    const refs = config.plugins ?? ["@aurobore/echo"];
+    const refs = resolvePluginRefs(config.plugins);
     const { manifests } = runProjectCodegenFromConfig(process.cwd(), refs);
     console.log(`[generate] ${manifests.length} plugin(s) processed`);
     return 0;

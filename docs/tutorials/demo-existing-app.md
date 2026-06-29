@@ -32,16 +32,20 @@ aurobore doctor
 **Глобально** (удобно для демо):
 
 ```bash
-npm install -g @aurobore/cli
+npm install -g @aurobore/cli@^0.0.2
+aurobore --version
 aurobore --help
 ```
 
-**Или** в корне Vue-проекта как dev-зависимость:
+**Или** в корне Vue-проекта как dev-зависимость (рекомендуется — `aurobore init` добавляет автоматически):
 
 ```bash
-npm install -D @aurobore/cli
+npm install -D @aurobore/cli@^0.0.2
+npx aurobore --version
 npx aurobore --help
 ```
+
+Runtime (`@aurobore/runtime`) подтягивается транзитивно через `@aurobore/build` — **`AUROBORE_RUNTIME_ROOT` не нужен** для npm-сценария.
 
 Дальше в примерах — глобальный `aurobore`; с `npx` замените на `npx aurobore`.
 
@@ -66,8 +70,11 @@ aurobore init -y --id ru.example.mysite --name "My Site"
 Команда создаёт:
 
 - `aurobore.config.json`
+- `@aurobore/cli` в `devDependencies` (если ещё нет)
 - скрипты в `package.json`: `aurora:build`, `aurora:run`, `aurora:dev`, `build:aurora`
 - строку `.aurobore/` в `.gitignore`
+
+После init выполните `npm install`, чтобы установить локальный CLI.
 
 ---
 
@@ -158,7 +165,7 @@ aurobore dev
 |---------|---------|
 | Белый экран, 404 на `/assets/...` | `base: '/'` в Vite |
 | `web root not found: dist` | Сначала `npm run build` |
-| `aurobore: command not found` | `npm i -g @aurobore/cli` или `npx aurobore` |
+| `aurobore: command not found` | `npm install` после init, или `npm i -g @aurobore/cli@^0.0.2` |
 | Ошибки `mb2` / sfdk | Git Bash, Aurora SDK, `aurobore doctor` |
 | API не работает | `"Internet"` в `permissions` |
 

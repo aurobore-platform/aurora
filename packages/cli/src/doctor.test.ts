@@ -7,6 +7,7 @@ describe("@aurobore/cli doctor", () => {
     const names = report.checks.map((c) => c.name);
     expect(names.some((n) => n.startsWith("Node"))).toBe(true);
     expect(names.some((n) => n.startsWith("pnpm"))).toBe(true);
+    expect(names.some((n) => n.startsWith("Aurobore runtime"))).toBe(true);
     expect(names.some((n) => n.startsWith("Aurora SDK"))).toBe(true);
     expect(names.some((n) => n.startsWith("aurobore.config"))).toBe(true);
     expect(names.some((n) => n.startsWith("SFDK target"))).toBe(true);

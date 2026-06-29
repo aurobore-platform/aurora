@@ -1,16 +1,19 @@
 {
   "name": "@aurobore/network",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
+  "version": "0.0.2",
   "description": "Network plugin for Aurobore",
   "license": "MIT",
-  "files": ["plugin.manifest", "generated/"],
+  "type": "module",
+  "files": ["plugin.manifest", "native", "generated"],
   "exports": {
     ".": {
       "types": "./generated/index.d.ts",
       "import": "./generated/index.js"
-    }
+    },
+    "./plugin.manifest": "./plugin.manifest"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@aurobore/core": "workspace:*"

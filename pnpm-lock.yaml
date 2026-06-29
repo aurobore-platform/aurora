@@ -82,6 +82,9 @@ importers:
       '@aurobore/core':
         specifier: workspace:*
         version: link:../core
+      '@aurobore/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       esbuild:
         specifier: ^0.24.2
         version: 0.24.2
@@ -98,6 +101,8 @@ importers:
   packages/core: {}
 
   packages/create-aurobore: {}
+
+  packages/runtime: {}
 
   plugins/clipboard:
     dependencies:

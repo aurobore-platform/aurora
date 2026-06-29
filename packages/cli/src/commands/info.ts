@@ -1,9 +1,7 @@
-import { createRequire } from "node:module";
 import process from "node:process";
 import { loadAuroraEnv, findMonorepoRoot } from "@aurobore/build";
 import { flagBool, type ParsedArgs } from "../args.js";
-
-const require = createRequire(import.meta.url);
+import { readCliVersion } from "../version.js";
 
 export function runInfoCommand(args: ParsedArgs): number {
   if (flagBool(args.flags, "help")) {
@@ -11,12 +9,7 @@ export function runInfoCommand(args: ParsedArgs): number {
     return 0;
   }
 
-  let cliVersion = "0.0.0";
-  try {
-    cliVersion = require("../../package.json").version;
-  } catch {
-    /* ignore */
-  }
+  const cliVersion = readCliVersion();
 
   const env = loadAuroraEnv({ projectRoot: process.cwd() });
   const monorepo = findMonorepoRoot(process.cwd());

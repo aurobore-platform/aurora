@@ -36,8 +36,10 @@ describe("init CLI", () => {
     expect(fs.existsSync(path.join(root, "aurobore.config.json"))).toBe(true);
     const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")) as {
       scripts: Record<string, string>;
+      devDependencies?: Record<string, string>;
     };
     expect(pkg.scripts["aurora:build"]).toBe("aurobore build");
     expect(pkg.scripts["build:aurora"]).toContain("aurobore build");
+    expect(pkg.devDependencies?.["@aurobore/cli"]).toBe("^0.0.2");
   });
 });

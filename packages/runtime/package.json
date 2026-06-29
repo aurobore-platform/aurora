@@ -1,0 +1,19 @@
+{
+  "name": "@aurobore/runtime",
+  "version": "0.0.2",
+  "description": "Aurobore native runtime sources (container, bridge-native, native-sdk) for npm consumers.",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "container",
+    "bridge-native",
+    "native-sdk"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prepare": "node scripts/stage-runtime.mjs",
+    "prepack": "node scripts/stage-runtime.mjs"
+  }
+}

@@ -1,8 +1,30 @@
 #!/usr/bin/env node
 /**
- * Preflight перед `pnpm run publish`: авторизация npm и доступ к org @aurobore.
+ * Preflight перед `pnpm run publish`: авторизация npm, доступ к org @aurobore,
+ * проверка полной цепочки публикуемых пакетов в workspace.
  */
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, "..");
+
+const PUBLISH_PACKAGES = [
+  { name: "@aurobore/runtime", pkgPath: "packages/runtime/package.json" },
+  { name: "@aurobore/build", pkgPath: "packages/build/package.json" },
+  { name: "@aurobore/cli", pkgPath: "packages/cli/package.json" },
+  { name: "@aurobore/core", pkgPath: "packages/core/package.json" },
+  { name: "@aurobore/bridge-js", pkgPath: "packages/bridge-js/package.json" },
+  { name: "create-aurobore", pkgPath: "packages/create-aurobore/package.json" },
+  { name: "@aurobore/echo", pkgPath: "plugins/echo/package.json" },
+  { name: "@aurobore/device", pkgPath: "plugins/device/package.json" },
+  { name: "@aurobore/storage", pkgPath: "plugins/storage/package.json" },
+  { name: "@aurobore/filesystem", pkgPath: "plugins/filesystem/package.json" },
+  { name: "@aurobore/clipboard", pkgPath: "plugins/clipboard/package.json" },
+  { name: "@aurobore/network", pkgPath: "plugins/network/package.json" },
+];
 
 function run(cmd, args) {
   return spawnSync(cmd, args, {
@@ -19,6 +41,72 @@ function fail(message, hints = []) {
   }
   console.error("");
   process.exit(1);
+}
+
+function readPackageVersion(relativePath) {
+  const full = path.join(REPO_ROOT, relativePath);
+  if (!fs.existsSync(full)) {
+    fail(`package.json не найден: ${relativePath}`);
+  }
+  const pkg = JSON.parse(fs.readFileSync(full, "utf8"));
+  if (!pkg.version) {
+    fail(`нет поля version в ${relativePath}`);
+  }
+  return pkg.version;
+}
+
+function checkPublishChain() {
+  const versions = new Map();
+  for (const entry of PUBLISH_PACKAGES) {
+    const version = readPackageVersion(entry.pkgPath);
+    versions.set(entry.name, version);
+    console.log(`[publish] ${entry.name}@${version} — OK (workspace)`);
+  }
+
+  const coreVersion = versions.get("@aurobore/core");
+  const runtimeVersion = versions.get("@aurobore/runtime");
+  const buildVersion = versions.get("@aurobore/build");
+  const cliVersion = versions.get("@aurobore/cli");
+
+  if (runtimeVersion !== buildVersion || buildVersion !== cliVersion) {
+    fail("Версии runtime/build/cli должны совпадать (linked changeset).", [
+      `@aurobore/runtime: ${runtimeVersion}`,
+      `@aurobore/build: ${buildVersion}`,
+      `@aurobore/cli: ${cliVersion}`,
+    ]);
+  }
+
+  const pluginNames = PUBLISH_PACKAGES.filter((p) => p.name.startsWith("@aurobore/") && p.pkgPath.startsWith("plugins/"));
+  const pluginVersions = new Set(pluginNames.map((p) => versions.get(p.name)));
+  if (pluginVersions.size > 1) {
+    fail("Все plugin-пакеты должны иметь одну версию.", [
+      ...pluginNames.map((p) => `${p.name}: ${versions.get(p.name)}`),
+    ]);
+  }
+
+  const runtimePkg = path.join(REPO_ROOT, "packages/runtime/container");
+  if (!fs.existsSync(runtimePkg)) {
+    fail("@aurobore/runtime не подготовлен: нет packages/runtime/container", [
+      "pnpm --filter @aurobore/runtime prepare",
+    ]);
+  }
+
+  for (const plugin of pluginNames) {
+    const nativeDir = path.join(REPO_ROOT, path.dirname(plugin.pkgPath), "native");
+    if (!fs.existsSync(nativeDir)) {
+      fail(`${plugin.name}: каталог native/ не найден (${nativeDir})`);
+    }
+  }
+
+  for (const [name, version] of versions) {
+    if (name === "create-aurobore") continue;
+    const view = run("npm", ["view", `${name}@${version}`, "version"]);
+    if (view.status === 0) {
+      console.warn(`[publish] WARN: ${name}@${version} already published on npm`);
+    }
+  }
+
+  console.log(`[publish] цепочка пакетов OK (core ${coreVersion}, cli stack ${cliVersion})\n`);
 }
 
 const whoami = run("npm", ["whoami"]);
@@ -58,4 +146,5 @@ if (orgLs.status !== 0) {
 }
 
 console.log("[publish] org @aurobore: доступ подтверждён");
+checkPublishChain();
 console.log("[publish] preflight OK\n");

@@ -1,6 +1,6 @@
 {
   "name": "aurobore",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "description": "Открытая платформа для WebView-приложений под ОС Аврора (мост + плагины + CLI).",

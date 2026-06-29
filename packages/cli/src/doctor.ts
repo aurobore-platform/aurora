@@ -1,9 +1,12 @@
 import process from "node:process";
+import path from "node:path";
 import {
+  childEnv,
   findConfigFile,
   findMonorepoRoot,
   loadAuroraEnv,
   loadConfig,
+  resolveBundledRuntimeRoot,
   resolvePluginManifests,
   validateConfig,
 } from "@aurobore/build";
@@ -13,11 +16,16 @@ import type { CheckStatus, DoctorCheck, DoctorReport } from "./doctor-types.js";
 
 const MIN_NODE_MAJOR = 20;
 
-function probeVersion(command: string, args: string[]): string | null {
+function probeVersion(
+  command: string,
+  args: string[],
+  env: NodeJS.ProcessEnv = process.env,
+): string | null {
   try {
     const res = spawnSync(command, args, {
       encoding: "utf8",
       shell: process.platform === "win32",
+      env,
     });
     if (res.status === 0 && typeof res.stdout === "string") {
       return res.stdout.trim();
@@ -56,12 +64,31 @@ function checkPnpm(): DoctorCheck {
   };
 }
 
-function checkAuroraSdk(): DoctorCheck {
-  const sfdk = probeVersion("sfdk", ["--version"]);
+function checkRuntime(): DoctorCheck {
+  const bundled = resolveBundledRuntimeRoot();
+  if (bundled) {
+    return {
+      name: "Aurobore runtime",
+      status: "ok",
+      detail: `@aurobore/runtime (${path.basename(bundled)})`,
+    };
+  }
+  return {
+    name: "Aurobore runtime",
+    status: "fail",
+    detail: "не найден; установите @aurobore/cli (включает @aurobore/runtime)",
+  };
+}
+
+function checkAuroraSdk(cwd: string): DoctorCheck {
+  const auroraEnv = loadAuroraEnv({ projectRoot: cwd });
+  const env = childEnv(auroraEnv);
+
+  const sfdk = probeVersion("sfdk", ["--version"], env);
   if (sfdk) {
     return { name: "Aurora SDK (sfdk)", status: "ok", detail: sfdk };
   }
-  const mb2 = probeVersion("mb2", ["--version"]);
+  const mb2 = probeVersion("mb2", ["--version"], env);
   if (mb2) {
     return { name: "Aurora SDK (mb2)", status: "ok", detail: mb2 };
   }
@@ -99,7 +126,7 @@ function checkProjectConfig(cwd: string): DoctorCheck {
       return {
         name: "aurobore.config",
         status: "ok",
-        detail: `${config.app.id} — плагины не указаны (будет echo stub)`,
+        detail: `${config.app.id} — web-only, плагины не указаны`,
       };
     }
 
@@ -132,7 +159,8 @@ export function runDoctor(cwd: string = process.cwd()): DoctorReport {
   const checks = [
     checkNode(),
     checkPnpm(),
-    checkAuroraSdk(),
+    checkRuntime(),
+    checkAuroraSdk(cwd),
     checkProjectConfig(cwd),
     checkSfdkTarget(cwd),
   ];

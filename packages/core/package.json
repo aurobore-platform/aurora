@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/core",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "Публичный SDK Aurobore: доступ к API, события, модель ошибок, типы.",
   "license": "MIT",
   "type": "module",

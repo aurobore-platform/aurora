@@ -3,7 +3,24 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [],
+  "linked": [
+    [
+      "@aurobore/runtime",
+      "@aurobore/build",
+      "@aurobore/cli",
+      "@aurobore/core",
+      "@aurobore/bridge-js",
+      "create-aurobore"
+    ],
+    [
+      "@aurobore/echo",
+      "@aurobore/device",
+      "@aurobore/storage",
+      "@aurobore/filesystem",
+      "@aurobore/clipboard",
+      "@aurobore/network"
+    ]
+  ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",

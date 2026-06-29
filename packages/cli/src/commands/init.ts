@@ -8,6 +8,7 @@ import {
 import process from "node:process";
 import { flagBool, flagString, type ParsedArgs } from "../args.js";
 import { createPrompts } from "../prompts.js";
+import { readCliVersion } from "../version.js";
 
 function printHelp(): void {
   console.log(`aurobore init — подключить существующий web-проект к Aurobore
@@ -122,8 +123,13 @@ function printNextSteps(
   packageManager: string,
   hasBuildScript: boolean,
   scriptsAdded: string[],
+  cliAdded: boolean,
 ): void {
   console.log("\nNext steps:");
+  if (cliAdded) {
+    const installCmd = packageManager === "npm" ? "npm install" : `${packageManager} install`;
+    console.log(`  ${installCmd}   # установить @aurobore/cli из devDependencies`);
+  }
   if (hasBuildScript && scriptsAdded.includes("build:aurora")) {
     console.log(`  ${runScript(packageManager, "build:aurora")}`);
     console.log(`  ${runScript(packageManager, "aurora:run")}`);
@@ -159,10 +165,14 @@ export async function runInitCommand(args: ParsedArgs): Promise<number> {
       force: flagBool(args.flags, "force"),
       skipPackage: flagBool(args.flags, "skip-package"),
       skipGitignore: flagBool(args.flags, "skip-gitignore"),
+      cliVersion: readCliVersion(),
     });
 
     if (result.configPath) {
       console.log(`[init] created ${result.configPath}`);
+    }
+    if (result.cliAdded) {
+      console.log(`[init] added @aurobore/cli@^${readCliVersion()} to devDependencies`);
     }
     if (result.packageJsonUpdated) {
       console.log(
@@ -175,7 +185,12 @@ export async function runInitCommand(args: ParsedArgs): Promise<number> {
       console.log("[init] updated .gitignore");
     }
 
-    printNextSteps(defaults.packageManager, defaults.hasBuildScript, result.scriptsAdded);
+    printNextSteps(
+      defaults.packageManager,
+      defaults.hasBuildScript,
+      result.scriptsAdded,
+      result.cliAdded,
+    );
     return 0;
   } catch (err) {
     console.error(`[init] ERROR: ${err instanceof Error ? err.message : String(err)}`);

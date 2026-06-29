@@ -11,6 +11,7 @@ import { runPluginCommand } from "./commands/plugin.js";
 import { runGenerateCommand, runCleanCommand } from "./commands/clean.js";
 import { runInfoCommand } from "./commands/info.js";
 import { formatReport, runDoctor } from "./doctor.js";
+import { readCliVersion } from "./version.js";
 
 const COMMANDS = [
   "create",
@@ -45,6 +46,8 @@ function printUsage(): void {
       "  generate          Перегенерировать кодоген плагинов",
       "  clean             Удалить .aurobore/",
       "  info              Версии и окружение",
+      "",
+      "Глобальные флаги: --version, -V, -h, --help",
     ].join("\n"),
   );
 }
@@ -55,6 +58,11 @@ async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
 
   if (!command || command === "--help" || command === "-h") {
     printUsage();
+    return;
+  }
+
+  if (command === "--version" || command === "-V") {
+    console.log(readCliVersion());
     return;
   }
 
