@@ -42,10 +42,11 @@
 - [x] WebView создаётся на CEF/Chromium (`ru.auroraos.webview`) через тонкий шов транспорта.
 - [x] Splash показывается/скрывается (по сигналу готовности + таймаут-fallback).
 - [x] Lifecycle-события прокидываются в JS (ready/pause/resume/backbutton/…).
-- [x] Навигация SPA + аппаратная «назад» обрабатываются (аппаратная — симуляция на SDK 5.2.1.200, V-14).
+- [x] Навигация SPA + аппаратная «назад» (`Qt.Key_Back` → SPA history / `backbutton`, V-14).
 - [x] Asset Loader: loopback HTTPS origin (`https://127.0.0.1:<port>/`) + логический ключ `aurobore-app://localhost/…`; не `file://` для entry (V-13; см. [runtime/container/README.md](../runtime/container/README.md)).
 - [x] Разрешения сопоставляются с конфигом (`AppConfig::grantedPermissions()` ← `config/defaults.json`; см. [`runtime/container/src/AppConfig.cpp`](../runtime/container/src/AppConfig.cpp)).
-- [ ] Deep links обрабатываются (→ Alpha, FR-R8).
+- [x] Deep links обрабатываются (→ Alpha, FR-R8): `DeepLinkHandler`, `deeplink` / `appurlopen`, [tutorials/deep-links.md](tutorials/deep-links.md).
+- [x] Scopes на мосту (FR-R9): `ScopeValidator`, `BRIDGE_SCOPE_DENIED`, codegen `scopes` в `PluginDescriptor`.
 - [x] Исключение в плагине не роняет Runtime (NFR-7): `PluginManager::dispatchInvoke` try/catch → `RUNTIME_PLUGIN_ERROR`.
 
 ## 5. Bridge чек-лист
@@ -55,7 +56,7 @@
 - [x] События двунаправленные; стримы с backpressure/coalescing (A1, FR-B8).
 - [x] Сериализация JSON; бинарные данные — через ResourceRef + Asset Loader (A1, FR-B7).
 - [x] Структурированные ошибки с пространствами имён кодов.
-- [x] Проверка источника (`trustedOrigin` ← asset server), разрешений по манифесту, method whitelist (M3); схема args и deep links — M4.
+- [x] Проверка источника (`trustedOrigin` ← asset server), разрешений по манифесту, method whitelist (M3); scopes на мосту (A2, FR-R9); deep links — A2.
 - [x] Транспорт на WebView async API + loopback для тестов; шов тонкий.
 
 ## 6. Plugin API чек-лист

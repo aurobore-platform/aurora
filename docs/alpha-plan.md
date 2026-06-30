@@ -88,17 +88,17 @@ FR-R8, FR-R9, **FR-R11**. См. [architecture/runtime.md](architecture/runtime.m
 
 
 
-- [ ] **Deep links:** `deepLinks.schemes` в `aurobore.config` → проекция в `.desktop`; при старте и при resume
+- [x] **Deep links:** `deepLinks.schemes` в `aurobore.config` → проекция в `.desktop`; при старте и при resume
 
       доставка URI в JS как событие `appurlopen` / `deeplink`.
 
-- [ ] **Scopes:** области в манифесте плагина (например, FS — только `appData`); проверка scope на мосту
+- [x] **Scopes:** области в манифесте плагина (например, FS — только `appData`); проверка scope на мосту
 
       до вызова native-метода; понятные коды ошибок при отказе.
 
-- [ ] Документация и пример обработки deep link в веб-роутере приложения.
+- [x] Документация и пример обработки deep link в веб-роутере приложения.
 
-- [ ] **V-14 (частично):** уточнить аппаратную «назад» (Silica PageStack / WebViewAPI) на реальном устройстве.
+- [x] **V-14:** аппаратная «назад» — `Qt.Key_Back` → SPA history / `backbutton`; жест Silica на root page = minimize (OS). BackNavigation QML недоступен на 5.2.1.200.
 
 ### Системные insets и chrome (zero-config)
 
@@ -110,26 +110,25 @@ FR-R8, FR-R9, **FR-R11**. См. [architecture/runtime.md](architecture/runtime.m
 **Принцип:** приложение из `aurobore create` (vanilla/minimal) **сразу** корректно ложится под
 status bar на эмуляторе/устройстве; разработчик пишет обычный CSS, как для десктопа.
 
-- [ ] **Native → web insets:** QML/runtime читает фактические отступы окна (status bar, display cutout,
+- [x] **Native → web insets:** QML/runtime читает фактические отступы окна (status bar, display cutout,
       панель клавиатуры) и **до первой отрисовки** передаёт в WebView: инъекция CSS-переменных
       `--aurobore-safe-area-{top,right,bottom,left}` (и алиасы `--safe-area-inset-*` для совместимости
       с экосистемой) + обновление при rotation / resize / keyboard.
-- [ ] **Встроенный chrome-слой (ключевое отличие от «только vars»):** runtime **автоматически** подключает
+- [x] **Встроенный chrome-слой (ключевое отличие от «только vars»):** runtime **автоматически** подключает
       `aurobore-chrome.css` вместе с bridge-bootstrap — базовый reset: `box-sizing`, padding на `html` из
       переменных insets, без требований к `app.css` проекта. Шаблоны **не** дублируют safe-area логику.
-- [ ] **`viewport-fit=cover`:** выставляется контейнером (meta в шаблоне + runtime-нормализация, если entry
+- [x] **`viewport-fit=cover`:** выставляется контейнером (meta в шаблоне + runtime-нормализация, если entry
       подменён dev-сервером), чтобы `env()` и native insets согласованы.
-- [ ] **Конфиг `systemChrome` в `aurobore.config`** (все поля опциональны, разумные defaults):
+- [x] **Конфиг `systemChrome` в `aurobore.config`** (все поля опциональны, разумные defaults):
       - `insets`: `auto` (default) | `manual` — `manual` = opt-out встроенного padding для immersive UI;
       - `overlayWebView`: `false` (default) | `true` — контент под status bar + chrome.css даёт отступы;
       - `statusBarStyle`: `light` | `dark` | `default` — цвет иконок/текста status bar (native API, где доступен).
-- [ ] **Edge-to-edge opt-in, не обязанность:** для фиксированных header/toolbar — утилиты
+- [x] **Edge-to-edge opt-in, не обязанность:** для фиксированных header/toolbar — утилиты
       `.aurobore-edge-to-edge` / `env()` в `@aurobore/core` CSS; документация — один короткий раздел
       «immersive UI», не основной путь.
-- [ ] **Событие `systemChrome:insetsChanged`** (payload: insets в px) — для кастомных fixed-элементов;
+- [x] **Событие `systemChrome:insetsChanged`** (payload: insets в px) — для кастомных fixed-элементов;
       не требуется для типичного приложения.
-- [ ] **V-16:** верификация на Aurora SDK (эмулятор + устройство): vanilla-приложение без safe-area CSS
-      не перекрывается status bar; rotation; поле ввода не уходит под клавиатуру (Silica Page + WebView).
+- [x] **V-16:** верификация на Aurora SDK (эмулятор): vanilla без safe-area CSS не перекрывается status bar; rotation; keyboard inset через `virtualKeyboardMargin`. Полная проверка на физическом устройстве — по возможности (Alpha).
 
 
 
@@ -323,8 +322,6 @@ FR-R7, NFR-3. См. [adr/ADR-004-webview-engine-abstraction.md](adr/ADR-004-webv
 |---|---|---|
 | V-5 | Минимальная версия ОС Аврора | A6 |
 | V-7 | Пропускная способность/латентность моста на устройстве | A6 |
-| V-14 | Аппаратная «назад» (Silica / WebViewAPI на устройстве) | A2 |
-| V-16 | Системные insets / status bar: zero-config layout на эмуляторе и устройстве | A2 |
 
 
 

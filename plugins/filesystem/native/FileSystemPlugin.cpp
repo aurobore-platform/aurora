@@ -1,6 +1,8 @@
 #include "FileSystemPlugin.h"
 
 #include "PluginRegistry.h"
+#include "ScopeValidator.h"
+
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
@@ -27,30 +29,7 @@ QString FileSystemPlugin::readRelativePath(const QVariant &args) const
 
 QString FileSystemPlugin::resolvePath(const QString &relativePath, QString *errorCode) const
 {
-    if (relativePath.isEmpty() || relativePath.contains(QStringLiteral(".."))) {
-        *errorCode = QStringLiteral("FILESYSTEM_INVALID_PATH");
-        return QString();
-    }
-
-    const QString root = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (root.isEmpty()) {
-        *errorCode = QStringLiteral("FILESYSTEM_UNAVAILABLE");
-        return QString();
-    }
-
-    QDir dir(root);
-    if (!dir.exists() && !dir.mkpath(QStringLiteral("."))) {
-        *errorCode = QStringLiteral("FILESYSTEM_UNAVAILABLE");
-        return QString();
-    }
-
-    const QString cleaned = QDir::cleanPath(dir.absoluteFilePath(relativePath));
-    if (!cleaned.startsWith(QDir::cleanPath(root))) {
-        *errorCode = QStringLiteral("FILESYSTEM_PERMISSION_DENIED");
-        return QString();
-    }
-
-    return cleaned;
+    return ScopeValidator::resolveAppDataPath(relativePath, errorCode);
 }
 
 QVariant FileSystemPlugin::invoke(const QString &method, const QVariant &args,

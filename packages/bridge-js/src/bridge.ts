@@ -306,6 +306,13 @@ export class Bridge {
   }
 
   private dispatchEvent(name: string, data?: unknown): void {
+    this.emitToHandlers(name, data);
+    if (name === "deeplink") {
+      this.emitToHandlers("appurlopen", data);
+    }
+  }
+
+  private emitToHandlers(name: string, data?: unknown): void {
     for (const handler of this.eventHandlers.get(name) ?? []) {
       try {
         handler(data);

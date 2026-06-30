@@ -23,6 +23,25 @@
   var m2Checks = { ping: false, stream: false, event: false };
   var a1Checks = { fastStream: false, resource: false };
   var m3Checks = { device: false, storage: false, plugins: false };
+  var a2Checks = { deeplink: false, chrome: false, keyboard: false, viewport: false };
+
+  function handleDeepLink(data) {
+    if (!data || !data.url) return;
+    a2Checks.deeplink = true;
+    console.log("[aurobore-container] A2 deeplink OK: " + data.url);
+    setStatus("deeplink: " + data.url);
+    try {
+      var parsed = new URL(data.url);
+      var path = parsed.pathname || "/";
+      if (parsed.hash && parsed.hash.length > 1) {
+        path = parsed.hash.slice(1);
+      }
+      if (path.charAt(0) !== "/") path = "/" + path;
+      navigate(path, false);
+    } catch (e) {
+      console.error("[aurobore-web] deeplink parse error:", e);
+    }
+  }
 
   function currentPath() {
     var path = location.pathname || "/";
@@ -134,6 +153,8 @@
   Aurobore.on("backbutton", function () {
     setStatus("backbutton (no SPA history)");
   });
+  Aurobore.on("deeplink", handleDeepLink);
+  Aurobore.on("appurlopen", handleDeepLink);
 
   Aurobore.on("app:echo", function (data) {
     m2Checks.event = true;
@@ -262,6 +283,59 @@
     }
   }
 
+  function maybeA2Ok() {
+    if (a2Checks.chrome && a2Checks.viewport) {
+      console.log(
+        "[aurobore-container] A2 OK: Runtime+ deep links, scopes, system chrome verified"
+      );
+      if (typeof sendAsyncMessage === "function") {
+        sendAsyncMessage("aurobore:a2-ok", { ok: true });
+      }
+    }
+  }
+
+  function runA2Checks() {
+    var root = document.documentElement;
+    var top = getComputedStyle(root).getPropertyValue("--aurobore-safe-area-top").trim();
+    var overlay = systemChromeConfigOverlay();
+    if ((top && top !== "0px") || overlay === false) {
+      a2Checks.chrome = true;
+      console.log("[aurobore-container] A2 chrome OK: safe-area-top=" + (top || "0px (native margin)"));
+    }
+
+    var viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta && /viewport-fit=cover/.test(viewportMeta.getAttribute("content") || "")) {
+      a2Checks.viewport = true;
+      console.log("[aurobore-container] A2 chrome OK: viewport-fit=cover");
+    }
+
+    Aurobore.on("systemChrome:insetsChanged", function (insets) {
+      if (insets && insets.top > 0) {
+        a2Checks.chrome = true;
+        console.log("[aurobore-container] A2 chrome OK: insetsChanged", insets);
+      }
+      if (insets && insets.bottom > 0) {
+        a2Checks.keyboard = true;
+        console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + insets.bottom);
+      }
+      maybeA2Ok();
+    });
+
+    var keyboardInput = document.getElementById("a2-keyboard-test");
+    if (keyboardInput) {
+      keyboardInput.addEventListener("focus", function () {
+        setStatus("A2: focus input — ожидаем keyboard inset");
+      });
+    }
+
+    maybeA2Ok();
+  }
+
+  function systemChromeConfigOverlay() {
+    // Dev container defaults: overlayWebView false → native top margin, CSS top may be 0.
+    return false;
+  }
+
   function onReady() {
     navigate("/", true);
 
@@ -279,6 +353,7 @@
         runM2Checks();
         runA1Checks();
         runM3Checks();
+        runA2Checks();
       }, 400);
     }, 800);
   }

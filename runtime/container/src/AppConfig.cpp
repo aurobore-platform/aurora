@@ -11,16 +11,9 @@
 
 namespace Aurobore {
 
-const char *AppConfig::kEntryUrl = "aurobore-app://localhost/index.html";
-const char *AppConfig::kAppScheme = "aurobore-app";
-const char *AppConfig::kAppHost = "localhost";
+namespace {
 
-int AppConfig::splashTimeoutMs()
-{
-    return 10000;
-}
-
-QStringList AppConfig::grantedPermissions()
+QString resolveConfigPath()
 {
     const QUrl configUrl = Aurora::Application::pathTo(QStringLiteral("config/defaults.json"));
     QString configPath = configUrl.toLocalFile();
@@ -35,12 +28,17 @@ QStringList AppConfig::grantedPermissions()
                            Aurora::Application::PathType::PackageFilesLocation)
             + QStringLiteral("/config/defaults.json");
     }
+    return configPath;
+}
 
+QJsonObject loadConfigObject()
+{
+    const QString configPath = resolveConfigPath();
     QFile file(configPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("[aurobore-container] config/defaults.json not found (%s); no permissions granted",
+        qWarning("[aurobore-container] config/defaults.json not found (%s)",
                  qPrintable(configPath));
-        return QStringList();
+        return QJsonObject();
     }
 
     QJsonParseError parseError;
@@ -48,21 +46,78 @@ QStringList AppConfig::grantedPermissions()
     if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
         qWarning("[aurobore-container] config/defaults.json parse error: %s",
                  qPrintable(parseError.errorString()));
-        return QStringList();
+        return QJsonObject();
     }
+    return doc.object();
+}
 
-    const QJsonValue permissionsValue = doc.object().value(QStringLiteral("permissions"));
-    if (!permissionsValue.isArray()) {
-        qWarning("[aurobore-container] config/defaults.json: permissions must be an array");
-        return QStringList();
-    }
-
-    QStringList permissions;
-    for (const QJsonValue &item : permissionsValue.toArray()) {
+QStringList readStringArray(const QJsonObject &root, const QString &key)
+{
+    QStringList values;
+    const QJsonValue arrayValue = root.value(key);
+    if (!arrayValue.isArray())
+        return values;
+    for (const QJsonValue &item : arrayValue.toArray()) {
         if (item.isString())
-            permissions.append(item.toString());
+            values.append(item.toString());
     }
-    return permissions;
+    return values;
+}
+
+} // namespace
+
+const char *AppConfig::kEntryUrl = "aurobore-app://localhost/index.html";
+const char *AppConfig::kAppScheme = "aurobore-app";
+const char *AppConfig::kAppHost = "localhost";
+
+int AppConfig::splashTimeoutMs()
+{
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue splashValue = root.value(QStringLiteral("app"));
+    if (splashValue.isObject()) {
+        const QJsonValue timeout = splashValue.toObject()
+            .value(QStringLiteral("splash"))
+            .toObject()
+            .value(QStringLiteral("timeoutMs"));
+        if (timeout.isDouble() && timeout.toInt() > 0)
+            return timeout.toInt();
+    }
+    return 10000;
+}
+
+QStringList AppConfig::grantedPermissions()
+{
+    return readStringArray(loadConfigObject(), QStringLiteral("permissions"));
+}
+
+QStringList AppConfig::deepLinkSchemes()
+{
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue deepLinksValue = root.value(QStringLiteral("deepLinks"));
+    if (!deepLinksValue.isObject())
+        return QStringList();
+    return readStringArray(deepLinksValue.toObject(), QStringLiteral("schemes"));
+}
+
+SystemChromeConfig AppConfig::systemChrome()
+{
+    SystemChromeConfig config;
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue chromeValue = root.value(QStringLiteral("systemChrome"));
+    if (!chromeValue.isObject())
+        return config;
+
+    const QJsonObject chrome = chromeValue.toObject();
+    const QJsonValue insets = chrome.value(QStringLiteral("insets"));
+    if (insets.isString())
+        config.insets = insets.toString();
+    const QJsonValue overlay = chrome.value(QStringLiteral("overlayWebView"));
+    if (overlay.isBool())
+        config.overlayWebView = overlay.toBool();
+    const QJsonValue statusBarStyle = chrome.value(QStringLiteral("statusBarStyle"));
+    if (statusBarStyle.isString())
+        config.statusBarStyle = statusBarStyle.toString();
+    return config;
 }
 
 } // namespace Aurobore

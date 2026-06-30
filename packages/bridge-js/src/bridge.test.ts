@@ -9,12 +9,12 @@ import { LoopbackNativeStub, LoopbackTransport } from "./transport/loopback.js";
 import { resetCallIdCounter } from "./messages.js";
 
 describe("Bridge (loopback)", () => {
-  function setup(): { bridge: Bridge; native: LoopbackNativeStub } {
+  function setup(): { bridge: Bridge; native: LoopbackNativeStub; nativeTransport: LoopbackTransport } {
     resetCallIdCounter();
     const [jsSide, nativeSide] = LoopbackTransport.pair();
     const bridge = new Bridge(jsSide);
     const native = new LoopbackNativeStub(nativeSide);
-    return { bridge, native };
+    return { bridge, native, nativeTransport: nativeSide };
   }
 
   it("invoke ping → Promise resolve", async () => {
@@ -137,6 +137,22 @@ describe("Bridge (loopback)", () => {
     await new Promise((r) => setTimeout(r, 0));
     expect(received).toHaveBeenCalledTimes(1);
     expect(received).toHaveBeenCalledWith({ n: 1 });
+  });
+
+  it("deeplink дублируется в appurlopen", async () => {
+    const { bridge, nativeTransport } = setup();
+    const deeplink = vi.fn();
+    const alias = vi.fn();
+    bridge.on("deeplink", deeplink);
+    bridge.on("appurlopen", alias);
+    nativeTransport.sendRaw({
+      type: "event",
+      name: "deeplink",
+      data: { url: "myapp://settings" },
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(deeplink).toHaveBeenCalledWith({ url: "myapp://settings" });
+    expect(alias).toHaveBeenCalledWith({ url: "myapp://settings" });
   });
 
   it("invalid JSON args reject до отправки", async () => {

@@ -20,6 +20,7 @@
 #include "AssetResolver.h"
 #include "AssetSchemeServer.h"
 #include "LifecycleBridge.h"
+#include "DeepLinkHandler.h"
 #include "BridgeRouter.h"
 #include "LoopbackTlsCredentials.h"
 
@@ -76,6 +77,9 @@ int main(int argc, char *argv[])
 
     LifecycleBridge lifecycleBridge;
     BridgeRouter bridgeRouter;
+    DeepLinkHandler deepLinkHandler(&bridgeRouter);
+    deepLinkHandler.setSchemes(Aurobore::AppConfig::deepLinkSchemes());
+    deepLinkHandler.captureFromArguments(application->arguments());
     bridgeRouter.setGrantedPermissions(Aurobore::AppConfig::grantedPermissions());
     if (!bridgeRouter.initializePlugins()) {
         qWarning("[aurobore-container] no plugins registered");
@@ -88,12 +92,26 @@ int main(int argc, char *argv[])
         &bridgeRouter, [&bridgeRouter](const QString &event) {
             bridgeRouter.emitEvent(event);
         });
+    QObject::connect(
+        &lifecycleBridge, &LifecycleBridge::lifecycleEvent,
+        &deepLinkHandler, [&deepLinkHandler, &application](const QString &event) {
+            if (event == QStringLiteral("resume"))
+                deepLinkHandler.captureFromArguments(application->arguments());
+        });
+
+    const Aurobore::SystemChromeConfig systemChrome = Aurobore::AppConfig::systemChrome();
+    QVariantMap systemChromeMap;
+    systemChromeMap.insert(QStringLiteral("insets"), systemChrome.insets);
+    systemChromeMap.insert(QStringLiteral("overlayWebView"), systemChrome.overlayWebView);
+    systemChromeMap.insert(QStringLiteral("statusBarStyle"), systemChrome.statusBarStyle);
 
     auto *rootContext = view->rootContext();
     rootContext->setContextProperty(QStringLiteral("htmlRootPath"), htmlRoot);
     rootContext->setContextProperty(QStringLiteral("assetResolver"), &assetResolver);
     rootContext->setContextProperty(QStringLiteral("assetServerOrigin"), assetServer.origin());
     rootContext->setContextProperty(QStringLiteral("lifecycleBridge"), &lifecycleBridge);
+    rootContext->setContextProperty(QStringLiteral("deepLinkHandler"), &deepLinkHandler);
+    rootContext->setContextProperty(QStringLiteral("systemChromeConfig"), systemChromeMap);
     rootContext->setContextProperty(QStringLiteral("bridgeRouter"), &bridgeRouter);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),

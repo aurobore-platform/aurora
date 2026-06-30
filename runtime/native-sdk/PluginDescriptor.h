@@ -11,6 +11,7 @@ struct PluginDescriptor
     QString version;
     int bridgeProtocol = 1;
     QStringList permissions;
+    QStringList scopes;
     QStringList methods;
     QStringList events;
 };

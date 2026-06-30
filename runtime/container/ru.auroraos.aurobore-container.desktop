@@ -3,10 +3,13 @@ Type=Application
 Name=Aurobore Container
 Comment=M1 runtime-контейнер Aurobore
 Icon=ru.auroraos.aurobore-container
-Exec=ru.auroraos.aurobore-container
+Exec=ru.auroraos.aurobore-container %u
 X-Application-Type=silica-qt5
+MimeType=x-scheme-handler/aurobore-demo;
+Intents=OpenURI
 
 [X-Application]
 Permissions=Internet
 OrganizationName=ru.auroraos
 ApplicationName=aurobore-container
+Custom-Schemes=aurobore-demo

@@ -1,0 +1,26 @@
+/* Re-export of runtime aurobore-chrome.css for power-users / immersive UI. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding:
+    var(--aurobore-safe-area-top, var(--safe-area-inset-top, 0px))
+    var(--aurobore-safe-area-right, var(--safe-area-inset-right, 0px))
+    var(--aurobore-safe-area-bottom, var(--safe-area-inset-bottom, 0px))
+    var(--aurobore-safe-area-left, var(--safe-area-inset-left, 0px));
+}
+
+html.aurobore-insets-manual {
+  padding: 0;
+}
+
+body {
+  margin: 0;
+}
+
+.aurobore-edge-to-edge {
+  margin: 0;
+  padding-top: var(--aurobore-safe-area-top, var(--safe-area-inset-top, 0px));
+}

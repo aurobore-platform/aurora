@@ -31,11 +31,13 @@ add_executable(${PROJECT_NAME}
     src/AssetSchemeServer.cpp
     src/LoopbackTlsCredentials.cpp
     src/LifecycleBridge.cpp
+    src/DeepLinkHandler.cpp
     generated/PluginRegistry.cpp
     ${BRIDGE_NATIVE_DIR}/BridgeRouter.cpp
     ${NATIVE_SDK_DIR}/IPlugin.cpp
     ${NATIVE_SDK_DIR}/PluginManager.cpp
     ${NATIVE_SDK_DIR}/ResourceRef.cpp
+    ${NATIVE_SDK_DIR}/ScopeValidator.cpp
     ${NATIVE_SDK_DIR}/StreamPublisher.cpp
     ${PLUGIN_NATIVE_DIR}/echo/native/EchoPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/device/native/DevicePlugin.cpp

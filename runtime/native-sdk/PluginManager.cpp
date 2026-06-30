@@ -2,6 +2,7 @@
 
 #include "IPlugin.h"
 #include "PluginRegistry.h"
+#include "ScopeValidator.h"
 
 #include "BridgeRouter.h"
 
@@ -83,6 +84,24 @@ QVariant PluginManager::permissionDenied(const QString &plugin, const QString &i
                                        error.value(QStringLiteral("message")).toString());
 }
 
+bool PluginManager::validateScopes(const PluginDescriptor &descriptor, const QVariant &args,
+                                   QString *violatedScope, QString *message) const
+{
+    if (descriptor.scopes.isEmpty())
+        return true;
+    return ScopeValidator::validate(descriptor.scopes, args, violatedScope, message);
+}
+
+QVariant PluginManager::scopeDenied(const QString &plugin, const QString &id,
+                                    const QString &scope, const QString &message) const
+{
+    QVariantMap data;
+    data.insert(QStringLiteral("scope"), scope);
+    data.insert(QStringLiteral("plugin"), plugin);
+    return m_router->makeErrorResponse(
+        id, QStringLiteral("BRIDGE_SCOPE_DENIED"), message, data);
+}
+
 QVariant PluginManager::dispatchInvoke(const QString &plugin, const QString &method,
                                          const QVariant &args, const QString &id, bool isStream,
                                          const QVariantMap &meta)
@@ -107,6 +126,14 @@ QVariant PluginManager::dispatchInvoke(const QString &plugin, const QString &met
 
     if (!hasRequiredPermissions(descriptor)) {
         return emitAndReturn(permissionDenied(plugin, id));
+    }
+
+    QString violatedScope;
+    QString scopeMessage;
+    if (!validateScopes(descriptor, args, &violatedScope, &scopeMessage)) {
+        return emitAndReturn(scopeDenied(
+            plugin, id, violatedScope,
+            scopeMessage.isEmpty() ? QStringLiteral("Scope validation failed") : scopeMessage));
     }
 
     try {

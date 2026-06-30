@@ -20,4 +20,5 @@ export type LifecycleEvent =
   | "backbutton"
   | "memoryWarning"
   | "orientationchange"
+  | "deeplink"
   | "destroy";

@@ -12,6 +12,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("1.0.0"),
         1,
         QStringList({  }),
+        QStringList({  }),
         QStringList({ QStringLiteral("ping"), QStringLiteral("echo"), QStringLiteral("fail"), QStringLiteral("watchTicks"), QStringLiteral("watchFastTicks"), QStringLiteral("getSampleResource") }),
         QStringList({  })
     },
@@ -20,6 +21,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("device"),
         QStringLiteral("1.0.0"),
         1,
+        QStringList({  }),
         QStringList({  }),
         QStringList({ QStringLiteral("getInfo") }),
         QStringList({  })
@@ -30,6 +32,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("1.0.0"),
         1,
         QStringList({  }),
+        QStringList({  }),
         QStringList({ QStringLiteral("get"), QStringLiteral("set"), QStringLiteral("remove"), QStringLiteral("keys"), QStringLiteral("clear") }),
         QStringList({  })
     },
@@ -39,6 +42,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("1.0.0"),
         1,
         QStringList({  }),
+        QStringList({ QStringLiteral("appData") }),
         QStringList({ QStringLiteral("readText"), QStringLiteral("writeText"), QStringLiteral("exists"), QStringLiteral("mkdir"), QStringLiteral("delete"), QStringLiteral("list") }),
         QStringList({  })
     },
@@ -47,6 +51,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("clipboard"),
         QStringLiteral("1.0.0"),
         1,
+        QStringList({  }),
         QStringList({  }),
         QStringList({ QStringLiteral("copy"), QStringLiteral("paste") }),
         QStringList({  })
@@ -57,6 +62,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("1.0.0"),
         1,
         QStringList({ QStringLiteral("Internet") }),
+        QStringList({  }),
         QStringList({ QStringLiteral("getStatus") }),
         QStringList({ QStringLiteral("network:change") })
     }

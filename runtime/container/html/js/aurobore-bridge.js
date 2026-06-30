@@ -299,6 +299,12 @@
       }
     }
     dispatchEvent(name, data) {
+      this.emitToHandlers(name, data);
+      if (name === "deeplink") {
+        this.emitToHandlers("appurlopen", data);
+      }
+    }
+    emitToHandlers(name, data) {
       for (const handler of this.eventHandlers.get(name) ?? []) {
         try {
           handler(data);

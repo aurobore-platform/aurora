@@ -10,10 +10,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./css/aurobore-chrome.css": "./css/aurobore-chrome.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "css"
   ],
   "publishConfig": {
     "access": "public"

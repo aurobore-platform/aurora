@@ -38,7 +38,11 @@ public:
 private:
     bool hasRequiredPermissions(const PluginDescriptor &descriptor) const;
     bool isMethodAllowed(const PluginDescriptor &descriptor, const QString &method) const;
+    bool validateScopes(const PluginDescriptor &descriptor, const QVariant &args,
+                        QString *violatedScope, QString *message) const;
     QVariant permissionDenied(const QString &plugin, const QString &id) const;
+    QVariant scopeDenied(const QString &plugin, const QString &id, const QString &scope,
+                         const QString &message) const;
 
     BridgeRouter *m_router = nullptr;
     QStringList m_grantedPermissions;

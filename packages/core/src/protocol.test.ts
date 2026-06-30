@@ -46,6 +46,10 @@ describe("@aurobore/core protocol", () => {
     });
   });
 
+  it("BRIDGE_ERROR_CODES включает scope denied", () => {
+    expect(BRIDGE_ERROR_CODES.SCOPE_DENIED).toBe("BRIDGE_SCOPE_DENIED");
+  });
+
   it("isBridgeMessage и isInvokeMessage", () => {
     const invoke = {
       type: "invoke" as const,
