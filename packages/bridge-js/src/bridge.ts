@@ -13,6 +13,9 @@ import type { BridgeTransport } from "./transport/types.js";
 
 export interface InvokeOptions {
   stream?: boolean;
+  maxFps?: number;
+  /** Latest-wins coalescing для phase:data (default true, FR-B8). */
+  streamCoalesce?: boolean;
   timeoutMs?: number;
   signal?: AbortSignal;
 }
@@ -36,6 +39,10 @@ type StreamEntry = {
   onData: (payload: unknown) => void;
   onError: (error: BridgeError) => void;
   onComplete: () => void;
+  coalesce: boolean;
+  pendingPayload?: unknown;
+  hasPending: boolean;
+  flushScheduled: boolean;
 };
 
 const DEFAULT_TIMEOUT_MS = 30_000;
@@ -47,6 +54,36 @@ function assertJsonSerializable(value: unknown): void {
     throw createBridgeError(BRIDGE_ERROR_CODES.INVALID_ARGS, "Arguments are not JSON-serializable");
   }
 }
+
+function scheduleStreamFlush(
+  streams: Map<string, StreamEntry>,
+  subscriptionId: string,
+): void {
+  const stream = streams.get(subscriptionId);
+  if (!stream || stream.flushScheduled) return;
+  stream.flushScheduled = true;
+
+  const flush = (): void => {
+    const current = streams.get(subscriptionId);
+    if (!current) return;
+    current.flushScheduled = false;
+    if (current.hasPending) {
+      current.onData(current.pendingPayload);
+      current.hasPending = false;
+      current.pendingPayload = undefined;
+    }
+  };
+
+  const g = globalThis as typeof globalThis & {
+    requestAnimationFrame?: (cb: () => void) => number;
+  };
+  if (typeof g.requestAnimationFrame === "function") {
+    g.requestAnimationFrame(flush);
+  } else {
+    setTimeout(flush, 0);
+  }
+}
+
 export class Bridge {
   private readonly pending = new Map<string, PendingEntry>();
   private readonly streams = new Map<string, StreamEntry>();
@@ -151,8 +188,11 @@ export class Bridge {
     args: unknown,
     options: InvokeOptions,
   ): Promise<StreamSubscription> {
-    const msg = createInvoke(plugin, method, args, { stream: true });
+    const meta: { stream: true; maxFps?: number } = { stream: true };
+    if (options.maxFps !== undefined) meta.maxFps = options.maxFps;
+    const msg = createInvoke(plugin, method, args, meta);
     const subscriptionId = msg.id;
+    const coalesce = options.streamCoalesce !== false;
 
     const sub: StreamSubscription = {
       subscriptionId,
@@ -166,6 +206,9 @@ export class Bridge {
       onData: (payload) => sub.onData(payload),
       onError: (error) => sub.onError(error),
       onComplete: () => sub.onComplete(),
+      coalesce,
+      hasPending: false,
+      flushScheduled: false,
     });
 
     const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
@@ -219,9 +262,6 @@ export class Bridge {
       if (!entry) return;
       this.pending.delete(msg.id);
       if (entry.timeoutId) clearTimeout(entry.timeoutId);
-      if (entry.abortHandler && msg.ok) {
-        // abort handler cleanup handled on abort
-      }
       if (msg.ok) {
         entry.resolve(msg.result);
       } else {
@@ -239,11 +279,26 @@ export class Bridge {
       const stream = this.streams.get(msg.subscriptionId);
       if (!stream) return;
       if (msg.phase === "data") {
-        stream.onData(msg.payload);
+        if (stream.coalesce) {
+          stream.pendingPayload = msg.payload;
+          stream.hasPending = true;
+          scheduleStreamFlush(this.streams, msg.subscriptionId);
+        } else {
+          stream.onData(msg.payload);
+        }
       } else if (msg.phase === "error") {
+        if (stream.hasPending) {
+          stream.hasPending = false;
+          stream.pendingPayload = undefined;
+        }
         stream.onError(msg.error ?? createBridgeError("BRIDGE_STREAM_ERROR", "Stream error"));
         this.streams.delete(msg.subscriptionId);
       } else if (msg.phase === "complete") {
+        if (stream.hasPending) {
+          stream.onData(stream.pendingPayload);
+          stream.hasPending = false;
+          stream.pendingPayload = undefined;
+        }
         stream.onComplete();
         this.streams.delete(msg.subscriptionId);
       }
@@ -260,4 +315,3 @@ export class Bridge {
     }
   }
 }
-

@@ -27,6 +27,8 @@ public:
     void emitStream(const QString &subscriptionId, const QString &phase,
                     const QVariant &payload = QVariant(), const QVariant &error = QVariant());
 
+    int streamMaxFps(const QString &subscriptionId) const;
+
     QVariant makeErrorResponse(const QString &id, const QString &code, const QString &message,
                                const QVariant &data = QVariant()) const;
     QVariant makeOkResponse(const QString &id, const QVariant &result) const;

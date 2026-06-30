@@ -6,18 +6,30 @@
   "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
   "permissions": [],
   "types": {
-    "PingResult": { "pong": "boolean", "ts": "number" }
+    "PingResult": { "pong": "boolean", "ts": "number" },
+    "ResourceRef": {
+      "kind": "string",
+      "url": "string",
+      "mimeType": "string?",
+      "size": "number?"
+    }
   },
   "methods": {
     "ping": { "args": {}, "result": "PingResult" },
     "echo": { "args": "object", "result": "object" },
     "fail": { "args": {}, "result": "void" },
-    "watchTicks": { "args": {}, "result": "void", "stream": true }
+    "watchTicks": { "args": {}, "result": "void", "stream": true },
+    "watchFastTicks": { "args": {}, "result": "void", "stream": true },
+    "getSampleResource": { "args": {}, "result": "ResourceRef" }
   },
   "errors": {
     "ECHO_TEST_ERROR": {
       "message": "demo error",
       "description": "Метод fail() — conformance-stub для проверки reject в приложении"
+    },
+    "ECHO_RESOURCE_ERROR": {
+      "message": "failed to write sample resource",
+      "description": "getSampleResource() — ошибка записи в app-data"
     }
   }
 }

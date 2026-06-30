@@ -1,4 +1,5 @@
 import type { BridgeInbound, BridgeMessage, BridgeOutbound } from "@aurobore/core";
+import { APP_DATA_URL_PREFIX } from "@aurobore/core";
 import type { LoopbackTransportLike } from "./types.js";
 
 type Handler = (msg: BridgeInbound) => void;
@@ -57,9 +58,11 @@ export class LoopbackNativeStub {
   constructor(private readonly transport: LoopbackTransport) {
     transport.onReceiveRaw((msg) => {
       if (msg.type === "cancel") {
-        if (this.activeStreamId === msg.id && this.streamTimeoutId !== null) {
-          clearTimeout(this.streamTimeoutId);
-          this.streamTimeoutId = null;
+        if (this.activeStreamId === msg.id) {
+          if (this.streamTimeoutId !== null) {
+            clearTimeout(this.streamTimeoutId);
+            this.streamTimeoutId = null;
+          }
           this.activeStreamId = null;
         }
         return;
@@ -78,6 +81,15 @@ export class LoopbackNativeStub {
           });
         } else if (plugin === "Echo" && method === "watchTicks") {
           this.streamTicks(id);
+        } else if (plugin === "Echo" && method === "watchFastTicks") {
+          this.streamFastTicks(id);
+        } else if (plugin === "Echo" && method === "getSampleResource") {
+          this.reply(id, true, {
+            kind: "resource",
+            url: `${APP_DATA_URL_PREFIX}echo/sample.txt`,
+            mimeType: "text/plain",
+            size: 28,
+          });
         } else {
           this.reply(id, false, {
             code: "BRIDGE_METHOD_NOT_FOUND",
@@ -131,5 +143,27 @@ export class LoopbackNativeStub {
       }
     };
     send();
+  }
+
+  /** Burst в одном microtask — проверка JS coalescing (latest-wins за кадр). */
+  private streamFastTicks(subscriptionId: string): void {
+    this.activeStreamId = subscriptionId;
+    const limit = 100;
+    queueMicrotask(() => {
+      for (let tick = 1; tick <= limit; tick += 1) {
+        this.transport.sendRaw({
+          type: "stream",
+          subscriptionId,
+          phase: "data",
+          payload: { tick },
+        });
+      }
+      this.activeStreamId = null;
+      this.transport.sendRaw({
+        type: "stream",
+        subscriptionId,
+        phase: "complete",
+      });
+    });
   }
 }

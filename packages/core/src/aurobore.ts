@@ -3,6 +3,10 @@ import type { LifecycleEvent } from "./types.js";
 
 export interface InvokeOptions {
   stream?: boolean;
+  /** Native throttle (Hz) для stream invoke; см. invoke.meta.maxFps. */
+  maxFps?: number;
+  /** JS coalescing latest-wins для phase:data (default true, FR-B8). */
+  streamCoalesce?: boolean;
   timeoutMs?: number;
   signal?: AbortSignal;
 }

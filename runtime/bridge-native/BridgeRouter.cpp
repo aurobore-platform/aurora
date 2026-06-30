@@ -87,11 +87,8 @@ QVariant BridgeRouter::handleMessage(const QVariant &inbound)
 
     if (type == QStringLiteral("cancel")) {
         const QString id = map.value(QStringLiteral("id")).toString();
-        if (!id.isEmpty()) {
-            for (const QString &plugin : m_pluginManager->registeredPlugins()) {
-                m_pluginManager->dispatchCancel(plugin, id);
-            }
-        }
+        if (!id.isEmpty())
+            m_pluginManager->dispatchCancelById(id);
         return QVariant();
     }
 
@@ -121,7 +118,7 @@ QVariant BridgeRouter::handleMessage(const QVariant &inbound)
                          QStringLiteral("plugin and method required"));
     }
 
-    return m_pluginManager->dispatchInvoke(plugin, method, args, id, isStream);
+    return m_pluginManager->dispatchInvoke(plugin, method, args, id, isStream, meta);
 }
 
 void BridgeRouter::emitEvent(const QString &name, const QVariant &data)
@@ -173,4 +170,12 @@ void BridgeRouter::emitStream(const QString &subscriptionId, const QString &phas
     if (error.isValid())
         stream.insert(QStringLiteral("error"), error);
     emitOutbound(stream);
+
+    if (phase == QStringLiteral("complete") || phase == QStringLiteral("error"))
+        m_pluginManager->unregisterStream(subscriptionId);
+}
+
+int BridgeRouter::streamMaxFps(const QString &subscriptionId) const
+{
+    return m_pluginManager->streamMaxFps(subscriptionId);
 }

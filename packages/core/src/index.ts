@@ -67,3 +67,12 @@ export {
 } from "./errors.js";
 
 export { checkBridgeProtocol, type BridgeProtocolCheckResult } from "./compat.js";
+
+export {
+  APP_DATA_URL_PREFIX,
+  RESOURCE_REF_KIND,
+  createResourceRef,
+  isResourceRef,
+  resolveResourceUrl,
+  type ResourceRef,
+} from "./resource.js";

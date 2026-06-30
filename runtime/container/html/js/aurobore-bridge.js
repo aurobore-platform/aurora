@@ -34,6 +34,27 @@
     return typeof value === "object" && value !== null && value.type === "stream";
   }
 
+  // ../core/dist/resource.js
+  var RESOURCE_REF_KIND = "resource";
+  function isResourceRef(value) {
+    return typeof value === "object" && value !== null && value.kind === RESOURCE_REF_KIND && typeof value.url === "string";
+  }
+  function resolveResourceUrl(ref, baseOrigin) {
+    const url = typeof ref === "string" ? ref : ref.url;
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    const origin = baseOrigin ?? (() => {
+      const g = globalThis;
+      return typeof g.location?.origin === "string" ? g.location.origin : "";
+    })();
+    if (url.startsWith("aurobore-app://localhost")) {
+      const path = url.slice("aurobore-app://localhost".length) || "/";
+      return origin + (path.startsWith("/") ? path : `/${path}`);
+    }
+    return url;
+  }
+
   // src/messages.ts
   var counter = 0;
   function nextCallId() {
@@ -59,6 +80,27 @@
       JSON.stringify(value);
     } catch {
       throw createBridgeError(BRIDGE_ERROR_CODES.INVALID_ARGS, "Arguments are not JSON-serializable");
+    }
+  }
+  function scheduleStreamFlush(streams, subscriptionId) {
+    const stream = streams.get(subscriptionId);
+    if (!stream || stream.flushScheduled) return;
+    stream.flushScheduled = true;
+    const flush = () => {
+      const current = streams.get(subscriptionId);
+      if (!current) return;
+      current.flushScheduled = false;
+      if (current.hasPending) {
+        current.onData(current.pendingPayload);
+        current.hasPending = false;
+        current.pendingPayload = void 0;
+      }
+    };
+    const g = globalThis;
+    if (typeof g.requestAnimationFrame === "function") {
+      g.requestAnimationFrame(flush);
+    } else {
+      setTimeout(flush, 0);
     }
   }
   var Bridge = class {
@@ -147,8 +189,11 @@
       this.eventHandlers.clear();
     }
     invokeStream(plugin, method, args, options) {
-      const msg = createInvoke(plugin, method, args, { stream: true });
+      const meta = { stream: true };
+      if (options.maxFps !== void 0) meta.maxFps = options.maxFps;
+      const msg = createInvoke(plugin, method, args, meta);
       const subscriptionId = msg.id;
+      const coalesce = options.streamCoalesce !== false;
       const sub = {
         subscriptionId,
         onData: () => {
@@ -163,7 +208,10 @@
       this.streams.set(subscriptionId, {
         onData: (payload) => sub.onData(payload),
         onError: (error) => sub.onError(error),
-        onComplete: () => sub.onComplete()
+        onComplete: () => sub.onComplete(),
+        coalesce,
+        hasPending: false,
+        flushScheduled: false
       });
       const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
       const timeoutId = setTimeout(() => {
@@ -210,8 +258,6 @@
         if (!entry) return;
         this.pending.delete(msg.id);
         if (entry.timeoutId) clearTimeout(entry.timeoutId);
-        if (entry.abortHandler && msg.ok) {
-        }
         if (msg.ok) {
           entry.resolve(msg.result);
         } else {
@@ -227,11 +273,26 @@
         const stream = this.streams.get(msg.subscriptionId);
         if (!stream) return;
         if (msg.phase === "data") {
-          stream.onData(msg.payload);
+          if (stream.coalesce) {
+            stream.pendingPayload = msg.payload;
+            stream.hasPending = true;
+            scheduleStreamFlush(this.streams, msg.subscriptionId);
+          } else {
+            stream.onData(msg.payload);
+          }
         } else if (msg.phase === "error") {
+          if (stream.hasPending) {
+            stream.hasPending = false;
+            stream.pendingPayload = void 0;
+          }
           stream.onError(msg.error ?? createBridgeError("BRIDGE_STREAM_ERROR", "Stream error"));
           this.streams.delete(msg.subscriptionId);
         } else if (msg.phase === "complete") {
+          if (stream.hasPending) {
+            stream.onData(stream.pendingPayload);
+            stream.hasPending = false;
+            stream.pendingPayload = void 0;
+          }
           stream.onComplete();
           this.streams.delete(msg.subscriptionId);
         }
@@ -281,6 +342,8 @@
     off: (name, handler) => bridge.off(name, handler),
     once: (name, handler) => bridge.once(name, handler),
     emit: (name, data) => bridge.emit(name, data),
+    resolveResourceUrl,
+    isResourceRef,
     __protocolVersion: BRIDGE_PROTOCOL_VERSION
   };
   console.log("[aurobore-bridge] M2 bridge initialized");

@@ -11,8 +11,10 @@
     echo: function (args) { return A.invoke("Echo", "echo", args || {}); },
     fail: function (args) { return A.invoke("Echo", "fail", args || {}); },
     watchTicks: function (args) { return A.invoke("Echo", "watchTicks", args || {}, { stream: true }); },
+    watchFastTicks: function (args) { return A.invoke("Echo", "watchFastTicks", args || {}, { stream: true }); },
+    getSampleResource: function (args) { return A.invoke("Echo", "getSampleResource", args || {}); },
   };
-  A.__plugins["Echo"] = { version: "1.0.0", methods: ["ping","echo","fail","watchTicks"], events: [] };
+  A.__plugins["Echo"] = { version: "1.0.0", methods: ["ping","echo","fail","watchTicks","watchFastTicks","getSampleResource"], events: [] };
   A.Device = {
     getInfo: function (args) { return A.invoke("Device", "getInfo", args || {}); },
   };

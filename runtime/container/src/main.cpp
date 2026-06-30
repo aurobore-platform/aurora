@@ -8,6 +8,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QDebug>
+#include <QtCore/QStandardPaths>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickView>
@@ -45,6 +46,11 @@ int main(int argc, char *argv[])
             + QStringLiteral("/html");
     }
     assetResolver.setWebRoot(htmlRoot);
+
+    const QString appDataRoot =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!appDataRoot.isEmpty())
+        assetResolver.setAppDataRoot(appDataRoot);
 
     LoopbackTlsCredentials tlsCredentials;
     tlsCredentials.loadFromPackage();

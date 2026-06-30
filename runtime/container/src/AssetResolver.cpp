@@ -21,6 +21,15 @@ void AssetResolver::setWebRoot(const QString &webRoot)
     emit webRootChanged();
 }
 
+void AssetResolver::setAppDataRoot(const QString &appDataRoot)
+{
+    const QString normalized = QDir::cleanPath(appDataRoot);
+    if (m_appDataRoot == normalized)
+        return;
+    m_appDataRoot = normalized;
+    emit appDataRootChanged();
+}
+
 QString AssetResolver::entryUrl() const
 {
     return QString::fromLatin1(Aurobore::AppConfig::kEntryUrl);
@@ -58,6 +67,27 @@ QString AssetResolver::resolveFilesystemPath(const QUrl &url) const
     const QString relative = normalizeRelativePath(pathPart);
     if (relative.isEmpty())
         return QString();
+
+    if (relative.startsWith(QLatin1String("app-data/"))) {
+        if (m_appDataRoot.isEmpty())
+            return QString();
+        const QString subPath = relative.mid(QStringLiteral("app-data/").length());
+        if (subPath.isEmpty())
+            return QString();
+        const QString candidate = QDir(m_appDataRoot).filePath(subPath);
+        const QFileInfo info(candidate);
+        if (!info.exists() || !info.isFile())
+            return QString();
+        const QString root = QDir(m_appDataRoot).canonicalPath();
+        if (root.isEmpty())
+            return info.absoluteFilePath();
+        const QString canonical = info.canonicalFilePath();
+        if (canonical.isEmpty())
+            return info.absoluteFilePath();
+        if (!canonical.startsWith(root))
+            return QString();
+        return canonical;
+    }
 
     const QString candidate = QDir(m_webRoot).filePath(relative);
     const QFileInfo info(candidate);

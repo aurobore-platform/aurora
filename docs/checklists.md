@@ -52,8 +52,8 @@
 - [x] Формат сообщений (invoke/response/event/stream) и версия протокола зафиксированы.
 - [x] Корреляция запрос↔ответ, таблица ожидания, таймауты.
 - [x] Promise API; отмена через AbortSignal (JS + native cancel).
-- [x] События двунаправленные; стримы (backpressure — post-M2).
-- [x] Сериализация JSON; бинарные данные — через ссылки на ресурсы (post-M2).
+- [x] События двунаправленные; стримы с backpressure/coalescing (A1, FR-B8).
+- [x] Сериализация JSON; бинарные данные — через ResourceRef + Asset Loader (A1, FR-B7).
 - [x] Структурированные ошибки с пространствами имён кодов.
 - [x] Проверка источника (`trustedOrigin` ← asset server), разрешений по манифесту, method whitelist (M3); схема args и deep links — M4.
 - [x] Транспорт на WebView async API + loopback для тестов; шов тонкий.

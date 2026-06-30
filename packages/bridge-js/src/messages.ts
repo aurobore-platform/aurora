@@ -19,7 +19,7 @@ export function createInvoke(
   plugin: string,
   method: string,
   args?: unknown,
-  meta?: { stream?: boolean },
+  meta?: { stream?: boolean; maxFps?: number },
 ): InvokeMessage {
   return {
     type: "invoke",

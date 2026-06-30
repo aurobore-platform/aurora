@@ -44,17 +44,17 @@ FR-B7, FR-B8. См. [architecture/bridge.md](architecture/bridge.md) §6–§7, 
 
 
 
-- [ ] **Backpressure и батчинг** для стримов: прореживание/буферизация высокочастотных источников
+- [x] **Backpressure и батчинг** для стримов: прореживание/буферизация высокочастотных источников
 
       (сенсоры, геолокация), чтобы не перегружать JS-поток (FR-B8, NFR-1).
 
-- [ ] **Передача бинарных данных** без base64 в JSON: ссылки на ресурсы через Asset Loader / безопасный URL
+- [x] **Передача бинарных данных** без base64 в JSON: ссылки на ресурсы через Asset Loader / безопасный URL
 
       (фото камеры, файлы); опционально blob/ArrayBuffer-канал, если движок позволяет (FR-B7).
 
-- [ ] Контракт `stream` в протоколе: фазы `data`/`complete`/`error`, отмена подписки останавливает native-источник.
+- [x] Контракт `stream` в протоколе: фазы `data`/`complete`/`error`, отмена подписки останавливает native-источник.
 
-- [ ] Loopback-тесты на backpressure и resource-ref в `packages/bridge-js`; обновление conformance-stub Echo.
+- [x] Loopback-тесты на backpressure и resource-ref в `packages/bridge-js`; обновление conformance-stub Echo.
 
 
 

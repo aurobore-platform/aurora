@@ -21,6 +21,7 @@
   var viewEl = document.getElementById("view");
   var routeDepth = 0;
   var m2Checks = { ping: false, stream: false, event: false };
+  var a1Checks = { fastStream: false, resource: false };
   var m3Checks = { device: false, storage: false, plugins: false };
 
   function currentPath() {
@@ -42,6 +43,17 @@
       );
       if (typeof sendAsyncMessage === "function") {
         sendAsyncMessage("aurobore:m2-ok", { ok: true });
+      }
+    }
+  }
+
+  function maybeA1Ok() {
+    if (a1Checks.fastStream && a1Checks.resource) {
+      console.log(
+        "[aurobore-container] A1 OK: bridge backpressure + resource-ref verified"
+      );
+      if (typeof sendAsyncMessage === "function") {
+        sendAsyncMessage("aurobore:a1-ok", { ok: true });
       }
     }
   }
@@ -166,6 +178,53 @@
     Aurobore.emit("app:demo", { hello: "native" });
   }
 
+  function runA1Checks() {
+    if (!window.Aurobore || typeof Aurobore.invoke !== "function") {
+      return;
+    }
+
+    Aurobore.invoke("Echo", "watchFastTicks", {}, { stream: true, maxFps: 60 })
+      .then(function (sub) {
+        var deliveries = 0;
+        var lastTick = 0;
+        sub.onData = function (payload) {
+          deliveries += 1;
+          lastTick = payload.tick;
+        };
+        sub.onComplete = function () {
+          if (deliveries > 0 && deliveries < 60 && lastTick === 60) {
+            a1Checks.fastStream = true;
+            setStatus("A1 fastStream: " + deliveries + " deliveries / 60 native ticks");
+            maybeA1Ok();
+          }
+        };
+      })
+      .catch(function (err) {
+        console.error("[aurobore-web] watchFastTicks failed:", err);
+      });
+
+    Aurobore.invoke("Echo", "getSampleResource")
+      .then(function (ref) {
+        if (!Aurobore.isResourceRef || !Aurobore.isResourceRef(ref)) {
+          console.error("[aurobore-web] getSampleResource: not a ResourceRef");
+          return;
+        }
+        var wireUrl = Aurobore.resolveResourceUrl(ref);
+        return fetch(wireUrl).then(function (res) {
+          return res.text().then(function (body) {
+            if (body.indexOf("Aurobore A1 sample resource") !== -1) {
+              a1Checks.resource = true;
+              setStatus("A1 resource: " + wireUrl);
+              maybeA1Ok();
+            }
+          });
+        });
+      })
+      .catch(function (err) {
+        console.error("[aurobore-web] getSampleResource failed:", err);
+      });
+  }
+
   function runM3Checks() {
     if (Aurobore.__plugins && Aurobore.Device && Aurobore.Storage) {
       m3Checks.plugins = true;
@@ -218,6 +277,7 @@
       );
       setTimeout(function () {
         runM2Checks();
+        runA1Checks();
         runM3Checks();
       }, 400);
     }, 800);

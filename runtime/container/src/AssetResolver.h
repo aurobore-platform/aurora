@@ -16,6 +16,9 @@ public:
     QString webRoot() const { return m_webRoot; }
     void setWebRoot(const QString &webRoot);
 
+    QString appDataRoot() const { return m_appDataRoot; }
+    void setAppDataRoot(const QString &appDataRoot);
+
     Q_INVOKABLE QString entryUrl() const;
     Q_INVOKABLE QString toFilesystemPath(const QString &urlString) const;
     Q_INVOKABLE QString toFileUrl(const QString &urlString) const;
@@ -26,9 +29,11 @@ public:
 
 signals:
     void webRootChanged();
+    void appDataRootChanged();
 
 private:
     QString m_webRoot;
+    QString m_appDataRoot;
     QString normalizeRelativePath(const QString &path) const;
     QString resolveFilesystemPath(const QUrl &url) const;
 };

@@ -84,7 +84,8 @@ QVariant PluginManager::permissionDenied(const QString &plugin, const QString &i
 }
 
 QVariant PluginManager::dispatchInvoke(const QString &plugin, const QString &method,
-                                         const QVariant &args, const QString &id, bool isStream)
+                                         const QVariant &args, const QString &id, bool isStream,
+                                         const QVariantMap &meta)
 {
     auto emitAndReturn = [this](const QVariant &response) -> QVariant {
         if (response.isValid())
@@ -123,6 +124,8 @@ QVariant PluginManager::dispatchInvoke(const QString &plugin, const QString &met
         }
 
         if (isStream && result.isNull()) {
+            const int maxFps = meta.value(QStringLiteral("maxFps"), 60).toInt();
+            registerStream(id, plugin, maxFps < 1 ? 60 : maxFps);
             return QVariant();
         }
 
@@ -163,6 +166,36 @@ void PluginManager::dispatchCancel(const QString &plugin, const QString &id)
         qWarning("[aurobore-plugin] %s cancel unhandled exception",
                  qPrintable(plugin));
     }
+}
+
+void PluginManager::dispatchCancelById(const QString &id)
+{
+    const QString plugin = m_streamOwners.value(id);
+    if (!plugin.isEmpty()) {
+        dispatchCancel(plugin, id);
+        unregisterStream(id);
+        return;
+    }
+
+    for (const QString &name : m_plugins.keys())
+        dispatchCancel(name, id);
+}
+
+void PluginManager::registerStream(const QString &subscriptionId, const QString &plugin, int maxFps)
+{
+    m_streamOwners.insert(subscriptionId, plugin);
+    m_streamMaxFps.insert(subscriptionId, maxFps);
+}
+
+void PluginManager::unregisterStream(const QString &subscriptionId)
+{
+    m_streamOwners.remove(subscriptionId);
+    m_streamMaxFps.remove(subscriptionId);
+}
+
+int PluginManager::streamMaxFps(const QString &subscriptionId) const
+{
+    return m_streamMaxFps.value(subscriptionId, 60);
 }
 
 QStringList PluginManager::registeredPlugins() const

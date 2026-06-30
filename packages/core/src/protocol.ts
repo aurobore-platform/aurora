@@ -26,7 +26,8 @@ export interface InvokeMessage {
   plugin: string;
   method: string;
   args?: unknown;
-  meta?: { stream?: boolean };
+  /** stream: подписка; maxFps: native throttle для высокочастотных источников (FR-B8). */
+  meta?: { stream?: boolean; maxFps?: number };
 }
 
 export interface ResponseMessage {

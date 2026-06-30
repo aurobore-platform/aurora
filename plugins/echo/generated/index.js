@@ -15,4 +15,10 @@ export const Echo = {
   watchTicks(args) {
     return getAurobore().invoke("Echo", "watchTicks", args ?? {}, { stream: true });
   },
+  watchFastTicks(args) {
+    return getAurobore().invoke("Echo", "watchFastTicks", args ?? {}, { stream: true });
+  },
+  getSampleResource(args) {
+    return getAurobore().invoke("Echo", "getSampleResource", args ?? {});
+  },
 };

@@ -23,9 +23,15 @@ public:
     bool loadFromRegistry();
 
     QVariant dispatchInvoke(const QString &plugin, const QString &method,
-                            const QVariant &args, const QString &id, bool isStream);
+                            const QVariant &args, const QString &id, bool isStream,
+                            const QVariantMap &meta = QVariantMap());
 
     void dispatchCancel(const QString &plugin, const QString &id);
+    void dispatchCancelById(const QString &id);
+
+    void registerStream(const QString &subscriptionId, const QString &plugin, int maxFps);
+    void unregisterStream(const QString &subscriptionId);
+    int streamMaxFps(const QString &subscriptionId) const;
 
     QStringList registeredPlugins() const;
 
@@ -38,6 +44,8 @@ private:
     QStringList m_grantedPermissions;
     QHash<QString, PluginDescriptor> m_descriptors;
     QHash<QString, IPlugin *> m_plugins;
+    QHash<QString, QString> m_streamOwners;
+    QHash<QString, int> m_streamMaxFps;
 };
 
 #endif

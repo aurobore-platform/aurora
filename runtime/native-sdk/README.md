@@ -87,6 +87,28 @@ router()->emitStream(subscriptionId, QStringLiteral("complete"));
 
 События доставляются в JS через `BridgeRouter::outbound` → `__auroboreBridgeReceive`.
 
+### ResourceRef (бинарные данные, FR-B7)
+
+```cpp
+#include "ResourceRef.h"
+
+const QString root = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+return AuroboreResource::writeAppDataFile(root, QStringLiteral("echo/sample.txt"), bytes,
+                                          QStringLiteral("text/plain"));
+```
+
+### StreamPublisher (backpressure, FR-B8)
+
+```cpp
+#include "StreamPublisher.h"
+
+StreamPublisher publisher(router());
+publisher.setMaxHz(router()->streamMaxFps(subscriptionId));
+publisher.start(subscriptionId);
+publisher.push(payload);
+publisher.complete();
+```
+
 ## Кодоген
 
 После изменения `plugin.manifest`:

@@ -12,7 +12,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringLiteral("1.0.0"),
         1,
         QStringList({  }),
-        QStringList({ QStringLiteral("ping"), QStringLiteral("echo"), QStringLiteral("fail"), QStringLiteral("watchTicks") }),
+        QStringList({ QStringLiteral("ping"), QStringLiteral("echo"), QStringLiteral("fail"), QStringLiteral("watchTicks"), QStringLiteral("watchFastTicks"), QStringLiteral("getSampleResource") }),
         QStringList({  })
     },
     {

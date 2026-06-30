@@ -1,7 +1,7 @@
 /**
  * IIFE-бандл для runtime/container: window.Aurobore = { invoke, on, emit, off }.
  */
-import { BRIDGE_PROTOCOL_VERSION } from "@aurobore/core";
+import { BRIDGE_PROTOCOL_VERSION, isResourceRef, resolveResourceUrl } from "@aurobore/core";
 import { Bridge } from "./bridge.js";
 import { WebViewTransport } from "./transport/webview.js";
 
@@ -15,6 +15,8 @@ declare global {
       off: Bridge["off"];
       once: Bridge["once"];
       emit: Bridge["emit"];
+      resolveResourceUrl: typeof resolveResourceUrl;
+      isResourceRef: typeof isResourceRef;
       __protocolVersion: number;
     };
   }
@@ -26,6 +28,8 @@ window.Aurobore = {
   off: (name, handler) => bridge.off(name, handler),
   once: (name, handler) => bridge.once(name, handler),
   emit: (name, data) => bridge.emit(name, data),
+  resolveResourceUrl,
+  isResourceRef,
   __protocolVersion: BRIDGE_PROTOCOL_VERSION,
 };
 

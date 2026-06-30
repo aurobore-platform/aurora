@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { BRIDGE_ERROR_CODES } from "@aurobore/core";
+import {
+  BRIDGE_ERROR_CODES,
+  isResourceRef,
+  resolveResourceUrl,
+} from "@aurobore/core";
 import { Bridge } from "./bridge.js";
 import { LoopbackNativeStub, LoopbackTransport } from "./transport/loopback.js";
 import { resetCallIdCounter } from "./messages.js";
@@ -64,6 +68,53 @@ describe("Bridge (loopback)", () => {
       sub.onComplete = resolve;
     });
     expect(ticks).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it("stream watchFastTicks: coalescing снижает число onData", async () => {
+    const { bridge } = setup();
+    const ticks: number[] = [];
+    const sub = (await bridge.invoke("Echo", "watchFastTicks", {}, {
+      stream: true,
+      streamCoalesce: true,
+    })) as import("./bridge.js").StreamSubscription;
+    sub.onData = (payload: unknown) => {
+      ticks.push((payload as { tick: number }).tick);
+    };
+    await new Promise<void>((resolve) => {
+      sub.onComplete = resolve;
+    });
+    expect(ticks.length).toBeGreaterThan(0);
+    expect(ticks.length).toBeLessThan(100);
+    expect(ticks[ticks.length - 1]).toBe(100);
+  });
+
+  it("stream watchFastTicks без coalesce доставляет все тики", async () => {
+    const { bridge } = setup();
+    const ticks: number[] = [];
+    const sub = (await bridge.invoke("Echo", "watchFastTicks", {}, {
+      stream: true,
+      streamCoalesce: false,
+    })) as import("./bridge.js").StreamSubscription;
+    sub.onData = (payload: unknown) => {
+      ticks.push((payload as { tick: number }).tick);
+    };
+    await new Promise<void>((resolve) => {
+      sub.onComplete = resolve;
+    });
+    expect(ticks).toHaveLength(100);
+    expect(ticks[99]).toBe(100);
+  });
+
+  it("getSampleResource возвращает ResourceRef", async () => {
+    const { bridge } = setup();
+    const result = await bridge.invoke("Echo", "getSampleResource");
+    expect(isResourceRef(result)).toBe(true);
+    if (isResourceRef(result)) {
+      expect(result.url).toContain("/app-data/echo/sample.txt");
+      expect(resolveResourceUrl(result, "https://127.0.0.1:1")).toBe(
+        "https://127.0.0.1:1/app-data/echo/sample.txt",
+      );
+    }
   });
 
   it("timeout reject", async () => {
