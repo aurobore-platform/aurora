@@ -56,6 +56,7 @@
 | [repository-structure.md](repository-structure.md) | Структура репозитория (монорепо) |
 | [roadmap.md](roadmap.md) | Этапы: Research → Design → MVP → Alpha → Beta → RC → 1.0 |
 | [mvp-plan.md](mvp-plan.md) | Детальный план этапа MVP (майлстоуны M0…M5, первый шаг — PoC моста) |
+| [alpha-plan.md](alpha-plan.md) | Детальный план этапа Alpha (майлстоуны A1…A6, первый шаг — Bridge+) |
 | [checklists.md](checklists.md) | Чек-листы: архитектура, инфраструктура, Runtime, Bridge, CLI, SDK, тесты, релиз |
 
 ### Архитектура (`architecture/`)
@@ -108,7 +109,7 @@
 | Research (исследование) | ✅ выполнено (см. источники в [vision.md](vision.md)) |
 | Design (проектирование) | ✅ завершён (2026-06-27): ADR-001…009 Accepted, чек-листы §1/§3 подписаны |
 | MVP (реализация) | ✅ завершён (2026-06-28): M0…M5, sign-off [checklists.md](checklists.md) §4–§8 |
-| Alpha | 🟢 текущий этап — см. [roadmap.md](roadmap.md) |
+| Alpha | 🟢 текущий этап — см. [alpha-plan.md](alpha-plan.md) |
 
 > Исходная постановка задачи сохранена в [task.txt](task.txt) и использовалась как отправная точка.
 > Там, где исследование выявило более удачные решения, они вынесены в ADR с обоснованием.

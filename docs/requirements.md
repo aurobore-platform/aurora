@@ -72,6 +72,10 @@
 
 - **FR-R8.** Deep links / обработка кастомных URI-схем.
 - **FR-R9.** Гранулярная модель разрешений и областей (scopes) на уровне моста.
+- **FR-R11.** Системный chrome и safe-area **из коробки (zero-config):** runtime автоматически учитывает
+  insets status bar / cutout / клавиатуры (native → CSS vars + встроенный `aurobore-chrome.css`);
+  приложение из шаблона корректно отображается без ручного `env(safe-area-inset-*)` в коде разработчика;
+  настройка overlay, стиля status bar и opt-out — через `systemChrome` в `aurobore.config` (см. [alpha-plan](alpha-plan.md) A2).
 - **FR-B7.** Передача бинарных данных эффективно (через blob/ArrayBuffer или ссылки на ресурсы, не base64 в JSON).
 - **FR-B8.** Батчинг событий и backpressure для высокочастотных стримов.
 - **FR-P6.** Расширенный набор плагинов: **Camera, Geolocation, Notifications (local), Share, Sensors**.

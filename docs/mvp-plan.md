@@ -185,7 +185,7 @@ FR-S1…S3, FR-D1…D2.
 
 ([checklists.md](checklists.md) §4–§8).
 
-**Sign-off (2026-06-28):** runtime permissions из `config/defaults.json`, NFR-7 (try/catch + `emitAndReturn`), CI lint, `pnpm container:all` на SDK 5.2.1.200 (M1/M2/M3 OK). Этап Alpha — см. [roadmap.md](roadmap.md).
+**Sign-off (2026-06-28):** runtime permissions из `config/defaults.json`, NFR-7 (try/catch + `emitAndReturn`), CI lint, `pnpm container:all` на SDK 5.2.1.200 (M1/M2/M3 OK). Этап Alpha — см. [alpha-plan.md](alpha-plan.md).
 
 
 

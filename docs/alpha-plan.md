@@ -1,0 +1,341 @@
+# План этапа Alpha
+
+
+
+> Детализация этапа 3 ([roadmap.md](roadmap.md)) — расширение возможностей поверх завершённого MVP.
+
+> Критерии приёмки — SHOULD-требования в [requirements.md](requirements.md) §2. Принцип: каждую гипотезу проверяем на
+
+> **реальном Aurora SDK**, а не на предположениях. Базовый путь create→dev→build→run — из [mvp-plan.md](mvp-plan.md).
+
+
+
+## Порядок майлстоунов
+
+
+
+```
+
+A1 Bridge+ ─► A2 Runtime+ ─► A3 Plugins+ ─► A4 CLI+ ─► A5 SDK+ ─► A6 Compat/Demos
+
+  backpressure   deep links    Camera/Geo/    HMR +         React/Vue/    матрица версий
+
+  binary refs    insets/chrome Notif/Share/   plugin        Svelte        + демо-приложения
+
+                 scopes        Sensors        create
+
+```
+
+
+
+---
+
+
+
+## A1 — Bridge+ (стримы, бинарные данные) ⚑ первый шаг
+
+
+
+**Цель:** довести мост до сценариев высокочастотных стримов и тяжёлых полезных нагрузок (камера, сенсоры).
+
+
+
+FR-B7, FR-B8. См. [architecture/bridge.md](architecture/bridge.md) §6–§7, [architecture/event-system.md](architecture/event-system.md).
+
+
+
+- [ ] **Backpressure и батчинг** для стримов: прореживание/буферизация высокочастотных источников
+
+      (сенсоры, геолокация), чтобы не перегружать JS-поток (FR-B8, NFR-1).
+
+- [ ] **Передача бинарных данных** без base64 в JSON: ссылки на ресурсы через Asset Loader / безопасный URL
+
+      (фото камеры, файлы); опционально blob/ArrayBuffer-канал, если движок позволяет (FR-B7).
+
+- [ ] Контракт `stream` в протоколе: фазы `data`/`complete`/`error`, отмена подписки останавливает native-источник.
+
+- [ ] Loopback-тесты на backpressure и resource-ref в `packages/bridge-js`; обновление conformance-stub Echo.
+
+
+
+**Выход A1:** Geolocation/Sensors/Camera могут опираться на стримы и resource URL без деградации UI.
+
+
+
+---
+
+
+
+## A2 — Runtime+ (deep links, scopes, system chrome)
+
+
+
+**Цель:** маршрутизация извне, гранулярные разрешения на мосту и **zero-config** корректная вёрстка под
+
+системный chrome Аврора (status bar, safe area, клавиатура) — без ручного `env()` и без отдельного
+
+Cordova-плагина.
+
+
+
+FR-R8, FR-R9, **FR-R11**. См. [architecture/runtime.md](architecture/runtime.md) §8–§9,
+
+[architecture/configuration.md](architecture/configuration.md).
+
+
+
+### Deep links и scopes
+
+
+
+- [ ] **Deep links:** `deepLinks.schemes` в `aurobore.config` → проекция в `.desktop`; при старте и при resume
+
+      доставка URI в JS как событие `appurlopen` / `deeplink`.
+
+- [ ] **Scopes:** области в манифесте плагина (например, FS — только `appData`); проверка scope на мосту
+
+      до вызова native-метода; понятные коды ошибок при отказе.
+
+- [ ] Документация и пример обработки deep link в веб-роутере приложения.
+
+- [ ] **V-14 (частично):** уточнить аппаратную «назад» (Silica PageStack / WebViewAPI) на реальном устройстве.
+
+### Системные insets и chrome (zero-config)
+
+> **Проблема Cordova/Capacitor:** даже после появления `env(safe-area-inset-*)` и инъекции
+> `--safe-area-inset-*` разработчик обязан сам прописать padding в CSS; большинство этого не делает.
+> На Aurora status bar — **нативный chrome ОС**, CEF часто не заполняет `env()` корректно. Решение —
+> ответственность **runtime по умолчанию**, а не документация «добавьте padding-top».
+
+**Принцип:** приложение из `aurobore create` (vanilla/minimal) **сразу** корректно ложится под
+status bar на эмуляторе/устройстве; разработчик пишет обычный CSS, как для десктопа.
+
+- [ ] **Native → web insets:** QML/runtime читает фактические отступы окна (status bar, display cutout,
+      панель клавиатуры) и **до первой отрисовки** передаёт в WebView: инъекция CSS-переменных
+      `--aurobore-safe-area-{top,right,bottom,left}` (и алиасы `--safe-area-inset-*` для совместимости
+      с экосистемой) + обновление при rotation / resize / keyboard.
+- [ ] **Встроенный chrome-слой (ключевое отличие от «только vars»):** runtime **автоматически** подключает
+      `aurobore-chrome.css` вместе с bridge-bootstrap — базовый reset: `box-sizing`, padding на `html` из
+      переменных insets, без требований к `app.css` проекта. Шаблоны **не** дублируют safe-area логику.
+- [ ] **`viewport-fit=cover`:** выставляется контейнером (meta в шаблоне + runtime-нормализация, если entry
+      подменён dev-сервером), чтобы `env()` и native insets согласованы.
+- [ ] **Конфиг `systemChrome` в `aurobore.config`** (все поля опциональны, разумные defaults):
+      - `insets`: `auto` (default) | `manual` — `manual` = opt-out встроенного padding для immersive UI;
+      - `overlayWebView`: `false` (default) | `true` — контент под status bar + chrome.css даёт отступы;
+      - `statusBarStyle`: `light` | `dark` | `default` — цвет иконок/текста status bar (native API, где доступен).
+- [ ] **Edge-to-edge opt-in, не обязанность:** для фиксированных header/toolbar — утилиты
+      `.aurobore-edge-to-edge` / `env()` в `@aurobore/core` CSS; документация — один короткий раздел
+      «immersive UI», не основной путь.
+- [ ] **Событие `systemChrome:insetsChanged`** (payload: insets в px) — для кастомных fixed-элементов;
+      не требуется для типичного приложения.
+- [ ] **V-16:** верификация на Aurora SDK (эмулятор + устройство): vanilla-приложение без safe-area CSS
+      не перекрывается status bar; rotation; поле ввода не уходит под клавиатуру (Silica Page + WebView).
+
+
+
+**Выход A2:** deep links и scopes работают; **vanilla из коробки** без знания CSS env — корректные
+
+отступы под системный chrome; power-users настраивают через `systemChrome` / opt-out `insets: manual`.
+
+
+
+---
+
+
+
+## A3 — Plugins+ (расширенный набор)
+
+
+
+**Цель:** пять стандартных плагинов расширения с полным циклом манифест → native → codegen → docs.
+
+
+
+FR-P6. См. [plugins/standard-plugins.md](plugins/standard-plugins.md) §3, [dev/adding-a-plugin.md](dev/adding-a-plugin.md).
+
+
+
+- [ ] **Camera** — съёмка/выбор из галереи; возврат **URL ресурса** (не байты в JSON); разрешения `camera`.
+
+- [ ] **Geolocation** — `getCurrentPosition`, **стрим** `watch` / `clearWatch`; разрешения `location`.
+
+- [ ] **Notifications (local)** — создать/отменить/расписание; событие нажатия; разрешения по модели Аврора.
+
+- [ ] **Share** — системный шаринг текста/файлов/URL.
+
+- [ ] **Sensors** — акселерометр/гироскоп как **стримы** с backpressure (зависит от A1).
+
+- [ ] На каждый плагин: манифест (SoT), native-реализация, `@aurobore/<plugin>`, справочник в `docs/plugins/`,
+
+      обработка `*_UNAVAILABLE` и отказа разрешений.
+
+- [ ] Прогон на эмуляторе (`pnpm container:all` / `aurobore run`) для хотя бы Camera + Geolocation + Sensors.
+
+
+
+**Выход A3:** расширенный набор плагинов доступен через `plugin add` и типизированный SDK.
+
+
+
+---
+
+
+
+## A4 — CLI+ (Hot Reload, plugin create)
+
+
+
+**Цель:** ускорить итерацию веба и снизить порог создания нового плагина.
+
+
+
+FR-C7, FR-C8. См. [architecture/dev-server.md](architecture/dev-server.md), [architecture/cli.md](architecture/cli.md).
+
+
+
+- [ ] **Hot Reload (HMR)** в `aurobore dev`: интеграция с HMR веб-сборщика (Vite и аналоги), без блокировки
+
+      HMR-канала dev-контейнером; откат к live reload при неподдерживаемой замене модуля.
+
+- [ ] **`aurobore plugin create <name>`** — скелет плагина (манифест, native stub, package.json, README)
+
+      по шаблону из [dev/native-plugin-guide.md](dev/native-plugin-guide.md).
+
+- [ ] Диагностика типичных проблем dev-режима (хост недоступен с эмулятора, порт, файрвол).
+
+
+
+**Выход A4:** разработчик меняет веб без потери состояния; новый плагин создаётся одной командой.
+
+
+
+---
+
+
+
+## A5 — SDK+ (шаблоны фреймворков, туториалы)
+
+
+
+**Цель:** официальные точки входа для популярных фреймворков и app-facing гайд по плагинам.
+
+
+
+FR-S4. См. [architecture/typescript-sdk.md](architecture/typescript-sdk.md), [tutorials/README.md](tutorials/README.md).
+
+
+
+- [ ] Шаблоны **`react`**, **`vue`**, **`svelte`** в `templates/` (Vite, `aurobore.config`, пример плагина).
+
+- [ ] `aurobore create --template react|vue|svelte` подключает шаблон.
+
+- [ ] Туториал: [шаблоны React/Vue/Svelte](tutorials/framework-templates.md) (рабочий пример в `examples/`).
+
+- [ ] Туториал: [написание своего плагина](tutorials/writing-a-plugin.md) (app-facing, поверх `plugin create`).
+
+
+
+**Выход A5:** новый проект можно начать с выбранного фреймворка без ручной интеграции с Aurobore.
+
+
+
+---
+
+
+
+## A6 — Совместимость и демо-приложения
+
+
+
+**Цель:** подтвердить работу на линейке Chromium/CEF и нескольких версиях ОС Аврора.
+
+
+
+FR-R7, NFR-3. См. [adr/ADR-004-webview-engine-abstraction.md](adr/ADR-004-webview-engine-abstraction.md).
+
+
+
+- [ ] **Матрица совместимости** в документации: минимальная версия ОС (`build.minOs`), проверенные SDK
+
+      (5.1.5/5.1.6+, 5.2.x); Gecko вне области поддержки.
+
+- [ ] Прогон ключевых сценариев на **двух** целевых версиях SDK (например 5.1.x и 5.2.1.200).
+
+- [ ] **2+ демо-приложения** (например `camera-demo`, `geo-demo` или расширение `hello-world`), использующих
+
+      плагины A3; воспроизводимый путь create→build→run.
+
+- [ ] Закрыть или зафиксировать статус **V-5** (мин. версия ОС) и **V-7** (бенчмарк моста на устройстве).
+
+
+
+**Выход A6:** реальные демо работают на нескольких версиях Аврора — критерий выхода Alpha из roadmap.
+
+
+
+---
+
+
+
+## Критерий выхода Alpha
+
+
+
+Выполнены FR-R8, FR-R9, **FR-R11**, FR-B7, FR-B8, FR-P6, FR-C7, FR-C8, FR-S4 и NFR-3
+
+(см. [requirements.md](requirements.md) §2). Прогон соответствующих пунктов
+
+[checklists.md](checklists.md) §4–§8 (deep links, HMR, адаптеры фреймворков, матрица версий).
+
+**Реальные демо-приложения работают на нескольких версиях Аврора** ([roadmap.md](roadmap.md) §3).
+
+
+
+**Sign-off:** _ожидается_ — после закрытия A1…A6 и прогона `pnpm container:all` / `aurobore run` на целевых SDK.
+
+Этап Beta — см. [roadmap.md](roadmap.md).
+
+
+
+## Вне области Alpha (следующие этапы)
+
+
+
+| Требование | Этап |
+|---|---|
+| FR-B9 — бинарный/компактный протокол моста | Post-1.0 (COULD) |
+| FR-P7 — сторонние плагины из npm | Beta |
+| FR-D3 — DevTools (лог моста, профилирование) | Beta |
+| FR-T1 — conformance-suite | Beta |
+| FR-D4 — автоген справочника API в сайт доков | Beta |
+
+
+
+## Открытые верификации, закрываемые по ходу Alpha
+
+
+
+Из [aurora/verification-status.md](aurora/verification-status.md):
+
+
+
+| ID | Содержание | Майлстоун |
+|---|---|---|
+| V-5 | Минимальная версия ОС Аврора | A6 |
+| V-7 | Пропускная способность/латентность моста на устройстве | A6 |
+| V-14 | Аппаратная «назад» (Silica / WebViewAPI на устройстве) | A2 |
+| V-16 | Системные insets / status bar: zero-config layout на эмуляторе и устройстве | A2 |
+
+
+
+## Окружение
+
+
+
+Как в MVP: Node 20 LTS + pnpm, Aurora SDK (mb2) + эмулятор + сертификаты подписи;
+
+на Windows — Git Bash + режим разработчика. См. [README](../README.md#требования-к-окружению-разработчика).
+
+Для Alpha желательно доступ к **физическому устройству** (Camera, Sensors, Notifications, V-7/V-14/V-16).
+
+Нативная проверка: `pnpm container:all` или `aurobore build` / `aurobore run` (см. [tools/aurora/README.md](../tools/aurora/README.md)).

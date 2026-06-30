@@ -53,6 +53,7 @@
 - **Критерий выхода:** см. «Критерии приёмки MVP» в [requirements.md](requirements.md). Sign-off: permissions из `defaults.json`, NFR-7, lint, `pnpm container:all` (M1/M2/M3 OK).
 
 ## Этап 3 — Alpha 🟢 текущий
+Детальный план майлстоунов A1…A6 — [alpha-plan.md](alpha-plan.md).
 - **Bridge+:** стримы с backpressure, эффективная передача бинарных данных/ссылок на ресурсы (FR-B6…B8).
 - **Плагины+:** Camera, Geolocation, Notifications (local), Share, Sensors (FR-P6).
 - **CLI+:** dev с Hot Reload, plugin create (FR-C7, FR-C8).
