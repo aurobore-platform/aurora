@@ -25,7 +25,7 @@ Options:
   --entry <file>         Entry HTML (default: index.html)
   --no-internet          Не добавлять разрешение Internet
   --skip-package         Не изменять package.json
-  --skip-gitignore       Не изменять .gitignore
+  --skip-gitignore       Не изменять .gitignore (по умолчанию добавляется .aurobore/)
 `);
 }
 

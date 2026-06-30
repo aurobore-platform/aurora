@@ -6,6 +6,7 @@ import { runConfigCommand } from "./commands/config.js";
 import { runRunCommand } from "./commands/run.js";
 import { runCreateCommand } from "./commands/create.js";
 import { runInitCommand } from "./commands/init.js";
+import { runUninitCommand } from "./commands/uninit.js";
 import { runDevCommand } from "./commands/dev.js";
 import { runPluginCommand } from "./commands/plugin.js";
 import { runGenerateCommand, runCleanCommand } from "./commands/clean.js";
@@ -16,6 +17,7 @@ import { readCliVersion } from "./version.js";
 const COMMANDS = [
   "create",
   "init",
+  "uninit",
   "dev",
   "build",
   "run",
@@ -37,6 +39,7 @@ function printUsage(): void {
       "Команды:",
       "  create <name>     Создать проект из шаблона",
       "  init              Подключить существующий web-проект",
+      "  uninit            Откатить init (конфиг, скрипты, CLI)",
       "  dev               Dev server + live reload",
       "  build             Собрать RPM-пакет",
       "  run               Установить и запустить на эмуляторе",
@@ -89,6 +92,9 @@ async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
       break;
     case "init":
       exitCode = await runInitCommand(rest);
+      break;
+    case "uninit":
+      exitCode = await runUninitCommand(rest);
       break;
     case "dev":
       exitCode = await runDevCommand(rest);
