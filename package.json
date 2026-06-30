@@ -16,7 +16,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "doctor": "pnpm --filter @aurobore/cli exec aurobore doctor",
+    "doctor": "pnpm --filter @aurobore/build build && pnpm --filter @aurobore/cli build && node packages/cli/dist/cli.js doctor",
     "codegen:plugins": "pnpm --filter @aurobore/build build && node packages/build/scripts/codegen-plugins.mjs",
     "poc:sync": "node tools/aurora/poc.mjs sync",
     "poc:build": "node tools/aurora/poc.mjs build",

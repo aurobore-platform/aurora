@@ -6,6 +6,6 @@ CoverBackground {
 
     CoverTemplate {
         objectName: "applicationCover"
-        secondaryText: qsTr("Aurobore")
+        secondaryText: qsTr("AUROBORE_APP_NAME")
     }
 }

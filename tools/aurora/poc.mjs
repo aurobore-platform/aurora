@@ -156,6 +156,9 @@ async function main() {
   }
 
   if (cmd === "build" || cmd === "all") {
+    log(`sfdk build (target=${env.SFDK_TARGET})`);
+    log(`cwd: ${env.POC_BUILD_DIR}`);
+    log("sfdk: лог сборки ниже (Docker/SDK; первая пересборка после CMake — 15–40 мин, это нормально)");
     build.sfdkBuild(env.POC_BUILD_DIR, env.SFDK_TARGET, env);
     const rpm = build.findRpm(env.POC_BUILD_DIR, projectCfg.rpmGlob);
     log(`build: ${rpm}`);

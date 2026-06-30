@@ -8,7 +8,7 @@ Rectangle {
 
     Label {
         anchors.centerIn: parent
-        text: "Aurobore"
+        text: qsTr("AUROBORE_APP_NAME")
         font.pixelSize: Theme.fontSizeHuge
         color: Theme.highlightColor
     }
@@ -25,7 +25,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Theme.paddingLarge
         color: Theme.highlightColor
-        text: qsTr("Aurobore")
+        text: qsTr("AUROBORE_APP_NAME")
         font.pixelSize: Theme.fontSizeSmall
     }
 }

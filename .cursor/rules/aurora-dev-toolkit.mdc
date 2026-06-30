@@ -55,7 +55,7 @@ pnpm container:sync | build | deploy | run | emulator | all
 | Только пересборка RPM | `pnpm container:build` |
 | RPM уже собран, нужен деплой/запуск | `pnpm container:deploy` / `pnpm container:run` |
 | Правишь сам `tools/aurora/poc.mjs` | тестируй затронутую подкоманду |
-| Только JS/TS монорепо | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm doctor` |
+| Только JS/TS монорепо | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm run doctor` |
 
 ## Успех прогона
 

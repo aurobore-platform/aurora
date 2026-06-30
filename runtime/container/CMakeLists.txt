@@ -11,11 +11,14 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/cef")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-find_package(Qt5 COMPONENTS Core Gui Qml Quick Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Qml Quick Network LinguistTools REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
 pkg_check_modules(AuroraWebView aurorawebview REQUIRED IMPORTED_TARGET)
+
+file(GLOB TsFiles "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+qt5_add_translation(QmFiles ${TsFiles})
 
 set(PLUGIN_NATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../plugins)
 set(NATIVE_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../native-sdk)
@@ -38,6 +41,7 @@ add_executable(${PROJECT_NAME}
     ${PLUGIN_NATIVE_DIR}/filesystem/native/FileSystemPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/clipboard/native/ClipboardPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/network/native/NetworkPlugin.cpp
+    ${QmFiles}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -74,4 +78,8 @@ set(AUROBORE_ICON_SIZES 86x86 108x108 128x128 172x172)
 foreach(_icon_size IN LISTS AUROBORE_ICON_SIZES)
     install(FILES icons/${_icon_size}/${PROJECT_NAME}.png
         DESTINATION share/icons/hicolor/${_icon_size}/apps)
+endforeach()
+
+foreach(_qm IN LISTS QmFiles)
+    install(FILES ${_qm} DESTINATION share/${PROJECT_NAME}/translations)
 endforeach()

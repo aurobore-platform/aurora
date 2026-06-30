@@ -75,6 +75,7 @@
 - [x] dev: live reload (и hot reload на Alpha+).
 - [x] plugin add/remove/list корректно меняют артефакты без ручной правки.
 - [x] Иконки лаунчера генерируются в native-проект и попадают в RPM (86/108/128/172, `hicolor`). → [`packages/build/src/native/icons.ts`](../packages/build/src/native/icons.ts), V-15.
+- [x] Переводы нативного UI: `translations/*.ts`, `qt5_add_translation`, `.qm` в RPM. → [`packages/build/src/native/translations.ts`](../packages/build/src/native/translations.ts).
 - [ ] (SHOULD) plugin create, generate, publish, migrate.
 
 ## 8. SDK чек-лист

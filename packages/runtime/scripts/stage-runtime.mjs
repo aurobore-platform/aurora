@@ -26,6 +26,22 @@ function ensureContainerIcons() {
   }
 }
 
+const CONTAINER_TS_MARKER = path.join(
+  REPO_RUNTIME,
+  "container/translations/ru.auroraos.aurobore-container.ts",
+);
+
+function ensureContainerTranslations() {
+  if (fs.existsSync(CONTAINER_TS_MARKER)) {
+    return;
+  }
+  const script = path.join(REPO_ROOT, "packages/build/scripts/gen-container-translations.mjs");
+  const res = spawnSync(process.execPath, [script], { cwd: REPO_ROOT, stdio: "inherit" });
+  if (res.status !== 0) {
+    throw new Error("gen-container-translations failed");
+  }
+}
+
 function copyDirFiltered(src, dst, excludeDirs) {
   fs.mkdirSync(dst, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
@@ -42,6 +58,7 @@ function copyDirFiltered(src, dst, excludeDirs) {
 
 function stageRuntime() {
   ensureContainerIcons();
+  ensureContainerTranslations();
   for (const dir of RUNTIME_DIRS) {
     const src = path.join(REPO_RUNTIME, dir);
     const dst = path.join(PKG_ROOT, dir);

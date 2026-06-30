@@ -42,7 +42,7 @@ Aurobore автоматизирует именно эти шаги для веб
 | `*.desktop`, `CMakeLists.txt`, `rpm/*.spec` | `aurobore.config.json` + web (`src/`, `dist/`) | генерируется |
 | `icons/<size>/<app.id>.png` | `resources/icon.svg` или `resources/icons/` | `icons/<size>/<app.id>.png` |
 | `qml/`, `src/` | — (скрыто в runtime) | из контейнера |
-| `translations/*.ts` | — (этап 2) | планируется |
+| `translations/*.ts` | — (web не использует) | генерируется из `app.name` (splash/cover) |
 
 ## 4. Отладка и профилирование
 

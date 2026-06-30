@@ -10,6 +10,7 @@ import {
   resolvePluginManifests,
   checkProjectIcons,
   validateConfig,
+  probeDockerDaemon,
 } from "@aurobore/build";
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -181,6 +182,15 @@ function checkProjectIconsDoctor(cwd: string): DoctorCheck {
   }
 }
 
+function checkDocker(): DoctorCheck {
+  const probe = probeDockerDaemon();
+  return {
+    name: "Docker (sfdk build engine)",
+    status: probe.status === "ok" ? "ok" : probe.status === "warn" ? "warn" : "fail",
+    detail: probe.detail,
+  };
+}
+
 /** Выполняет проверки окружения разработчика Aurobore. */
 export function runDoctor(cwd: string = process.cwd()): DoctorReport {
   const checks = [
@@ -188,6 +198,7 @@ export function runDoctor(cwd: string = process.cwd()): DoctorReport {
     checkPnpm(),
     checkRuntime(),
     checkAuroraSdk(cwd),
+    checkDocker(),
     checkProjectConfig(cwd),
     checkProjectIconsDoctor(cwd),
     checkSfdkTarget(cwd),

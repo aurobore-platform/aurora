@@ -7,7 +7,7 @@
 
 - Node.js LTS (>= 20), pnpm (через `corepack enable`).
 - Для нативной сборки/запуска — Aurora SDK (mb2) + эмулятор (см. [README](README.md#требования-к-окружению-разработчика)).
-- Проверить окружение: `pnpm doctor`.
+- Проверить окружение: `pnpm run doctor` (в монорепо; не путать со встроенным `pnpm doctor`).
 - Прогон PoC на эмуляторе (M0.5): скопировать `tools/aurora/local.env.example` → `local.env`, затем `pnpm poc:all` (см. [tools/aurora/README.md](tools/aurora/README.md)).
 
 ## Быстрый старт

@@ -11,6 +11,8 @@
   устанавливает в `share/icons/hicolor/`, обновляет `%files` в `.spec`. Источник: `app.icon`,
   `resources/icons/` или placeholder. `doctor` проверяет наличие кастомной иконки; шаблоны и `init`
   добавляют `resources/icon.svg`. Зависимость `@aurobore/build`: `sharp`.
+- **Переводы нативного UI:** `translations/<app.id>.ts` + `-ru.ts` (splash/cover), `qt5_add_translation`,
+  `auroraapp_i18n`, установка `.qm` в `share/<app>/translations/`. Web-часть не затрагивается.
 
 ### Added (M0 — Spike)
 
