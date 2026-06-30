@@ -2,7 +2,7 @@ import { buildApp } from "@aurobore/build";
 import type { BuildAppOptions } from "@aurobore/build";
 import { flagBool, flagString, type ParsedArgs } from "../args.js";
 
-export function runBuildCommand(args: ParsedArgs): number {
+export async function runBuildCommand(args: ParsedArgs): Promise<number> {
   const mode = flagString(args.flags, "mode") === "dev" ? "dev" : "prod";
   const options: BuildAppOptions = {
     mode,
@@ -34,7 +34,7 @@ Options:
   }
 
   try {
-    const result = buildApp(options);
+    const result = await buildApp(options);
     console.log(`[build] RPM: ${result.rpmPath}`);
     console.log(`[build] app: ${result.appId} v${result.report.version}`);
     console.log(`[build] plugins: ${result.report.plugins.join(", ")}`);

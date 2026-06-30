@@ -79,7 +79,7 @@ async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
       break;
     }
     case "build":
-      exitCode = runBuildCommand(rest);
+      exitCode = await runBuildCommand(rest);
       break;
     case "run":
       exitCode = await runRunCommand(rest);

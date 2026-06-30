@@ -33,7 +33,16 @@ Aurobore автоматизирует именно эти шаги для веб
 | Отладка | DevTools моста + штатные средства (gdb, runtime-manager-tool) | [architecture/bridge.md](../architecture/bridge.md) |
 
 > Принцип: Aurobore **не подменяет** штатный цикл Аврора, а порождает корректные входные артефакты
-> (нативный проект, `.spec`, `.desktop`, CMake) и вызывает официальные инструменты сборки/запуска.
+> (нативный проект, `.spec`, `.desktop`, CMake, **иконки**) и вызывает официальные инструменты сборки/запуска.
+
+### Структура: ApplicationTemplate vs Aurobore
+
+| ApplicationTemplate (корень нативного проекта) | Aurobore (репозиторий пользователя) | Aurobore (`.aurobore/native/` при build) |
+|---|---|---|
+| `*.desktop`, `CMakeLists.txt`, `rpm/*.spec` | `aurobore.config.json` + web (`src/`, `dist/`) | генерируется |
+| `icons/<size>/<app.id>.png` | `resources/icon.svg` или `resources/icons/` | `icons/<size>/<app.id>.png` |
+| `qml/`, `src/` | — (скрыто в runtime) | из контейнера |
+| `translations/*.ts` | — (этап 2) | планируется |
 
 ## 4. Отладка и профилирование
 

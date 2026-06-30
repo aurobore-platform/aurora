@@ -81,19 +81,37 @@ sb2 -t AuroraOS-4.0.2.89-base-armv7hl ./test_armv7hl
 - Имя пакета следует схеме `ru.<organization>.<App>` (в примерах — `ru.auroraos.<App>`),
   см. [adr/ADR-009](../adr/ADR-009-naming.md).
 
-## 7. Проекция на Aurobore
+## 7. Иконки приложения
+
+По шаблону [ApplicationTemplate](https://gitlab.com/omprussia/demos/ApplicationTemplate) и демо OMP:
+
+| Элемент | Значение |
+|---|---|
+| Каталог в проекте | `icons/86x86/`, `icons/108x108/`, `icons/128x128/`, `icons/172x172/` |
+| Формат | PNG, имя файла = **app id** (`ru.example.myapp.png`) |
+| Поле `.desktop` | `Icon=<app id>` (без расширения) |
+| Установка (CMake) | `install(FILES icons/<size>/${PROJECT_NAME}.png DESTINATION share/icons/hicolor/<size>/apps)` |
+| Упаковка (`.spec`) | `%{_datadir}/icons/hicolor/*/apps/%{name}.png` или по одной строке на размер |
+
+Размеры фиксированы: **86×86**, **108×108**, **128×128**, **172×172** (`AURORAAPP_ICONS` в `.pro`-шаблонах).
+
+Aurobore генерирует каталог `icons/` в `.aurobore/native/` из `app.icon` (мастер SVG/PNG) или
+`resources/icons/` (готовые PNG), см. [architecture/configuration.md](../architecture/configuration.md).
+
+## 8. Проекция на Aurobore
 
 | Что генерирует Aurobore | На основе |
 |---|---|
 | `CMakeLists.txt` нативного контейнера | конфиг проекта (`aurobore.config`) |
 | `.spec` (имя `ru.<org>.<app>`, версия, зависимости, в т.ч. WebView) | конфиг + список плагинов/нативных зависимостей |
 | `.desktop` (точка входа + разрешения) | секция permissions конфига |
+| `icons/<size>/<app.id>.png` + install в `hicolor` | `app.icon` / `resources/icons/` / placeholder |
 | Вызов `mb2`/`apptool` под выбранный таргет | команда `aurobore build --arch <...>` |
 
 Подробнее — [architecture/build-system.md](../architecture/build-system.md),
 [architecture/configuration.md](../architecture/configuration.md), [adr/ADR-007](../adr/ADR-007-packaging-build.md).
 
-## 8. Что верифицировать `(verify)`
+## 9. Что верифицировать `(verify)`
 
 Полный статус — в [verification-status.md](verification-status.md). Кратко:
 

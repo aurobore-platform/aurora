@@ -74,6 +74,7 @@
 - [x] Валидация конфига на каждом запуске. → `loadConfig` / `config validate`.
 - [x] dev: live reload (и hot reload на Alpha+).
 - [x] plugin add/remove/list корректно меняют артефакты без ручной правки.
+- [x] Иконки лаунчера генерируются в native-проект и попадают в RPM (86/108/128/172, `hicolor`). → [`packages/build/src/native/icons.ts`](../packages/build/src/native/icons.ts), V-15.
 - [ ] (SHOULD) plugin create, generate, publish, migrate.
 
 ## 8. SDK чек-лист

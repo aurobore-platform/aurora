@@ -69,3 +69,9 @@ install(DIRECTORY qml DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY tls DESTINATION share/${PROJECT_NAME})
 install(FILES ${PROJECT_NAME}.desktop DESTINATION share/applications)
+
+set(AUROBORE_ICON_SIZES 86x86 108x108 128x128 172x172)
+foreach(_icon_size IN LISTS AUROBORE_ICON_SIZES)
+    install(FILES icons/${_icon_size}/${PROJECT_NAME}.png
+        DESTINATION share/icons/hicolor/${_icon_size}/apps)
+endforeach()

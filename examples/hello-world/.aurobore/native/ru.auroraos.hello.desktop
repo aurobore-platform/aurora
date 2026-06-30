@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Hello World
+Comment=Hello World
+Icon=ru.auroraos.hello
+Exec=ru.auroraos.hello
+X-Application-Type=silica-qt5
+
+[X-Application]
+Permissions=Internet
+OrganizationName=ru.auroraos
+ApplicationName=hello

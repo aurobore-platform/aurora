@@ -8,6 +8,7 @@ import {
   loadConfig,
   resolveBundledRuntimeRoot,
   resolvePluginManifests,
+  checkProjectIcons,
   validateConfig,
 } from "@aurobore/build";
 import fs from "node:fs";
@@ -154,6 +155,32 @@ function checkSfdkTarget(cwd: string): DoctorCheck {
   return { name: "SFDK target", status: "ok", detail: env.SFDK_TARGET };
 }
 
+function checkProjectIconsDoctor(cwd: string): DoctorCheck {
+  const configPath = findConfigFile(cwd);
+  if (!configPath) {
+    return {
+      name: "App icons",
+      status: "warn",
+      detail: "aurobore.config не найден",
+    };
+  }
+  try {
+    const { config } = loadConfig(cwd);
+    const result = checkProjectIcons(cwd, config.app.id, config.app.icon);
+    return {
+      name: "App icons",
+      status: result.level === "warn" ? "warn" : "ok",
+      detail: result.detail,
+    };
+  } catch (err) {
+    return {
+      name: "App icons",
+      status: "warn",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
 /** Выполняет проверки окружения разработчика Aurobore. */
 export function runDoctor(cwd: string = process.cwd()): DoctorReport {
   const checks = [
@@ -162,6 +189,7 @@ export function runDoctor(cwd: string = process.cwd()): DoctorReport {
     checkRuntime(),
     checkAuroraSdk(cwd),
     checkProjectConfig(cwd),
+    checkProjectIconsDoctor(cwd),
     checkSfdkTarget(cwd),
   ];
   const ok = checks.every((c) => c.status !== "fail");

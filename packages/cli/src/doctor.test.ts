@@ -10,6 +10,7 @@ describe("@aurobore/cli doctor", () => {
     expect(names.some((n) => n.startsWith("Aurobore runtime"))).toBe(true);
     expect(names.some((n) => n.startsWith("Aurora SDK"))).toBe(true);
     expect(names.some((n) => n.startsWith("aurobore.config"))).toBe(true);
+    expect(names.some((n) => n.startsWith("App icons"))).toBe(true);
     expect(names.some((n) => n.startsWith("SFDK target"))).toBe(true);
   });
 

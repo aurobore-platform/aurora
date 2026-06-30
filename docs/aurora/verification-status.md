@@ -42,6 +42,7 @@
 | V-12 | ✅ **Закрыт (M1).** `InitBrowser()` после `createView()`, до `setSource()` с `ApplicationWindow` + `pageStack` + `cover` — приложение стартует на SDK 5.2.1.200. | ✅ | — | `runtime/container`; `pnpm container:all` |
 | V-13 | 🟢 **M1+.** Прямой `CefRegisterSchemeHandlerFactory` недоступен в public SDK. Реализован **loopback `AssetSchemeServer`** (`https://127.0.0.1:<port>/`, auto-trust SPKI в `InitBrowser`) с маппингом через `AssetResolver`; path-based SPA, secure context. HTTP fallback при отсутствии Qt SSL. | 🟢 | Средний (FR-R6) | `src/AssetSchemeServer.*`, `LoopbackTlsCredentials`, `tls/` |
 | V-14 | 🟡 **Частично (M1).** Тип `BackNavigation` недоступен в QML на 5.2.1.200. SPA «назад» — `history.back()` по `sendAsyncMessage("aurobore:back")` (симуляция в демо); аппаратный жест Silica — уточнить на устройстве. | 🟡 | Средний (UX) | Демо SPA; WebViewAPI / Silica PageStack на устройстве |
+| V-15 | 🟢 **Закрыт (шаблон OMP).** Иконки: `icons/{86,108,128,172}x{86,108,128,172}/<appId>.png`; CMake `install(... DESTINATION share/icons/hicolor/<size>/apps)`; spec `%{_datadir}/icons/hicolor/*/apps/%{name}.png`; `.desktop` `Icon=<appId>`. Источник: ApplicationTemplate, TFLiteSample. Aurobore генерирует те же пути в `.aurobore/native/`. | 🟢 | Низкий (store UI) | `aurobore build`; `rpm -ql` на пакет; лаунчер эмулятора |
 
 ## 3. Влияние на завершение этапа Design
 

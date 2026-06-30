@@ -34,6 +34,11 @@ describe("init CLI", () => {
 
     expect(code).toBe(0);
     expect(fs.existsSync(path.join(root, "aurobore.config.json"))).toBe(true);
+    const config = JSON.parse(fs.readFileSync(path.join(root, "aurobore.config.json"), "utf8")) as {
+      app: { icon?: string };
+    };
+    expect(config.app.icon).toBe("resources/icon.svg");
+    expect(fs.existsSync(path.join(root, "resources", "icon.svg"))).toBe(true);
     const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")) as {
       scripts: Record<string, string>;
       devDependencies?: Record<string, string>;

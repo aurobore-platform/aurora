@@ -36,6 +36,10 @@ aurobore-app://, splash, lifecycle, SPA-навигация.
 %{_bindir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
+%{_datadir}/icons/hicolor/86x86/apps/%{name}.png
+%{_datadir}/icons/hicolor/108x108/apps/%{name}.png
+%{_datadir}/icons/hicolor/128x128/apps/%{name}.png
+%{_datadir}/icons/hicolor/172x172/apps/%{name}.png
 
 %changelog
 * Sat Jun 27 2026 Aurobore contributors - 0.1.0-1

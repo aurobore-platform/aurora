@@ -1,0 +1,10 @@
+{
+  "appId": "ru.auroraos.hello",
+  "version": "0.1.0",
+  "plugins": [
+    "echo",
+    "device"
+  ],
+  "generatedAt": "2026-06-30T12:38:42.332Z",
+  "mode": "prod"
+}

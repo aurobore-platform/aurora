@@ -31,7 +31,7 @@ Options:
 
     if (!flagBool(args.flags, "no-run")) {
       console.log(`[dev] building dev container (entry: ${entryUrl})`);
-      buildApp({ mode: "dev", devEntryUrl: entryUrl });
+      await buildApp({ mode: "dev", devEntryUrl: entryUrl });
       await runApp({});
     }
 

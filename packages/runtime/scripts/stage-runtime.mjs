@@ -1,13 +1,30 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = path.resolve(__dirname, "..");
-const REPO_RUNTIME = path.resolve(PKG_ROOT, "../../runtime");
+const REPO_ROOT = path.resolve(PKG_ROOT, "../..");
+const REPO_RUNTIME = path.join(REPO_ROOT, "runtime");
 
 const RUNTIME_DIRS = ["container", "bridge-native", "native-sdk"];
 const EXCLUDE_DIRS = new Set(["RPMS", "CMakeFiles", ".sfdk", "generated", "node_modules"]);
+const CONTAINER_ICON_MARKER = path.join(
+  REPO_RUNTIME,
+  "container/icons/86x86/ru.auroraos.aurobore-container.png",
+);
+
+function ensureContainerIcons() {
+  if (fs.existsSync(CONTAINER_ICON_MARKER)) {
+    return;
+  }
+  const script = path.join(REPO_ROOT, "packages/build/scripts/gen-container-icons.mjs");
+  const res = spawnSync(process.execPath, [script], { cwd: REPO_ROOT, stdio: "inherit" });
+  if (res.status !== 0) {
+    throw new Error("gen-container-icons failed");
+  }
+}
 
 function copyDirFiltered(src, dst, excludeDirs) {
   fs.mkdirSync(dst, { recursive: true });
@@ -24,6 +41,7 @@ function copyDirFiltered(src, dst, excludeDirs) {
 }
 
 function stageRuntime() {
+  ensureContainerIcons();
   for (const dir of RUNTIME_DIRS) {
     const src = path.join(REPO_RUNTIME, dir);
     const dst = path.join(PKG_ROOT, dir);
