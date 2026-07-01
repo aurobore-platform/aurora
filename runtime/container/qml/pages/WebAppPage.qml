@@ -57,6 +57,42 @@ Page {
         return result
     }
 
+    function screenAxisHeight() {
+        switch (page.orientation) {
+        case Orientation.Portrait:
+        case Orientation.PortraitInverted:
+            return Screen.height
+        case Orientation.Landscape:
+        case Orientation.LandscapeInverted:
+            return Screen.width
+        }
+        return Screen.height
+    }
+
+    function nativeKeyboardInsetPx() {
+        return Qt.inputMethod.visible ? Qt.inputMethod.keyboardRectangle.height : 0
+    }
+
+    function applyKeyboardInset(bottom) {
+        if (bottom === keyboardInset)
+            return
+        var wasClosed = keyboardInset === 0
+        keyboardInset = bottom
+        injectInsets()
+        if (wasClosed && bottom > 0) {
+            webView.runJavaScript(
+                "document.activeElement && document.activeElement.scrollIntoView" +
+                "({block:'nearest',behavior:'smooth'})"
+            )
+        }
+        if (bottom > 0)
+            console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + bottom)
+    }
+
+    function updateKeyboardInset() {
+        applyKeyboardInset(nativeKeyboardInsetPx())
+    }
+
     function chromeStylesheetHref() {
         if (assetServerOrigin && assetServerOrigin.length > 0)
             return assetServerOrigin + "/css/aurobore-chrome.css"
@@ -194,7 +230,10 @@ Page {
         }
     }
 
-    onOrientationChanged: injectInsets()
+    onOrientationChanged: {
+        injectInsets()
+        updateKeyboardInset()
+    }
     onWidthChanged: injectInsets()
     onHeightChanged: injectInsets()
 
@@ -211,6 +250,7 @@ Page {
         injectViewportMeta()
         injectKeyboardViewportListener()
         injectInsets()
+        updateKeyboardInset()
         splashTimer.start()
         entryLoadTimer.start()
         console.log("[aurobore-container] htmlRootPath:", htmlRootPath)
@@ -231,6 +271,12 @@ Page {
     Connections {
         target: bridgeRouter
         onOutbound: page.deliverBridgeMessage(message)
+    }
+
+    Connections {
+        target: Qt.inputMethod
+        onVisibleChanged: page.updateKeyboardInset()
+        onKeyboardRectangleChanged: page.updateKeyboardInset()
     }
 
     Timer {
@@ -268,17 +314,7 @@ Page {
             right: parent.right
         }
 
-        height: {
-            switch(page.orientation) {
-                case Orientation.Portrait: {
-                    return Screen.height
-                }
-                case Orientation.Landscape: {
-                    return Screen.width
-                }
-           
-            }
-        }
+        height: page.screenAxisHeight()
         url: "about:blank"
 
         TouchInput { enabled: true }
@@ -363,19 +399,9 @@ Page {
             } else if (name === "aurobore:keyboard-inset") {
                 var inset = parseBridgeData(data)
                 var bottom = (inset && inset.bottom) ? inset.bottom : 0
-                if (bottom !== keyboardInset) {
-                    var wasClosed = keyboardInset === 0
-                    keyboardInset = bottom
-                    injectInsets()
-                    if (wasClosed && bottom > 0) {
-                        webView.runJavaScript(
-                            "document.activeElement && document.activeElement.scrollIntoView" +
-                            "({block:'nearest',behavior:'smooth'})"
-                        )
-                    }
-                    if (bottom > 0)
-                        console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + bottom)
-                }
+                // Fallback when Qt.inputMethod does not report keyboard height.
+                if (page.nativeKeyboardInsetPx() === 0 && bottom > 0)
+                    page.applyKeyboardInset(bottom)
             }
         }
     }

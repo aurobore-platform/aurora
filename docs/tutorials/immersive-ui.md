@@ -4,11 +4,18 @@
 
 Runtime всегда работает в единственном режиме (без настроек в конфиге):
 
-1. WebView **на весь экран** (`anchors.fill`), без native top margin.
-2. Инъектирует CSS-переменные `--aurobore-safe-area-*` (и алиасы `--safe-area-inset-*`) из `SafeZoneRect` / status bar.
-3. Подключает `aurobore-chrome.css` — padding на `html` из этих переменных.
-4. Нормализует `viewport-fit=cover` в meta viewport (в т.ч. при dev-сервере).
-5. Клавиатура **overlay** (`KeyboardInput` выключен, WebView не сжимается, `window.innerHeight` стабилен): bottom inset через **visualViewport → native** `injectInsets` и событие `systemChrome:insetsChanged`.
+1. WebView **на весь экран** — якоря `top`/`left`/`right` и фиксированная высота `screenAxisHeight()` (`Screen.height` / `Screen.width` по ориентации, включая перевёрнутые). WebView **не** `anchors.fill`: при открытии клавиатуры Silica сжимает `Page`, но CEF остаётся полноэкранным.
+2. `ApplicationWindow`: `displayMode: "FillScreen"`, `statusbarForceVisible: true`.
+3. Инъектирует CSS-переменные `--aurobore-safe-area-*` (и алиасы `--safe-area-inset-*`) из `SafeZoneRect` / status bar.
+4. Подключает `aurobore-chrome.css` — padding на `html` из этих переменных.
+5. Нормализует `viewport-fit=cover` в meta viewport (в т.ч. при dev-сервере).
+6. Клавиатура **overlay** (Chromium WebView):
+   - `KeyboardInput { enabled: true }` — **обязательно**; при `enabled: false` клавиатура не показывается.
+   - Bottom inset: **`Qt.inputMethod.keyboardRectangle`** → `injectInsets()` и событие `systemChrome:insetsChanged`.
+   - JS: `navigator.virtualKeyboard.overlaysContent = true` — стабильный `window.innerHeight`.
+   - Fallback: `visualViewport` → `aurobore:keyboard-inset`, если `Qt.inputMethod` вернул 0.
+
+> **Gecko vs Chromium:** официальный гайд [«Клавиатура с WebView»](https://developer.auroraos.ru/doc/5.1.3/software_development/guides/keyboard/webview_keyboard) относится только к Gecko. Aurobore использует **Chromium** (`ru.auroraos.WebView`); см. [webview.md](../aurora/webview.md) §«Клавиатура».
 
 ## Edge-to-edge и fixed header
 

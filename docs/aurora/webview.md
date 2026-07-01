@@ -66,6 +66,23 @@ WebView {
 Ключевой C++-класс — `Aurora::WebView::WebViewItem`; в справочнике есть раздел примеров и
 отдельный проект-пример.
 
+### Клавиатура (Chromium)
+
+Aurobore использует **Chromium** WebView, не Gecko. Официальный гайд
+[«Клавиатура с WebView»](https://developer.auroraos.ru/doc/5.1.3/software_development/guides/keyboard/webview_keyboard)
+относится **только к Gecko** (`virtualKeyboardMargin`, `loadFrameScript` и т.п.).
+
+Для Chromium в runtime-контейнере:
+
+| Компонент | Назначение |
+|---|---|
+| `KeyboardInput { enabled: true }` | **Обязательно** — мост `<input>` → системная клавиатура; при `false` клавиатура не открывается |
+| Фиксированная высота WebView (`screenAxisHeight()`) | WebView не сжимается при открытии клавиатуры (overlay) |
+| `Qt.inputMethod.keyboardRectangle` | Primary-источник bottom inset → CSS vars |
+| `navigator.virtualKeyboard.overlaysContent` | Стабильный `window.innerHeight` в CEF |
+
+Подробности: [immersive-ui.md](../tutorials/immersive-ui.md).
+
 ## 4. Зависимости и упаковка
 
 Подтверждённые факты (официальный справочник + перепроверка на примерах/сообществе):
