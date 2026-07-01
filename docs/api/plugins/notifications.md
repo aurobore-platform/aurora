@@ -50,6 +50,7 @@
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
 | `NOTIFICATIONS_UNAVAILABLE` | notifications not available | Нет локальных уведомлений на устройстве или плагин в stub-режиме (A3 scaffold) |
+| `NOTIFICATIONS_CANCELLED` | user cancelled | Пользователь отменил действие с уведомлением (UI-итерация) |
 ## Импорт
 
 ```typescript

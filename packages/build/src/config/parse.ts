@@ -1,0 +1,295 @@
+import fs from "node:fs";
+import path from "node:path";
+import { applyConfigDefaults } from "./defaults.js";
+import type { AuroboreConfig, ConfigValidationError, LoadedConfig } from "./types.js";
+
+const CONFIG_FILENAMES = ["aurobore.config.json", "aurobore.config.js"] as const;
+
+const TOP_KEYS = new Set([
+  "configVersion",
+  "app",
+  "web",
+  "permissions",
+  "plugins",
+  "build",
+  "deepLinks",
+  "cover",
+]);
+
+const APP_KEYS = new Set(["id", "name", "version", "orientation", "icon", "splash"]);
+const WEB_KEYS = new Set(["root", "entry", "entryUrl", "devServer"]);
+const SPLASH_KEYS = new Set(["image", "background", "timeoutMs"]);
+const DEV_SERVER_KEYS = new Set(["port", "host"]);
+const BUILD_KEYS = new Set(["engine", "minOs", "targets"]);
+const DEEP_LINKS_KEYS = new Set(["schemes"]);
+const COVER_KEYS = new Set(["actions"]);
+const COVER_ACTION_KEYS = new Set(["id", "label", "icon"]);
+
+const ORIENTATIONS = new Set(["portrait", "landscape", "auto"]);
+const ENGINES = new Set(["chromium"]);
+
+const APP_ID_RE = /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/;
+const SEMVER_RE = /^\d+\.\d+\.\d+(-[\w.-]+)?(\+[\w.-]+)?$/;
+const COVER_ACTION_ID_RE = /^[a-z][a-z0-9_-]*$/i;
+const MAX_COVER_ACTIONS = 4;
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function push(errors: ConfigValidationError[], configPath: string, message: string): void {
+  errors.push({ path: configPath, message });
+}
+
+function validateStringField(
+  errors: ConfigValidationError[],
+  obj: Record<string, unknown>,
+  key: string,
+  configPath: string,
+): string | undefined {
+  const value = obj[key];
+  if (typeof value !== "string" || value.trim() === "") {
+    push(errors, configPath, `${key} must be a non-empty string`);
+    return undefined;
+  }
+  return value;
+}
+
+function validateStringArray(
+  errors: ConfigValidationError[],
+  value: unknown,
+  configPath: string,
+): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    push(errors, configPath, "must be an array of strings");
+    return undefined;
+  }
+  return value;
+}
+
+/** Валидирует сырой JSON конфига; возвращает список ошибок (пустой = ok). */
+export function validateConfig(raw: unknown): ConfigValidationError[] {
+  const errors: ConfigValidationError[] = [];
+  if (!isPlainObject(raw)) {
+    return [{ path: "", message: "config must be a JSON object" }];
+  }
+
+  for (const key of Object.keys(raw)) {
+    if (!TOP_KEYS.has(key)) {
+      push(errors, key, `unknown field: ${key}`);
+    }
+  }
+
+  const configVersion = raw.configVersion;
+  if (typeof configVersion !== "number" || !Number.isInteger(configVersion)) {
+    push(errors, "configVersion", "configVersion must be an integer");
+  } else if (configVersion !== 1) {
+    push(errors, "configVersion", `unsupported configVersion: ${configVersion}`);
+  }
+
+  if (!isPlainObject(raw.app)) {
+    push(errors, "app", "app is required");
+  } else {
+    for (const key of Object.keys(raw.app)) {
+      if (!APP_KEYS.has(key)) {
+        push(errors, `app.${key}`, `unknown field: ${key}`);
+      }
+    }
+    const appId = validateStringField(errors, raw.app, "id", "app.id");
+    if (appId && !APP_ID_RE.test(appId)) {
+      push(errors, "app.id", "app.id must be a reverse-domain identifier (e.g. ru.example.app)");
+    }
+    validateStringField(errors, raw.app, "name", "app.name");
+    const version = validateStringField(errors, raw.app, "version", "app.version");
+    if (version && !SEMVER_RE.test(version)) {
+      push(errors, "app.version", "app.version must be semver (e.g. 1.0.0)");
+    }
+    if (raw.app.orientation !== undefined) {
+      if (typeof raw.app.orientation !== "string" || !ORIENTATIONS.has(raw.app.orientation)) {
+        push(errors, "app.orientation", "orientation must be portrait, landscape, or auto");
+      }
+    }
+    if (raw.app.splash !== undefined) {
+      if (!isPlainObject(raw.app.splash)) {
+        push(errors, "app.splash", "splash must be an object");
+      } else {
+        for (const key of Object.keys(raw.app.splash)) {
+          if (!SPLASH_KEYS.has(key)) {
+            push(errors, `app.splash.${key}`, `unknown field: ${key}`);
+          }
+        }
+        if (
+          raw.app.splash.timeoutMs !== undefined &&
+          (typeof raw.app.splash.timeoutMs !== "number" || raw.app.splash.timeoutMs < 0)
+        ) {
+          push(errors, "app.splash.timeoutMs", "timeoutMs must be a non-negative number");
+        }
+      }
+    }
+  }
+
+  if (!isPlainObject(raw.web)) {
+    push(errors, "web", "web is required");
+  } else {
+    for (const key of Object.keys(raw.web)) {
+      if (!WEB_KEYS.has(key)) {
+        push(errors, `web.${key}`, `unknown field: ${key}`);
+      }
+    }
+    validateStringField(errors, raw.web, "root", "web.root");
+    validateStringField(errors, raw.web, "entry", "web.entry");
+    if (raw.web.devServer !== undefined) {
+      if (!isPlainObject(raw.web.devServer)) {
+        push(errors, "web.devServer", "devServer must be an object");
+      } else {
+        for (const key of Object.keys(raw.web.devServer)) {
+          if (!DEV_SERVER_KEYS.has(key)) {
+            push(errors, `web.devServer.${key}`, `unknown field: ${key}`);
+          }
+        }
+        if (
+          raw.web.devServer.port !== undefined &&
+          (typeof raw.web.devServer.port !== "number" ||
+            raw.web.devServer.port < 1 ||
+            raw.web.devServer.port > 65535)
+        ) {
+          push(errors, "web.devServer.port", "port must be an integer between 1 and 65535");
+        }
+      }
+    }
+  }
+
+  validateStringArray(errors, raw.permissions, "permissions");
+  validateStringArray(errors, raw.plugins, "plugins");
+
+  if (raw.build !== undefined) {
+    if (!isPlainObject(raw.build)) {
+      push(errors, "build", "build must be an object");
+    } else {
+      for (const key of Object.keys(raw.build)) {
+        if (!BUILD_KEYS.has(key)) {
+          push(errors, `build.${key}`, `unknown field: ${key}`);
+        }
+      }
+      if (raw.build.engine !== undefined) {
+        if (typeof raw.build.engine !== "string" || !ENGINES.has(raw.build.engine)) {
+          push(errors, "build.engine", "engine must be chromium");
+        }
+      }
+      validateStringArray(errors, raw.build.targets, "build.targets");
+    }
+  }
+
+  if (raw.deepLinks !== undefined) {
+    if (!isPlainObject(raw.deepLinks)) {
+      push(errors, "deepLinks", "deepLinks must be an object");
+    } else {
+      for (const key of Object.keys(raw.deepLinks)) {
+        if (!DEEP_LINKS_KEYS.has(key)) {
+          push(errors, `deepLinks.${key}`, `unknown field: ${key}`);
+        }
+      }
+      validateStringArray(errors, raw.deepLinks.schemes, "deepLinks.schemes");
+    }
+  }
+
+  if (raw.cover !== undefined) {
+    if (!isPlainObject(raw.cover)) {
+      push(errors, "cover", "cover must be an object");
+    } else {
+      for (const key of Object.keys(raw.cover)) {
+        if (!COVER_KEYS.has(key)) {
+          push(errors, `cover.${key}`, `unknown field: ${key}`);
+        }
+      }
+      if (raw.cover.actions !== undefined) {
+        if (!Array.isArray(raw.cover.actions)) {
+          push(errors, "cover.actions", "actions must be an array");
+        } else if (raw.cover.actions.length > MAX_COVER_ACTIONS) {
+          push(errors, "cover.actions", `actions must contain at most ${MAX_COVER_ACTIONS} items`);
+        } else {
+          const seenIds = new Set<string>();
+          raw.cover.actions.forEach((item, index) => {
+            const path = `cover.actions[${index}]`;
+            if (!isPlainObject(item)) {
+              push(errors, path, "action must be an object");
+              return;
+            }
+            for (const key of Object.keys(item)) {
+              if (!COVER_ACTION_KEYS.has(key)) {
+                push(errors, `${path}.${key}`, `unknown field: ${key}`);
+              }
+            }
+            const id = validateStringField(errors, item, "id", `${path}.id`);
+            const label = validateStringField(errors, item, "label", `${path}.label`);
+            if (id && !COVER_ACTION_ID_RE.test(id)) {
+              push(errors, `${path}.id`, "id must be alphanumeric with _ or -");
+            }
+            if (id && seenIds.has(id)) {
+              push(errors, `${path}.id`, `duplicate action id: ${id}`);
+            } else if (id) {
+              seenIds.add(id);
+            }
+            if (label === undefined && item.label !== undefined) {
+              push(errors, `${path}.label`, "label must be a non-empty string");
+            }
+            if (item.icon !== undefined && (typeof item.icon !== "string" || item.icon.trim() === "")) {
+              push(errors, `${path}.icon`, "icon must be a non-empty string");
+            }
+          });
+        }
+      }
+    }
+  }
+
+  return errors;
+}
+
+/** Парсит и валидирует конфиг; бросает при ошибках. */
+export function parseConfig(raw: unknown): AuroboreConfig {
+  const errors = validateConfig(raw);
+  if (errors.length > 0) {
+    const detail = errors.map((e) => `${e.path}: ${e.message}`).join("; ");
+    throw new Error(`Invalid aurobore.config: ${detail}`);
+  }
+  return applyConfigDefaults(raw as AuroboreConfig);
+}
+
+/** Ищет файл конфигурации в каталоге проекта. */
+export function findConfigFile(projectRoot: string): string | null {
+  for (const name of CONFIG_FILENAMES) {
+    const candidate = path.join(projectRoot, name);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+/** Загружает конфиг из каталога проекта. */
+export function loadConfig(projectRoot: string): LoadedConfig {
+  const configPath = findConfigFile(projectRoot);
+  if (!configPath) {
+    throw new Error(
+      `aurobore.config not found in ${projectRoot} (expected aurobore.config.json)`,
+    );
+  }
+
+  let raw: unknown;
+  if (configPath.endsWith(".json")) {
+    raw = JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } else {
+    throw new Error(`Dynamic config (${path.basename(configPath)}) is not supported yet`);
+  }
+
+  return { config: parseConfig(raw), configPath };
+}
+
+/** Проверяет формат app.id (reverse-DNS). */
+export function isValidAppId(id: string): boolean {
+  return APP_ID_RE.test(id);
+}
+
+/** Проверяет semver app.version. */
+export function isValidSemver(version: string): boolean {
+  return SEMVER_RE.test(version);
+}

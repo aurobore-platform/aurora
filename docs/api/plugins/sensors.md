@@ -31,6 +31,7 @@
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
 | `SENSORS_UNAVAILABLE` | sensors not available | Нет акселерометра/гироскопа на устройстве или плагин в stub-режиме (A3 scaffold) |
+| `SENSORS_CANCELLED` | user cancelled | Подписка на сенсор отменена пользователем (UI-итерация) |
 ## Импорт
 
 ```typescript

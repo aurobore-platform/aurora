@@ -21,6 +21,10 @@
     "SENSORS_UNAVAILABLE": {
       "message": "sensors not available",
       "description": "Нет акселерометра/гироскопа на устройстве или плагин в stub-режиме (A3 scaffold)"
+    },
+    "SENSORS_CANCELLED": {
+      "message": "user cancelled",
+      "description": "Подписка на сенсор отменена пользователем (UI-итерация)"
     }
   }
 }

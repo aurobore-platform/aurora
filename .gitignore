@@ -9,6 +9,7 @@ node_modules/
 # Build output
 dist/
 build/
+!packages/build/
 *.tsbuildinfo
 coverage/
 .codegen-plugins.stamp

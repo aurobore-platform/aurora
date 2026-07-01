@@ -35,6 +35,10 @@
     "NOTIFICATIONS_UNAVAILABLE": {
       "message": "notifications not available",
       "description": "Нет локальных уведомлений на устройстве или плагин в stub-режиме (A3 scaffold)"
+    },
+    "NOTIFICATIONS_CANCELLED": {
+      "message": "user cancelled",
+      "description": "Пользователь отменил действие с уведомлением (UI-итерация)"
     }
   }
 }

@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aurobore.dev/schema/aurobore.config.schema.json",
+  "title": "Aurobore Project Config",
+  "type": "object",
+  "required": ["configVersion", "app", "web"],
+  "additionalProperties": false,
+  "properties": {
+    "configVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "app": {
+      "type": "object",
+      "required": ["id", "name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[\\w.-]+)?(\\+[\\w.-]+)?$" },
+        "orientation": { "type": "string", "enum": ["portrait", "landscape", "auto"] },
+        "icon": { "type": "string" },
+        "splash": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "image": { "type": "string" },
+            "background": { "type": "string" },
+            "timeoutMs": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "web": {
+      "type": "object",
+      "required": ["root", "entry"],
+      "additionalProperties": false,
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "entry": { "type": "string", "minLength": 1 },
+        "entryUrl": { "type": "string" },
+        "devServer": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "host": { "type": "string" }
+          }
+        }
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "plugins": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engine": { "type": "string", "enum": ["chromium"] },
+        "minOs": { "type": "string" },
+        "targets": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "deepLinks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "cover": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": ["id", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$" },
+              "label": { "type": "string", "minLength": 1 },
+              "icon": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

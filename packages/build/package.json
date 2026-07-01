@@ -1,0 +1,31 @@
+{
+  "name": "@aurobore/build",
+  "version": "0.0.2",
+  "description": "Сборка и кодогенерация: генерация нативного проекта Аврора (CMake/.spec/.desktop) и JS/TS-обёрток.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/runtime": "workspace:*",
+    "esbuild": "^0.24.2",
+    "sharp": "^0.33.5"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "gen-container-icons": "node scripts/gen-container-icons.mjs",
+    "gen-container-translations": "node scripts/gen-container-translations.mjs"
+  }
+}
