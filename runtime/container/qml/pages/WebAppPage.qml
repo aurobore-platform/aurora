@@ -262,7 +262,23 @@ Page {
     WebView {
         id: webView
 
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+
+        height: {
+            switch(page.orientation) {
+                case Orientation.Portrait: {
+                    return Screen.height
+                }
+                case Orientation.Landscape: {
+                    return Screen.width
+                }
+           
+            }
+        }
         url: "about:blank"
 
         TouchInput { enabled: true }

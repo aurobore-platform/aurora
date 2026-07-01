@@ -11,7 +11,8 @@ ApplicationWindow {
     allowedOrientations: defaultAllowedOrientations
     cover: Qt.resolvedUrl("cover/DefaultCover.qml")
     focus: true
-
+    displayMode : "FillScreen"
+    statusbarForceVisible : true
     initialPage: Component {
         WebAppPage { }
     }
