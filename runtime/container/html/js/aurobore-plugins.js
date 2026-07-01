@@ -45,5 +45,34 @@
     getStatus: function (args) { return A.invoke("Network", "getStatus", args || {}); },
   };
   A.__plugins["Network"] = { version: "1.0.0", methods: ["getStatus"], events: ["network:change"] };
+  A.Camera = {
+    getPhoto: function (args) { return A.invoke("Camera", "getPhoto", args || {}); },
+    pickPhoto: function (args) { return A.invoke("Camera", "pickPhoto", args || {}); },
+  };
+  A.__plugins["Camera"] = { version: "1.0.0", methods: ["getPhoto","pickPhoto"], events: [] };
+  A.Geolocation = {
+    getCurrentPosition: function (args) { return A.invoke("Geolocation", "getCurrentPosition", args || {}); },
+    watch: function (args) { return A.invoke("Geolocation", "watch", args || {}, { stream: true }); },
+    clearWatch: function (args) { return A.invoke("Geolocation", "clearWatch", args || {}); },
+  };
+  A.__plugins["Geolocation"] = { version: "1.0.0", methods: ["getCurrentPosition","watch","clearWatch"], events: [] };
+  A.Notifications = {
+    schedule: function (args) { return A.invoke("Notifications", "schedule", args || {}); },
+    notify: function (args) { return A.invoke("Notifications", "notify", args || {}); },
+    cancel: function (args) { return A.invoke("Notifications", "cancel", args || {}); },
+    cancelAll: function (args) { return A.invoke("Notifications", "cancelAll", args || {}); },
+  };
+  A.__plugins["Notifications"] = { version: "1.0.0", methods: ["schedule","notify","cancel","cancelAll"], events: ["notification:tap"] };
+  A.Share = {
+    shareText: function (args) { return A.invoke("Share", "shareText", args || {}); },
+    shareUrl: function (args) { return A.invoke("Share", "shareUrl", args || {}); },
+    shareFile: function (args) { return A.invoke("Share", "shareFile", args || {}); },
+  };
+  A.__plugins["Share"] = { version: "1.0.0", methods: ["shareText","shareUrl","shareFile"], events: [] };
+  A.Sensors = {
+    watchAccelerometer: function (args) { return A.invoke("Sensors", "watchAccelerometer", args || {}, { stream: true }); },
+    watchGyroscope: function (args) { return A.invoke("Sensors", "watchGyroscope", args || {}, { stream: true }); },
+  };
+  A.__plugins["Sensors"] = { version: "1.0.0", methods: ["watchAccelerometer","watchGyroscope"], events: [] };
   console.log("[aurobore-plugins] M3 plugins registered:", Object.keys(A.__plugins));
 })();

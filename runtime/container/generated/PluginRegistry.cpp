@@ -65,6 +65,56 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         QStringList({  }),
         QStringList({ QStringLiteral("getStatus") }),
         QStringList({ QStringLiteral("network:change") })
+    },
+    {
+        QStringLiteral("Camera"),
+        QStringLiteral("camera"),
+        QStringLiteral("1.0.0"),
+        1,
+        QStringList({ QStringLiteral("Camera") }),
+        QStringList({  }),
+        QStringList({ QStringLiteral("getPhoto"), QStringLiteral("pickPhoto") }),
+        QStringList({  })
+    },
+    {
+        QStringLiteral("Geolocation"),
+        QStringLiteral("geolocation"),
+        QStringLiteral("1.0.0"),
+        1,
+        QStringList({ QStringLiteral("Location") }),
+        QStringList({  }),
+        QStringList({ QStringLiteral("getCurrentPosition"), QStringLiteral("watch"), QStringLiteral("clearWatch") }),
+        QStringList({  })
+    },
+    {
+        QStringLiteral("Notifications"),
+        QStringLiteral("notifications"),
+        QStringLiteral("1.0.0"),
+        1,
+        QStringList({ QStringLiteral("Notifications") }),
+        QStringList({  }),
+        QStringList({ QStringLiteral("schedule"), QStringLiteral("notify"), QStringLiteral("cancel"), QStringLiteral("cancelAll") }),
+        QStringList({ QStringLiteral("notification:tap") })
+    },
+    {
+        QStringLiteral("Share"),
+        QStringLiteral("share"),
+        QStringLiteral("1.0.0"),
+        1,
+        QStringList({  }),
+        QStringList({  }),
+        QStringList({ QStringLiteral("shareText"), QStringLiteral("shareUrl"), QStringLiteral("shareFile") }),
+        QStringList({  })
+    },
+    {
+        QStringLiteral("Sensors"),
+        QStringLiteral("sensors"),
+        QStringLiteral("1.0.0"),
+        1,
+        QStringList({  }),
+        QStringList({  }),
+        QStringList({ QStringLiteral("watchAccelerometer"), QStringLiteral("watchGyroscope") }),
+        QStringList({  })
     }
     };
 }
@@ -83,5 +133,15 @@ IPlugin *PluginRegistry::createPlugin(const QString &display, BridgeRouter *rout
         return createClipboardPlugin(router);
     if (display == QStringLiteral("Network"))
         return createNetworkPlugin(router);
+    if (display == QStringLiteral("Camera"))
+        return createCameraPlugin(router);
+    if (display == QStringLiteral("Geolocation"))
+        return createGeolocationPlugin(router);
+    if (display == QStringLiteral("Notifications"))
+        return createNotificationsPlugin(router);
+    if (display == QStringLiteral("Share"))
+        return createSharePlugin(router);
+    if (display == QStringLiteral("Sensors"))
+        return createSensorsPlugin(router);
     return nullptr;
 }

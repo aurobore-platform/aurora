@@ -1,0 +1,44 @@
+{
+  "manifestVersion": 1,
+  "name": "camera",
+  "display": "Camera",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": ["Camera"],
+  "types": {
+    "Photo": {
+      "kind": "string",
+      "url": "string",
+      "mimeType": "string?",
+      "size": "number?",
+      "width": "number?",
+      "height": "number?",
+      "format": "string?"
+    },
+    "GetPhotoArgs": {
+      "quality": "number?",
+      "allowEditing": "boolean?"
+    },
+    "PickPhotoArgs": {
+      "allowEditing": "boolean?"
+    }
+  },
+  "methods": {
+    "getPhoto": { "args": "GetPhotoArgs", "result": "Photo" },
+    "pickPhoto": { "args": "PickPhotoArgs", "result": "Photo" }
+  },
+  "errors": {
+    "CAMERA_UNAVAILABLE": {
+      "message": "camera or gallery not available",
+      "description": "Нет камеры/галереи на устройстве или плагин в stub-режиме (A3 scaffold)"
+    },
+    "CAMERA_CANCELLED": {
+      "message": "user cancelled",
+      "description": "Пользователь отменил съёмку или выбор из галереи"
+    },
+    "CAMERA_CAPTURE_FAILED": {
+      "message": "capture failed",
+      "description": "Ошибка при съёмке или сохранении фото в app-data"
+    }
+  }
+}

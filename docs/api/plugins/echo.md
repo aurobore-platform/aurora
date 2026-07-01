@@ -15,6 +15,8 @@
 | `echo` | `object` | `object` | — |
 | `fail` | `{}` | — | — |
 | `watchTicks` | `{}` | stream | — |
+| `watchFastTicks` | `{}` | stream | — |
+| `getSampleResource` | `{}` | `ResourceRef` | — |
 
 ## Типы
 
@@ -25,12 +27,22 @@
 | `pong` | `boolean` |
 | `ts` | `number` |
 
+### `ResourceRef`
+
+| Поле | Тип |
+|------|-----|
+| `kind` | `string` |
+| `url` | `string` |
+| `mimeType` | `string?` |
+| `size` | `number?` |
+
 
 ## Коды ошибок
 
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
 | `ECHO_TEST_ERROR` | demo error | Метод fail() — conformance-stub для проверки reject в приложении |
+| `ECHO_RESOURCE_ERROR` | failed to write sample resource | getSampleResource() — ошибка записи в app-data |
 ## Импорт
 
 ```typescript

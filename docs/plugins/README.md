@@ -14,6 +14,11 @@
 | FileSystem | `@aurobore/filesystem` | — (scope: `appData`) | [filesystem.md](filesystem.md) |
 | Clipboard | `@aurobore/clipboard` | — | [clipboard.md](clipboard.md) |
 | Network | `@aurobore/network` | `Internet` | [network.md](network.md) |
+| Camera | `@aurobore/camera` | `Camera` | [camera.md](camera.md) (A3 scaffold) |
+| Geolocation | `@aurobore/geolocation` | `Location` | [geolocation.md](geolocation.md) (A3 scaffold) |
+| Notifications | `@aurobore/notifications` | `Notifications` | [notifications.md](notifications.md) (A3 scaffold) |
+| Share | `@aurobore/share` | — | [share.md](share.md) (A3 scaffold) |
+| Sensors | `@aurobore/sensors` | — | [sensors.md](sensors.md) (A3 scaffold) |
 
 ## Импорт
 

@@ -14,6 +14,11 @@ IPlugin *createStoragePlugin(BridgeRouter *router);
 IPlugin *createFileSystemPlugin(BridgeRouter *router);
 IPlugin *createClipboardPlugin(BridgeRouter *router);
 IPlugin *createNetworkPlugin(BridgeRouter *router);
+IPlugin *createCameraPlugin(BridgeRouter *router);
+IPlugin *createGeolocationPlugin(BridgeRouter *router);
+IPlugin *createNotificationsPlugin(BridgeRouter *router);
+IPlugin *createSharePlugin(BridgeRouter *router);
+IPlugin *createSensorsPlugin(BridgeRouter *router);
 
 class PluginRegistry
 {

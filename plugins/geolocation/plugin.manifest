@@ -1,0 +1,48 @@
+{
+  "manifestVersion": 1,
+  "name": "geolocation",
+  "display": "Geolocation",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": ["Location"],
+  "types": {
+    "Position": {
+      "latitude": "number",
+      "longitude": "number",
+      "accuracy": "number?",
+      "altitude": "number?",
+      "altitudeAccuracy": "number?",
+      "heading": "number?",
+      "speed": "number?",
+      "timestamp": "number"
+    },
+    "GetCurrentPositionArgs": {
+      "enableHighAccuracy": "boolean?",
+      "timeout": "number?",
+      "maximumAge": "number?"
+    },
+    "WatchArgs": {
+      "enableHighAccuracy": "boolean?",
+      "timeout": "number?",
+      "maximumAge": "number?"
+    },
+    "ClearWatchArgs": {
+      "watchId": "string"
+    }
+  },
+  "methods": {
+    "getCurrentPosition": { "args": "GetCurrentPositionArgs", "result": "Position" },
+    "watch": { "args": "WatchArgs", "result": "void", "stream": true },
+    "clearWatch": { "args": "ClearWatchArgs", "result": "void" }
+  },
+  "errors": {
+    "GEOLOCATION_UNAVAILABLE": {
+      "message": "geolocation not available",
+      "description": "Нет GPS/геолокации на устройстве или плагин в stub-режиме (A3 scaffold)"
+    },
+    "GEOLOCATION_CANCELLED": {
+      "message": "user cancelled",
+      "description": "Пользователь отменил запрос геолокации (UI-итерация)"
+    }
+  }
+}

@@ -45,21 +45,26 @@
 
 ### Camera
 - Съёмка фото/видео, выбор из галереи. Возвращает **URL ресурса** через Asset Loader (не байты в JSON).
-- Разрешения: `camera` (и хранилище при сохранении).
+- Разрешения: `Camera`
+- **Reference:** [camera.md](camera.md)
 
 ### Geolocation
 - Текущая позиция и **стрим** наблюдения (`watch`), остановка.
-- Разрешения: `location`.
+- Разрешения: `Location`
+- **Reference:** [geolocation.md](geolocation.md)
 
 ### Notifications (local)
 - Локальные уведомления: создать/отменить/расписание; события нажатия.
-- Разрешения: по модели Аврора.
+- Разрешения: `Notifications`
+- **Reference:** [notifications.md](notifications.md)
 
 ### Share
 - Системный шаринг текста/файлов/URL.
+- **Reference:** [share.md](share.md)
 
 ### Sensors
 - Акселерометр/гироскоп и пр. как **стримы** с backpressure/прореживанием.
+- **Reference:** [sensors.md](sensors.md)
 
 ## 4. Дополнительные плагины (COULD)
 

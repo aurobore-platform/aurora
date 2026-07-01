@@ -1,0 +1,39 @@
+{
+  "manifestVersion": 1,
+  "name": "share",
+  "display": "Share",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "types": {
+    "ShareTextArgs": {
+      "text": "string",
+      "title": "string?"
+    },
+    "ShareUrlArgs": {
+      "url": "string",
+      "title": "string?"
+    },
+    "ShareFileArgs": {
+      "kind": "string",
+      "url": "string",
+      "mimeType": "string?",
+      "title": "string?"
+    }
+  },
+  "methods": {
+    "shareText": { "args": "ShareTextArgs", "result": "void" },
+    "shareUrl": { "args": "ShareUrlArgs", "result": "void" },
+    "shareFile": { "args": "ShareFileArgs", "result": "void" }
+  },
+  "errors": {
+    "SHARE_UNAVAILABLE": {
+      "message": "share sheet not available",
+      "description": "Нет системного шаринга на устройстве или плагин в stub-режиме (A3 scaffold)"
+    },
+    "SHARE_CANCELLED": {
+      "message": "user cancelled",
+      "description": "Пользователь отменил шаринг (UI-итерация)"
+    }
+  }
+}

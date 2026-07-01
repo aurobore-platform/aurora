@@ -1,0 +1,26 @@
+{
+  "manifestVersion": 1,
+  "name": "sensors",
+  "display": "Sensors",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "types": {
+    "SensorReading": {
+      "x": "number",
+      "y": "number",
+      "z": "number",
+      "timestamp": "number"
+    }
+  },
+  "methods": {
+    "watchAccelerometer": { "args": {}, "result": "void", "stream": true },
+    "watchGyroscope": { "args": {}, "result": "void", "stream": true }
+  },
+  "errors": {
+    "SENSORS_UNAVAILABLE": {
+      "message": "sensors not available",
+      "description": "Нет акселерометра/гироскопа на устройстве или плагин в stub-режиме (A3 scaffold)"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "manifestVersion": 1,
+  "name": "notifications",
+  "display": "Notifications",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": ["Notifications"],
+  "types": {
+    "NotificationOptions": {
+      "id": "string?",
+      "title": "string",
+      "body": "string",
+      "scheduleAt": "number?"
+    },
+    "CancelArgs": {
+      "id": "string"
+    },
+    "ScheduleResult": {
+      "id": "string"
+    }
+  },
+  "methods": {
+    "schedule": { "args": "NotificationOptions", "result": "ScheduleResult" },
+    "notify": { "args": "NotificationOptions", "result": "ScheduleResult" },
+    "cancel": { "args": "CancelArgs", "result": "void" },
+    "cancelAll": { "args": {}, "result": "void" }
+  },
+  "events": {
+    "notification:tap": {
+      "id": "string",
+      "action": "string"
+    }
+  },
+  "errors": {
+    "NOTIFICATIONS_UNAVAILABLE": {
+      "message": "notifications not available",
+      "description": "Нет локальных уведомлений на устройстве или плагин в stub-режиме (A3 scaffold)"
+    }
+  }
+}

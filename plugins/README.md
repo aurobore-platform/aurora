@@ -7,4 +7,6 @@
 
 Плагины MVP (M3): **echo** (conformance), **device**, **storage**, **filesystem**, **clipboard**, **network**.
 
+Плагины расширения (A3+): **camera** (scaffold).
+
 Кодоген: `pnpm codegen:plugins` из корня репо.

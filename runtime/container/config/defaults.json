@@ -16,7 +16,7 @@
     "entry": "index.html",
     "entryUrl": "aurobore-app://localhost/index.html"
   },
-  "permissions": ["Internet"],
+  "permissions": ["Internet", "Camera", "Location", "Notifications"],
   "build": {
     "engine": "chromium",
     "minOs": "5.1.5"

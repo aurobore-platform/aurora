@@ -9,7 +9,7 @@ MimeType=x-scheme-handler/aurobore-demo;
 Intents=OpenURI
 
 [X-Application]
-Permissions=Internet
+Permissions=Internet;Camera;Location;Notifications
 OrganizationName=ru.auroraos
 ApplicationName=aurobore-container
 Custom-Schemes=aurobore-demo

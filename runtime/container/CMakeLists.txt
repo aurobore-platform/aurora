@@ -47,6 +47,11 @@ add_executable(${PROJECT_NAME}
     ${PLUGIN_NATIVE_DIR}/filesystem/native/FileSystemPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/clipboard/native/ClipboardPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/network/native/NetworkPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/camera/native/CameraPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/geolocation/native/GeolocationPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/notifications/native/NotificationsPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/share/native/SharePlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/sensors/native/SensorsPlugin.cpp
     ${QmFiles}
 )
 
@@ -60,6 +65,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${PLUGIN_NATIVE_DIR}/filesystem/native
     ${PLUGIN_NATIVE_DIR}/clipboard/native
     ${PLUGIN_NATIVE_DIR}/network/native
+    ${PLUGIN_NATIVE_DIR}/camera/native
+    ${PLUGIN_NATIVE_DIR}/geolocation/native
+    ${PLUGIN_NATIVE_DIR}/notifications/native
+    ${PLUGIN_NATIVE_DIR}/share/native
+    ${PLUGIN_NATIVE_DIR}/sensors/native
 )
 
 target_link_libraries(${PROJECT_NAME}

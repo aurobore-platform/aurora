@@ -16,3 +16,8 @@
 | FileSystem | `@aurobore/filesystem` | scope: appData | [filesystem.md](filesystem.md) |
 | Clipboard | `@aurobore/clipboard` | — | [clipboard.md](clipboard.md) |
 | Network | `@aurobore/network` | Internet | [network.md](network.md) |
+| Camera | `@aurobore/camera` | Camera | [camera.md](camera.md) |
+| Geolocation | `@aurobore/geolocation` | Location | [geolocation.md](geolocation.md) |
+| Notifications | `@aurobore/notifications` | Notifications | [notifications.md](notifications.md) |
+| Share | `@aurobore/share` | — | [share.md](share.md) |
+| Sensors | `@aurobore/sensors` | — | [sensors.md](sensors.md) |

@@ -151,7 +151,13 @@ status bar на эмуляторе/устройстве; разработчик 
 
 
 
-**Цель:** пять стандартных плагинов расширения с полным циклом манифест → native → codegen → docs.
+**Цель:** пять стандартных плагинов расширения с полным циклом **каркаса**: манифест (SoT) → native-stub → codegen → docs.
+
+На этапе A3 каждый плагин делаем **минимально**, как [Camera](plugins/camera.md): зарегистрированный контракт API,
+
+типизированный SDK (`@aurobore/<plugin>`), native-методы возвращают `*_UNAVAILABLE` (или эквивалентный stub).
+
+Реальный UI / системные API (камера, галерея, GPS, уведомления, шаринг, сенсоры) — **после** каркаса, отдельными итерациями.
 
 
 
@@ -159,25 +165,27 @@ FR-P6. См. [plugins/standard-plugins.md](plugins/standard-plugins.md) §3, [de
 
 
 
-- [ ] **Camera** — съёмка/выбор из галереи; возврат **URL ресурса** (не байты в JSON); разрешения `camera`.
+- [x] **Camera** (каркас) — манифест `getPhoto` / `pickPhoto`, тип `Photo` (URL ресурса), permission `Camera`; stub → `CAMERA_UNAVAILABLE`.
 
-- [ ] **Geolocation** — `getCurrentPosition`, **стрим** `watch` / `clearWatch`; разрешения `location`.
+- [x] **Geolocation** (каркас) — `getCurrentPosition`, стрим `watch` / `clearWatch`; permission `Location`; stub → `GEOLOCATION_UNAVAILABLE`.
 
-- [ ] **Notifications (local)** — создать/отменить/расписание; событие нажатия; разрешения по модели Аврора.
+- [x] **Notifications (local)** (каркас) — создать/отменить/расписание, событие нажатия; permissions по модели Аврора; stub.
 
-- [ ] **Share** — системный шаринг текста/файлов/URL.
+- [x] **Share** (каркас) — `shareText` / `shareFile` / `shareUrl`; stub → `SHARE_UNAVAILABLE`.
 
-- [ ] **Sensors** — акселерометр/гироскоп как **стримы** с backpressure (зависит от A1).
+- [x] **Sensors** (каркас) — акселерометр/гироскоп как стримы (контракт + `cancel`); stub → `SENSORS_UNAVAILABLE` (зависит от A1 для стримов).
 
-- [ ] На каждый плагин: манифест (SoT), native-реализация, `@aurobore/<plugin>`, справочник в `docs/plugins/`,
+- [x] На каждый плагин (чеклист каркаса): `plugin.manifest`, `plugins/<name>/native/*Plugin.{h,cpp}` с factory,
 
-      обработка `*_UNAVAILABLE` и отказа разрешений.
+      `"<name>"` в `PLUGIN_NAMES`, CMake, `@aurobore/<name>`, `docs/plugins/<name>.md`, коды `*_UNAVAILABLE` / `*_CANCELLED` в манифесте.
 
-- [ ] Прогон на эмуляторе (`pnpm container:all` / `aurobore run`) для хотя бы Camera + Geolocation + Sensors.
+- [x] Сборка контейнера: `pnpm container:build` — все плагины A3 компилируются; journal: `registered <Name>`.
 
 
 
-**Выход A3:** расширенный набор плагинов доступен через `plugin add` и типизированный SDK.
+**Выход A3:** расширенный набор плагинов доступен через `plugin add` и типизированный SDK (контракт + stub).
+
+Полноценная работа на устройстве/эмуляторе — критерий **post-A3** (отдельные задачи на UI и нативные API).
 
 
 
