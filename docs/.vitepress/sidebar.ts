@@ -29,6 +29,8 @@ const tutorialsSidebar: SidebarItem[] = [
   { text: "Обзор", link: "/tutorials/" },
   { text: "Быстрый старт", link: "/tutorials/quick-start" },
   { text: "Демо: Vue/Vite сайт", link: "/tutorials/demo-existing-app" },
+  { text: "Шаблоны React/Vue/Svelte", link: "/tutorials/framework-templates" },
+  { text: "Написание плагина", link: "/tutorials/writing-a-plugin" },
   { text: "Использование плагинов", link: "/tutorials/using-plugins" },
   { text: "События и lifecycle", link: "/tutorials/events-and-lifecycle" },
 ];
@@ -36,6 +38,7 @@ const tutorialsSidebar: SidebarItem[] = [
 const humanAuroraSidebar: SidebarItem[] = [
   { text: "Разработка приложений", link: "/aurora/app-development" },
   { text: "Песочница и разрешения", link: "/aurora/sandbox-and-permissions" },
+  { text: "Матрица совместимости", link: "/aurora/compatibility-matrix" },
 ];
 
 const humanRootSidebar: SidebarItem[] = [

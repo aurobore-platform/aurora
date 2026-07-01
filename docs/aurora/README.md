@@ -28,6 +28,7 @@ RPM, WebView, песочница). Чтобы Runtime/Build/CLI принимал
 | [requirements-and-conventions.md](requirements-and-conventions.md) | Требования к ПО, профили безопасности, чек-лист готовности, оформление кода C++/QML | `/doc/software_development/guidelines` |
 | [glossary.md](glossary.md) | Термины ОС Аврора (МУ, таргет, sysroot, кросс-компиляция, песочница, Build Engine) | сводно |
 | [verification-status.md](verification-status.md) | Реестр допущений: что подтверждено официально, что открыто и как проверить | — |
+| [compatibility-matrix.md](compatibility-matrix.md) | Матрица совместимости: minOs, SDK targets, прогон сценариев A6 | — |
 | [sources.md](sources.md) | Реестр использованных страниц документации | — |
 
 ## Как это связано с архитектурой Aurobore

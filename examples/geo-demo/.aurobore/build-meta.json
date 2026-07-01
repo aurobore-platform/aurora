@@ -1,0 +1,10 @@
+{
+  "appId": "ru.auroraos.geodemo",
+  "version": "0.1.0",
+  "plugins": [
+    "echo",
+    "geolocation"
+  ],
+  "generatedAt": "2026-07-01T18:02:55.039Z",
+  "mode": "prod"
+}

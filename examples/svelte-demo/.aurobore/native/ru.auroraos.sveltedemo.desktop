@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Svelte Demo
+Comment=Svelte Demo
+Icon=ru.auroraos.sveltedemo
+Exec=ru.auroraos.sveltedemo
+X-Application-Type=silica-qt5
+
+[X-Application]
+Permissions=Internet
+OrganizationName=ru.auroraos
+ApplicationName=sveltedemo

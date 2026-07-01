@@ -84,7 +84,7 @@
 - [x] `@aurobore/core` публикует API, события, модель ошибок, типы.
 - [x] Пакеты плагинов генерируются и типизированы.
 - [x] Совместимость SDK ↔ протокол/Runtime проверяется (`checkBridgeProtocol`).
-- [ ] (SHOULD) адаптеры для React/Vue/Svelte.
+- [x] (SHOULD) адаптеры для React/Vue/Svelte. → `@aurobore/react`, `@aurobore/vue`, `@aurobore/svelte`.
 - [ ] Семантическое версионирование и changelog.
 
 ## 9. Чек-лист тестирования
@@ -92,7 +92,7 @@
 - [x] Тесты моста на loopback-транспорте → [`packages/bridge-js/src/bridge.test.ts`](../packages/bridge-js/src/bridge.test.ts).
 - [ ] e2e: create→build→run→проверка вызова/события/стрима.
 - [ ] Conformance-suite для плагинов (FR-T1).
-- [ ] Матрица версий Аврора/движков (NFR-3).
+- [x] Матрица версий Аврора/движков (NFR-3). → [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md); прогон `pnpm compat:verify`.
 - [ ] Тесты безопасности (отказ разрешений, посторонний источник).
 - [ ] Тесты ошибок/таймаутов/отмены.
 
@@ -103,5 +103,5 @@
 - [ ] CHANGELOG и версии готовы; semver соблюдён.
 - [ ] Документация и примеры полны и проверены.
 - [ ] `publish` для пакетов/приложения протестирован.
-- [ ] Известные ограничения и матрица совместимости опубликованы.
+- [x] Известные ограничения и матрица совместимости опубликованы. → [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md).
 - [ ] Нет открытых блокеров.

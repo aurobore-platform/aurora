@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello Stub</title>
+  <style>
+    body { font-family: system-ui; margin: 2rem; background: #1a1a2e; color: #eee; }
+  </style>
+</head>
+<body>
+  <h1>Hello Stub</h1>
+  <p id="out">Initializing…</p>
+  <script src="js/aurobore-bridge.js"></script>
+  <script src="js/aurobore-plugins.js"></script>
+  <script>
+    (async () => {
+      const out = document.getElementById("out");
+      try {
+        const ping = await Aurobore.Echo.ping({});
+        out.textContent = ping.pong ? "Echo ping OK" : "Echo failed";
+        document.dispatchEvent(new CustomEvent("aurobore:ready"));
+      } catch (e) {
+        out.textContent = String(e);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -123,6 +123,19 @@ export function resolveDevHost(): string {
   return "127.0.0.1";
 }
 
+export const APP_TEMPLATES = ["vanilla", "minimal", "react", "vue", "svelte"] as const;
+export type AppTemplateName = (typeof APP_TEMPLATES)[number];
+
+const VITE_APP_TEMPLATES = new Set<AppTemplateName>(["react", "vue", "svelte"]);
+
+export function isAppTemplateName(name: string): name is AppTemplateName {
+  return (APP_TEMPLATES as readonly string[]).includes(name);
+}
+
+export function isViteAppTemplate(template: AppTemplateName): boolean {
+  return VITE_APP_TEMPLATES.has(template);
+}
+
 export function resolveTemplateDir(templateName: string): string {
   const monorepo = findMonorepoRoot();
   if (!monorepo) throw new Error("Cannot locate templates/ (not in monorepo)");

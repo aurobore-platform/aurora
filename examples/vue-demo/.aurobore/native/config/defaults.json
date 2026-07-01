@@ -1,0 +1,25 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.vuedemo",
+    "name": "Vue Demo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "splash": {
+      "background": "#1a1a2e",
+      "timeoutMs": 10000
+    }
+  },
+  "web": {
+    "root": "html",
+    "entry": "index.html",
+    "entryUrl": "aurobore-app://localhost/index.html"
+  },
+  "permissions": [
+    "Internet"
+  ],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}

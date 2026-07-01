@@ -20,5 +20,6 @@ aurobore run
 | ping / echo | `import { Echo } from "@aurobore/echo"` |
 | fail | обработка `AuroboreError` / `wrapBridgeError` |
 | watchTicks | стрим с `stop()` |
+| Benchmark | 100× ping latency + stream (V-7) |
 | getInfo | `import { Device } from "@aurobore/device"` |
 | Lifecycle | `on("pause")`, `once("ready")` из `@aurobore/core` |

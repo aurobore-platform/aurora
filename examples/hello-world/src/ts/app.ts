@@ -6,6 +6,7 @@ const status = document.getElementById("status")!;
 const logEl = document.getElementById("log")!;
 const deviceEl = document.getElementById("device")!;
 const lifecycleEl = document.getElementById("lifecycle")!;
+const benchEl = document.getElementById("bench")!;
 const btnStop = document.getElementById("btn-stop") as HTMLButtonElement;
 
 let activeStream: StreamSubscription | null = null;
@@ -103,6 +104,50 @@ async function main(): Promise<void> {
       deviceEl.textContent = JSON.stringify(info, null, 2);
     } catch (err) {
       deviceEl.textContent = String(err);
+    }
+  });
+
+  document.getElementById("btn-bench")!.addEventListener("click", async () => {
+    benchEl.textContent = "Running…";
+    const samples: number[] = [];
+    const count = 100;
+    try {
+      for (let i = 0; i < count; i++) {
+        const t0 = performance.now();
+        await Echo.ping({});
+        samples.push(performance.now() - t0);
+      }
+      samples.sort((a, b) => a - b);
+      const median = samples[Math.floor(samples.length / 2)]!;
+      const p95 = samples[Math.floor(samples.length * 0.95)]!;
+
+      let streamTicks = 0;
+      const sub = (await Echo.watchTicks({})) as StreamSubscription;
+      await new Promise<void>((resolve) => {
+        const timeout = setTimeout(() => {
+          sub.stop();
+          resolve();
+        }, 5000);
+        const done = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        sub.onData = () => {
+          streamTicks++;
+          if (streamTicks >= 5) {
+            sub.stop();
+            done();
+          }
+        };
+        sub.onError = () => done();
+        sub.onComplete = () => done();
+      });
+
+      const summary = `ping n=${count}\nmedian=${median.toFixed(2)} ms\np95=${p95.toFixed(2)} ms\nstream ticks=${streamTicks}`;
+      benchEl.textContent = summary;
+      console.log(`[hello-world] bench: ${summary.replace(/\n/g, "; ")}`);
+    } catch (err) {
+      benchEl.textContent = String(err);
     }
   });
 }

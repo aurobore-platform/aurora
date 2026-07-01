@@ -73,5 +73,6 @@ C++ API `Aurora::WebView::*`, наличие `libcef`. `CefMessageRouter`/`windo
 демо WebViewAPI, см. [aurora/webview.md](../aurora/webview.md) §5). Транспортный шов строим **поверх него**
 (`WebViewTransport` в `packages/bridge-js`); `CefMessageRouter`/`cefQuery` — деталь/fallback.
 
-**Остаётся проверить на SDK/устройстве** (реестр §2): изменения `qtium-driver` в 5.2.0 (**V-4**);
-минимальная целевая версия ОС (**V-5**); пропускная способность/латентность на устройстве (**V-7**).
+**Остаётся проверить на SDK/устройстве** (реестр §2): изменения `qtium-driver` в 5.2.0 (**V-4** — закрыт PoC).
+**V-5** — 🟢 объявлен `minOs: 5.1.5`; прогон 5.1.x SDK pending ([compatibility-matrix.md](../aurora/compatibility-matrix.md)).
+**V-7** — 🟢 неформальный bench на эмуляторе 5.2.1.200; JSON-протокол достаточен для Alpha.

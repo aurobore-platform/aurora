@@ -1,0 +1,53 @@
+---
+description: Проверка examples/ — только простые pnpm-команды, без shell-one-liner
+alwaysApply: true
+---
+
+# Верификация демо (examples/)
+
+## Одна команда для полной проверки
+
+Из корня репозитория:
+
+```powershell
+pnpm demos:verify
+```
+
+Скрипт: `tools/aurora/verify-demos.mjs` (web + `aurobore build` для всех 7 examples, fail-fast).
+
+## Совместимость (A6)
+
+```powershell
+pnpm compat:verify
+```
+
+Скрипт: `tools/aurora/verify-compat.mjs` (`container:all` на текущем SDK).
+По умолчанию **без** повторного `demos:verify` (чтобы не гонять 7 RPM дважды).
+Полный прогон: `pnpm compat:verify -- --with-demos`.
+Опционально: `pnpm compat:verify -- --run-demo hello-world`.
+
+## Одно демо вручную
+
+```powershell
+cd examples/react-demo
+pnpm build
+aurobore build
+```
+
+Для vanilla: `pnpm build:web` вместо `pnpm build`. `hello-world-stub` — web уже в `dist/`.
+
+## Запрещено при проверке демо
+
+Не оркестрировать проверку сложными командами в терминале:
+
+- пайпы: `| Select-Object`, `| head`, `2>&1 | …`
+- циклы в одной строке: `for …; do`, `foreach ($d in …) { … }`
+- `bash -lc '…'` для `aurobore build`
+- обрезка вывода sfdk (ломает процесс)
+
+Нужна новая проверка — добавить скрипт в `tools/aurora/` и `package.json` scripts.
+
+## Окружение
+
+- `aurobore build` на Windows — **PowerShell** (не Git Bash); см. `tools/aurora/README.md`.
+- При ошибке — исправить код и снова `pnpm demos:verify`, не усложнять команду.

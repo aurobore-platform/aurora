@@ -40,6 +40,7 @@ export {
   generateDesktop,
   generateDefaultsJson,
   generateCMakeLists,
+  NATIVE_SDK_SOURCES,
   resolveRuntimeRoot,
   resolveBundledRuntimeRoot,
   resolvePluginNativeDir,
@@ -64,7 +65,11 @@ export {
   resolveDevHost,
   resolveTemplateDir,
   copyTemplate,
+  APP_TEMPLATES,
+  isAppTemplateName,
+  isViteAppTemplate,
 } from "./dev/server.js";
+export type { AppTemplateName } from "./dev/server.js";
 export type { DevServerOptions } from "./dev/server.js";
 export {
   materializeDevAssets,

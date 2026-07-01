@@ -1,0 +1,23 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.camerademo",
+    "name": "Camera Demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "resources/icon.svg"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "devServer": {
+      "port": 5175
+    }
+  },
+  "permissions": ["Internet", "Camera"],
+  "plugins": ["@aurobore/echo", "@aurobore/camera"],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}

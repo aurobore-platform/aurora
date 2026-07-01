@@ -42,6 +42,14 @@ pnpm install
 Шаблон `vanilla` — TypeScript + `@aurobore/core` + typed plugin imports.
 Для минимального plain JS используйте `--template minimal`.
 
+Для **React, Vue или Svelte** (Vite + адаптеры `@aurobore/react|vue|svelte`):
+
+```bash
+aurobore create MyApp --template react   # или vue | svelte
+```
+
+Подробнее: [framework-templates.md](framework-templates.md).
+
 ### Существующий проект (Vue / Vite / свой сборщик)
 
 Подробная инструкция: **[demo-existing-app.md](demo-existing-app.md)**.

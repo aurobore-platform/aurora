@@ -1,0 +1,10 @@
+{
+  "appId": "ru.auroraos.vuedemo",
+  "version": "1.0.0",
+  "plugins": [
+    "echo",
+    "device"
+  ],
+  "generatedAt": "2026-07-01T18:00:14.534Z",
+  "mode": "prod"
+}

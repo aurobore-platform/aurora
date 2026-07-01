@@ -1,0 +1,19 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.vuedemo",
+    "name": "Vue Demo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "resources/icon.svg"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "devServer": {
+      "port": 5173
+    }
+  },
+  "permissions": ["Internet"],
+  "plugins": ["@aurobore/echo", "@aurobore/device"]
+}

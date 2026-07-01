@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Camera Demo
+Comment=Camera Demo
+Icon=ru.auroraos.camerademo
+Exec=ru.auroraos.camerademo
+X-Application-Type=silica-qt5
+
+[X-Application]
+Permissions=Camera;Internet
+OrganizationName=ru.auroraos
+ApplicationName=camerademo

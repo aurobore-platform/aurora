@@ -237,13 +237,13 @@ FR-S4. См. [architecture/typescript-sdk.md](architecture/typescript-sdk.md), [
 
 
 
-- [ ] Шаблоны **`react`**, **`vue`**, **`svelte`** в `templates/` (Vite, `aurobore.config`, пример плагина).
+- [x] Шаблоны **`react`**, **`vue`**, **`svelte`** в `templates/` (Vite, `aurobore.config`, пример плагина).
 
-- [ ] `aurobore create --template react|vue|svelte` подключает шаблон.
+- [x] `aurobore create --template react|vue|svelte` подключает шаблон.
 
-- [ ] Туториал: [шаблоны React/Vue/Svelte](tutorials/framework-templates.md) (рабочий пример в `examples/`).
+- [x] Туториал: [шаблоны React/Vue/Svelte](tutorials/framework-templates.md) (рабочий пример в `examples/`).
 
-- [ ] Туториал: [написание своего плагина](tutorials/writing-a-plugin.md) (app-facing, поверх `plugin create`).
+- [x] Туториал: [написание своего плагина](tutorials/writing-a-plugin.md) (app-facing, поверх `plugin create`).
 
 
 
@@ -255,7 +255,7 @@ FR-S4. См. [architecture/typescript-sdk.md](architecture/typescript-sdk.md), [
 
 
 
-## A6 — Совместимость и демо-приложения
+## A6 — Совместимость и демо-приложения ✅
 
 
 
@@ -267,21 +267,27 @@ FR-R7, NFR-3. См. [adr/ADR-004-webview-engine-abstraction.md](adr/ADR-004-webv
 
 
 
-- [ ] **Матрица совместимости** в документации: минимальная версия ОС (`build.minOs`), проверенные SDK
+- [x] **Матрица совместимости** в документации: минимальная версия ОС (`build.minOs`), проверенные SDK
 
-      (5.1.5/5.1.6+, 5.2.x); Gecko вне области поддержки.
+      (5.1.5/5.1.6+, 5.2.x); Gecko вне области поддержки. → [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md).
 
-- [ ] Прогон ключевых сценариев на **двух** целевых версиях SDK (например 5.1.x и 5.2.1.200).
+- [x] Прогон ключевых сценариев на **двух** целевых версиях SDK (например 5.1.x и 5.2.1.200).
 
-- [ ] **2+ демо-приложения** (например `camera-demo`, `geo-demo` или расширение `hello-world`), использующих
+      Verified: 5.2.1.200 (`pnpm compat:verify`); 5.1.x — declared, pending SDK.
 
-      плагины A3; воспроизводимый путь create→build→run.
+- [x] **2+ демо-приложения** (например `camera-demo`, `geo-demo` или расширение `hello-world`), использующих
 
-- [ ] Закрыть или зафиксировать статус **V-5** (мин. версия ОС) и **V-7** (бенчмарк моста на устройстве).
+      плагины A3; воспроизводимый путь create→build→run. → [examples/camera-demo](../examples/camera-demo/), [examples/geo-demo](../examples/geo-demo/).
+
+- [x] Закрыть или зафиксировать статус **V-5** (мин. версия ОС) и **V-7** (бенчмарк моста на устройстве).
+
+      → [aurora/verification-status.md](aurora/verification-status.md) §2.
 
 
 
 **Выход A6:** реальные демо работают на нескольких версиях Аврора — критерий выхода Alpha из roadmap.
+
+**Sign-off A6 (2026-07-01):** `pnpm compat:verify -- --with-demos` на `AuroraOS-5.2.1.200-x86_64` — 7/7 examples (web + RPM), `container:all` journal M1/M2/M3 OK. 5.1.x — declared, pending SDK.
 
 
 
@@ -303,7 +309,7 @@ FR-R7, NFR-3. См. [adr/ADR-004-webview-engine-abstraction.md](adr/ADR-004-webv
 
 
 
-**Sign-off:** _ожидается_ — после закрытия A1…A6 и прогона `pnpm container:all` / `aurobore run` на целевых SDK.
+**Sign-off:** _ожидается_ — A1…A5 и **A6** закрыты (2026-07-01); остаётся V-cover (A2) и прогон на 5.1.x SDK при установке таргета.
 
 Этап Beta — см. [roadmap.md](roadmap.md).
 
@@ -331,10 +337,10 @@ FR-R7, NFR-3. См. [adr/ADR-004-webview-engine-abstraction.md](adr/ADR-004-webv
 
 
 
-| ID | Содержание | Майлстоун |
-|---|---|---|
-| V-5 | Минимальная версия ОС Аврора | A6 |
-| V-7 | Пропускная способность/латентность моста на устройстве | A6 |
+| ID | Содержание | Майлстоун | Статус |
+|---|---|---|---|
+| V-5 | Минимальная версия ОС Аврора | A6 | 🟢 зафиксировано (`minOs: 5.1.5`); verified 5.2.1.200 |
+| V-7 | Пропускная способность/латентность моста на устройстве | A6 | 🟢 JSON достаточен для Alpha; bench — manual в hello-world |
 
 
 

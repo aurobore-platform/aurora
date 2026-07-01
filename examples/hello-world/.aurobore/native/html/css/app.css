@@ -22,6 +22,12 @@ h2 {
   color: #aaa;
 }
 
+.hint {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 0.75rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

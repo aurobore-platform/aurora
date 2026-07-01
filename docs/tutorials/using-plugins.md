@@ -14,6 +14,8 @@
 | `@aurobore/filesystem` | FileSystem |
 | `@aurobore/clipboard` | Clipboard |
 | `@aurobore/network` | Network |
+| `@aurobore/camera` | Camera (A3) |
+| `@aurobore/geolocation` | Geolocation (A3) |
 
 Плагины перечисляются в `aurobore.config.json`:
 
@@ -109,7 +111,17 @@ try {
 
 Подробнее по каждому: [plugins/README.md](../plugins/README.md).
 
+## Плагины A3 (Alpha scaffold)
+
+| Пакет | Плагин | Demo | Статус native |
+|---|---|---|---|
+| `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | stub → `CAMERA_UNAVAILABLE` |
+| `@aurobore/geolocation` | Geolocation | [geo-demo](../../examples/geo-demo/) | stub → `GEOLOCATION_UNAVAILABLE` |
+
+См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md).
+
 ## Написание своего плагина
 
-Для авторов плагинов в монорепо платформы см. [dev/adding-a-plugin.md](../dev/adding-a-plugin.md).
-App-facing tutorial по созданию плагина — на этапе Alpha.
+См. туториал [writing-a-plugin.md](writing-a-plugin.md) (`aurobore plugin create` в проекте приложения).
+
+Для авторов плагинов в монорепо платформы: [dev/adding-a-plugin.md](../dev/adding-a-plugin.md).

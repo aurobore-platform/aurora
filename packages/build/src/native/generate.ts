@@ -246,6 +246,15 @@ export function generateDefaultsJson(effective: EffectiveConfig, mode: "prod" | 
   return `${JSON.stringify(defaults, null, 2)}\n`;
 }
 
+/** Источники native-sdk в app CMake — паритет с runtime/container/CMakeLists.txt */
+export const NATIVE_SDK_SOURCES = [
+  "IPlugin.cpp",
+  "PluginManager.cpp",
+  "ResourceRef.cpp",
+  "ScopeValidator.cpp",
+  "StreamPublisher.cpp",
+] as const;
+
 export function generateCMakeLists(
   appId: string,
   version: string,
@@ -260,6 +269,10 @@ export function generateCMakeLists(
   const pluginIncludes = manifests
     .map((m) => `    \${PLUGIN_NATIVE_DIR}/${m.name}/native`)
     .join("\n");
+
+  const nativeSdkSources = NATIVE_SDK_SOURCES.map(
+    (file) => `    \${NATIVE_SDK_DIR}/${file}`,
+  ).join("\n");
 
   return `cmake_minimum_required(VERSION 3.5)
 
@@ -297,9 +310,7 @@ add_executable(\${PROJECT_NAME}
     src/CoverPlugin.cpp
     generated/PluginRegistry.cpp
     \${BRIDGE_NATIVE_DIR}/BridgeRouter.cpp
-    \${NATIVE_SDK_DIR}/IPlugin.cpp
-    \${NATIVE_SDK_DIR}/PluginManager.cpp
-    \${NATIVE_SDK_DIR}/ScopeValidator.cpp
+${nativeSdkSources}
 ${pluginSources}
     \${QmFiles}
 )

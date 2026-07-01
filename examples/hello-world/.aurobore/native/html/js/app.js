@@ -10,6 +10,7 @@ var BRIDGE_ERROR_CODES = {
   INVALID_ARGS: "BRIDGE_INVALID_ARGS",
   TIMEOUT: "BRIDGE_TIMEOUT",
   PERMISSION_DENIED: "BRIDGE_PERMISSION_DENIED",
+  SCOPE_DENIED: "BRIDGE_SCOPE_DENIED",
   CANCELLED: "BRIDGE_CANCELLED"
 };
 
@@ -138,6 +139,12 @@ var Echo = {
   },
   watchTicks(args) {
     return getAurobore().invoke("Echo", "watchTicks", args ?? {}, { stream: true });
+  },
+  watchFastTicks(args) {
+    return getAurobore().invoke("Echo", "watchFastTicks", args ?? {}, { stream: true });
+  },
+  getSampleResource(args) {
+    return getAurobore().invoke("Echo", "getSampleResource", args ?? {});
   }
 };
 
@@ -153,6 +160,7 @@ var status = document.getElementById("status");
 var logEl = document.getElementById("log");
 var deviceEl = document.getElementById("device");
 var lifecycleEl = document.getElementById("lifecycle");
+var benchEl = document.getElementById("bench");
 var btnStop = document.getElementById("btn-stop");
 var activeStream = null;
 function log(msg) {
@@ -237,6 +245,50 @@ async function main() {
       deviceEl.textContent = JSON.stringify(info, null, 2);
     } catch (err) {
       deviceEl.textContent = String(err);
+    }
+  });
+  document.getElementById("btn-bench").addEventListener("click", async () => {
+    benchEl.textContent = "Running\u2026";
+    const samples = [];
+    const count = 100;
+    try {
+      for (let i = 0; i < count; i++) {
+        const t0 = performance.now();
+        await Echo.ping({});
+        samples.push(performance.now() - t0);
+      }
+      samples.sort((a, b) => a - b);
+      const median = samples[Math.floor(samples.length / 2)];
+      const p95 = samples[Math.floor(samples.length * 0.95)];
+      let streamTicks = 0;
+      const sub = await Echo.watchTicks({});
+      await new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          sub.stop();
+          resolve();
+        }, 5e3);
+        const done = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        sub.onData = () => {
+          streamTicks++;
+          if (streamTicks >= 5) {
+            sub.stop();
+            done();
+          }
+        };
+        sub.onError = () => done();
+        sub.onComplete = () => done();
+      });
+      const summary = `ping n=${count}
+median=${median.toFixed(2)} ms
+p95=${p95.toFixed(2)} ms
+stream ticks=${streamTicks}`;
+      benchEl.textContent = summary;
+      console.log(`[hello-world] bench: ${summary.replace(/\n/g, "; ")}`);
+    } catch (err) {
+      benchEl.textContent = String(err);
     }
   });
 }

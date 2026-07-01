@@ -30,6 +30,8 @@
     "container:run": "node tools/aurora/poc.mjs run container",
     "container:emulator": "node tools/aurora/poc.mjs emulator container",
     "container:all": "node tools/aurora/poc.mjs all container",
+    "demos:verify": "node tools/aurora/verify-demos.mjs",
+    "compat:verify": "node tools/aurora/verify-compat.mjs",
     "docs:dev": "vitepress dev docs",
     "docs:dev:full": "cross-env DOCS_AUDIENCE=full vitepress dev docs",
     "docs:build": "vitepress build docs",

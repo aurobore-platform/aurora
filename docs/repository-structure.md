@@ -58,6 +58,7 @@ aurobore/
 ├── examples/                  # законченные демо-приложения
 │   ├── hello-world/
 │   ├── camera-demo/
+│   ├── geo-demo/
 │   └── …
 │
 ├── tests/                     # сквозные/совместимостные тесты (см. §tests)

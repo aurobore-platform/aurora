@@ -5,6 +5,9 @@
     { "path": "packages/bridge-js" },
     { "path": "packages/build" },
     { "path": "packages/cli" },
-    { "path": "packages/create-aurobore" }
+    { "path": "packages/create-aurobore" },
+    { "path": "packages/react" },
+    { "path": "packages/vue" },
+    { "path": "packages/svelte" }
   ]
 }

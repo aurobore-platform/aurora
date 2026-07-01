@@ -9,6 +9,8 @@ node_modules/
 # Build output
 dist/
 build/
+!examples/hello-world-stub/dist/
+!examples/hello-world-stub/dist/**
 !packages/build/
 *.tsbuildinfo
 coverage/

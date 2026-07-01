@@ -1,0 +1,30 @@
+{
+  "name": "aurobore-template-vue",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Vue 3 + Vite Aurobore project template",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "aurora:build": "aurobore build",
+    "aurora:run": "aurobore run",
+    "aurora:dev": "aurobore dev",
+    "build:aurora": "pnpm run build && aurobore build"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/device": "workspace:*",
+    "@aurobore/echo": "workspace:*",
+    "@aurobore/vue": "workspace:*",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@aurobore/cli": "workspace:*",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.6",
+    "vue-tsc": "^2.2.0"
+  }
+}

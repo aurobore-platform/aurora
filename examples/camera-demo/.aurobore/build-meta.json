@@ -1,0 +1,10 @@
+{
+  "appId": "ru.auroraos.camerademo",
+  "version": "0.1.0",
+  "plugins": [
+    "echo",
+    "camera"
+  ],
+  "generatedAt": "2026-07-01T18:02:16.383Z",
+  "mode": "prod"
+}

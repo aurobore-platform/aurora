@@ -1,0 +1,19 @@
+{
+  "name": "@aurobore/example-geo-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Geolocation plugin demo — getCurrentPosition/watch with A3 stub handling",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/echo": "workspace:*",
+    "@aurobore/geolocation": "workspace:*"
+  },
+  "devDependencies": {
+    "@aurobore/build": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}
