@@ -6,6 +6,9 @@ packages/runtime/native-sdk/
 node_modules/
 .pnpm-store/
 
+# Aurobore codegen (aurobore build / dev)
+.aurobore/
+
 # Build output
 dist/
 build/
