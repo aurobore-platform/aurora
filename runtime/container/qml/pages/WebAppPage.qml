@@ -16,40 +16,13 @@ Page {
     property bool webReady: false
     property real keyboardInset: 0
 
-    function updateKeyboardInset() {
-        // virtualKeyboardMargin — Gecko WebView; на Chromium 5.2.x может отсутствовать (timer no-op).
-        var margin = 0
-        if (webView.virtualKeyboardMargin !== undefined)
-            margin = webView.virtualKeyboardMargin || 0
-        if (margin !== keyboardInset) {
-            keyboardInset = margin
-            injectInsets()
-        }
-    }
-
-    function isManualInsets() {
-        return systemChromeConfig && systemChromeConfig.insets === "manual"
-    }
-
-    function isOverlayWebView() {
-        return systemChromeConfig && systemChromeConfig.overlayWebView === true
-    }
-
     function statusBarHeightPx() {
         var h = Theme.statusBarHeight || 0
         return h > 0 ? h : 32
     }
 
-    property real webViewTopMargin: {
-        if (isManualInsets() || isOverlayWebView())
-            return 0
-        return statusBarHeightPx()
-    }
-
-    function computeCutoutMargins() {
+    function computeCutoutInsets() {
         var result = { top: 0, right: 0, bottom: 0, left: 0 }
-        if (isManualInsets())
-            return result
 
         if (typeof SafeZoneRect !== "undefined") {
             switch (page.orientation) {
@@ -78,12 +51,8 @@ Page {
             result.top = statusBarHeightPx()
         }
 
-        if (!isOverlayWebView()) {
-            // Native top margin clears status bar; CSS top stays 0 (side cutouts via left/right).
-            result.top = 0
-        } else if (result.top <= 0) {
+        if (result.top <= 0)
             result.top = statusBarHeightPx()
-        }
 
         return result
     }
@@ -113,12 +82,10 @@ Page {
         webView.runJavaScript(
             "(function(){ if(window.__auroboreKeyboardInsets) return;" +
             "window.__auroboreKeyboardInsets=true;" +
+            "if(navigator.virtualKeyboard) navigator.virtualKeyboard.overlaysContent=true;" +
             "function apply(){ if(!window.visualViewport) return;" +
             "var v=window.visualViewport;" +
             "var bottom=Math.max(0, Math.round(window.innerHeight-v.height-v.offsetTop));" +
-            "var r=document.documentElement;" +
-            "r.style.setProperty('--aurobore-safe-area-bottom',bottom+'px');" +
-            "r.style.setProperty('--safe-area-inset-bottom',bottom+'px');" +
             "if(typeof sendAsyncMessage==='function') sendAsyncMessage('aurobore:keyboard-inset',{bottom:bottom});" +
             "}" +
             "if(window.visualViewport){" +
@@ -144,12 +111,11 @@ Page {
     }
 
     function injectInsets() {
-        var manual = isManualInsets()
-        var cutout = computeCutoutMargins()
-        var top = manual ? 0 : cutout.top
-        var right = manual ? 0 : cutout.right
-        var bottom = manual ? 0 : keyboardInset
-        var left = manual ? 0 : cutout.left
+        var cutout = computeCutoutInsets()
+        var top = cutout.top
+        var right = cutout.right
+        var bottom = keyboardInset
+        var left = cutout.left
         webView.runJavaScript(
             "(function(){ var r=document.documentElement;" +
             "r.style.setProperty('--aurobore-safe-area-top','" + top + "px');" +
@@ -160,7 +126,6 @@ Page {
             "r.style.setProperty('--safe-area-inset-right','" + right + "px');" +
             "r.style.setProperty('--safe-area-inset-bottom','" + bottom + "px');" +
             "r.style.setProperty('--safe-area-inset-left','" + left + "px');" +
-            (manual ? "r.classList.add('aurobore-insets-manual');" : "r.classList.remove('aurobore-insets-manual');") +
             "})();",
             function () {},
             function (err) { console.log("[aurobore-container] inset inject error:", err) }
@@ -173,21 +138,14 @@ Page {
         })
     }
 
-    function applyStatusBarStyle() {
-        var style = (systemChromeConfig && systemChromeConfig.statusBarStyle) || "default"
-        if (style === "default")
-            return
-        // Status bar chrome is OS-managed on Aurora; config is advisory for future native hooks.
-        console.log("[aurobore-container] systemChrome.statusBarStyle=" + style
-            + " (OS-managed on Aurora SDK 5.2.x)")
-    }
-
     function hideSplash() {
         if (!splashVisible)
             return
         splashVisible = false
         if (!webReady) {
             webReady = true
+            if (typeof coverBridge !== "undefined" && coverBridge)
+                coverBridge.setWebReady(true)
             bridgeRouter.emitEvent("ready")
         }
     }
@@ -249,7 +207,6 @@ Page {
         webView.addMessageListener("aurobore:a2-ok")
         webView.addMessageListener("aurobore:keyboard-inset")
         bridgeRouter.trustedOrigin = assetServerOrigin && assetServerOrigin.length > 0
-        applyStatusBarStyle()
         injectChromeStylesheet()
         injectViewportMeta()
         injectKeyboardViewportListener()
@@ -259,7 +216,6 @@ Page {
         console.log("[aurobore-container] htmlRootPath:", htmlRootPath)
         console.log("[aurobore-container] assetServerOrigin:", assetServerOrigin)
         console.log("[aurobore-container] entry:", entryUrl)
-        console.log("[aurobore-container] systemChrome overlayWebView:", isOverlayWebView())
     }
 
     Timer {
@@ -303,22 +259,10 @@ Page {
         }
     }
 
-    Timer {
-        id: keyboardInsetTimer
-        interval: 250
-        repeat: true
-        running: page.webReady
-        onTriggered: page.updateKeyboardInset()
-    }
-
     WebView {
         id: webView
 
-        anchors.top: parent.top
-        anchors.topMargin: page.webViewTopMargin
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         url: "about:blank"
 
         TouchInput { enabled: true }
@@ -402,8 +346,20 @@ Page {
                 console.log("[aurobore-container] A2 OK: Runtime+ deep links, scopes, system chrome verified")
             } else if (name === "aurobore:keyboard-inset") {
                 var inset = parseBridgeData(data)
-                if (inset && inset.bottom > 0)
-                    console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + inset.bottom)
+                var bottom = (inset && inset.bottom) ? inset.bottom : 0
+                if (bottom !== keyboardInset) {
+                    var wasClosed = keyboardInset === 0
+                    keyboardInset = bottom
+                    injectInsets()
+                    if (wasClosed && bottom > 0) {
+                        webView.runJavaScript(
+                            "document.activeElement && document.activeElement.scrollIntoView" +
+                            "({block:'nearest',behavior:'smooth'})"
+                        )
+                    }
+                    if (bottom > 0)
+                        console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + bottom)
+                }
             }
         }
     }

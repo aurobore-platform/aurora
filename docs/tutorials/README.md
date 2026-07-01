@@ -11,7 +11,8 @@
 | [Использование плагинов](using-plugins.md) | plugin add, typed imports, обработка ошибок |
 | [События и lifecycle](events-and-lifecycle.md) | on/once, стримы, aurobore:ready |
 | [Deep links](deep-links.md) | Регистрация схем, `deeplink` / `appurlopen`, маршрутизация в SPA |
-| [Immersive UI / system chrome](immersive-ui.md) | Zero-config insets, opt-out, edge-to-edge |
+| [Immersive UI / system chrome](immersive-ui.md) | Zero-config insets, fullscreen WebView, edge-to-edge |
+| [Обложка (cover)](cover.md) | Формальная обложка по умолчанию; opt-in actions и `cover.setState` |
 
 Пример: [`examples/hello-world/`](../../examples/hello-world/).
 

@@ -22,12 +22,93 @@
         <button type="button" data-route="/settings">Настройки</button>
       </nav>
       <main id="view"></main>
-      <footer>
+      <div>
+        <div>
         <button type="button" id="btn-back">← Назад (SPA)</button>
         <button type="button" id="btn-sim-back">Симуляция «назад»</button>
+        </div>
+        <div>
         <label for="a2-keyboard-test">A2 keyboard:</label>
         <input type="text" id="a2-keyboard-test" placeholder="Фокус → проверка inset клавиатуры" />
-      </footer>
+        </div>
+      </div>
+      <div>
+          # Aurobore
+
+> Открытая платформа для создания **WebView-приложений под ОС Аврора** на стандартном вебе
+> (HTML/CSS/JS/TS) с доступом к нативным возможностям через типизированный мост и систему плагинов.
+> Аналог Cordova / Capacitor / Tauri, спроектированный с учётом особенностей Аврора (Qt/QML + C++).
+
+**Статус: MVP (M0–M5).** Платформа включает runtime, мост, плагины, CLI, SDK и шаблоны.
+Документация — в [`docs/`](docs/README.md).
+
+## Быстрый старт
+
+```bash
+pnpm install
+pnpm --filter @aurobore/cli build
+aurobore doctor
+aurobore create MyApp --template vanilla   # новый проект
+# или для существующего Vue/Vite: cd my-app && aurobore init
+cd MyApp && pnpm install && pnpm build:web
+aurobore build && aurobore run
+```
+
+Подробнее: [docs/tutorials/quick-start.md](docs/tutorials/quick-start.md).
+Пример: [`examples/hello-world/`](examples/hello-world/).
+
+## С чего начать
+
+1. [Видение проекта](docs/vision.md)
+2. [Требования](docs/requirements.md)
+3. [Обзор архитектуры](docs/architecture/README.md)
+4. [Структура репозитория](docs/repository-structure.md)
+5. [Дорожная карта](docs/roadmap.md) · [Чек-листы](docs/checklists.md)
+6. [Архитектурные решения (ADR)](docs/adr/README.md)
+
+Полная навигация — в [docs/README.md](docs/README.md).
+
+## Требования к окружению разработчика
+
+> Для сборки и запуска под ОС Аврора нужны Node.js 20 LTS, pnpm, Аврора SDK (mb2), эмулятор и сертификаты подписи.
+> Подробности: [docs/aurora/sdk-overview.md](docs/aurora/sdk-overview.md),
+> [docs/aurora/build-and-packaging.md](docs/aurora/build-and-packaging.md).
+
+### Общее (Windows и Linux)
+
+| Что                                                        | Зачем                                                                                               | Версия                                                                             |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **Git**                                                    | контроль версий                                                                                     | актуальная                                                                         |
+| **Node.js**                                                | рантайм инструментария `@aurobore/*` (CLI, SDK, кодоген) — [ADR-005](docs/adr/ADR-005-cli-stack.md) | LTS, рекоменд. **20+** _(точный минимум фиксируется в инфраструктурном чек-листе)_ |
+| **pnpm**                                                   | менеджер пакетов monorepo (workspaces); удобно через `corepack enable`                              | актуальная                                                                         |
+| **Аврора SDK** (вариант **mb2 / Build Engine**, на Docker) | штатная сборка приложения и RPM, эмулятор (QEMU) — [ADR-007](docs/adr/ADR-007-packaging-build.md)   | актуальная (5.2.x)                                                                 |
+| **Сертификаты подписи RPM**                                | установка пакета на устройство/эмулятор обязательна с подписью                                      | —                                                                                  |
+
+> SDK 5.2.0+ рекомендуется запускать **на хосте**, а не внутри виртуальной машины.
+
+### Windows
+
+| Что                                               | Зачем                                                                                  |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Windows 10 build ≥ 17063**                      | требование Аврора SDK (включает архиватор `tar`)                                       |
+| **Git Bash**                                      | команды `mb2`/`sb2` требуют Unix-совместимый терминал (PowerShell для них не подходит) |
+| **Режим разработчика** (или политика на symlinks) | избежать ошибок из-за символических ссылок при сборке                                  |
+| `ssh-keygen` (идёт с Git)                         | запрашивается мастером установки SDK                                                   |
+
+### Linux
+
+| Что                         | Зачем                                                    |
+| --------------------------- | -------------------------------------------------------- |
+| **Docker**                  | виртуализация среды сборки (Build Engine) и эмулятора    |
+| Стандартный терминал        | команды `mb2`/`sb2` работают нативно (Git Bash не нужен) |
+| Поддержка KVM/виртуализации | ускоряет эмулятор (QEMU)                                 |
+
+### По приоритету
+
+1. **Разработка приложений:** Node.js (LTS) + pnpm + `aurobore` CLI.
+2. **Сборка/запуск под Аврору:** + Аврора SDK (mb2) + эмулятор + сертификаты подписи (+ на Windows: Git Bash и режим разработчика).
+
+      </div>
     </div>
   </body>
 </html>

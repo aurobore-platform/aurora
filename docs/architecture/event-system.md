@@ -10,6 +10,7 @@ Event System — слой поверх [Bridge](bridge.md), отвечающий
 | Вид | Направление | Примеры |
 |---|---|---|
 | **Системные (lifecycle)** | native → JS | `ready`, `pause`, `resume`, `backbutton`, `memoryWarning`, `orientationchange`, `deeplink`, `destroy` |
+| **Обложка (cover)** | native → JS | `cover:action`, `cover:active`, `cover:inactive` |
 | **Плагинные** | native → JS | `network:change`, `keyboard:show/hide`, `battery:level` и т.п. |
 | **Стримовые** | native → JS | геолокация, сенсоры, прогресс — серия сообщений по одной подписке |
 | **Пользовательские** | JS → native | приложение эмитит события, на которые подписан натив/плагин |

@@ -1,6 +1,7 @@
 #include "BridgeRouter.h"
 
 #include "PluginManager.h"
+#include "IPlugin.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QJsonDocument>
@@ -36,6 +37,12 @@ bool BridgeRouter::initializePlugins()
               qPrintable(m_pluginManager->registeredPlugins().join(QStringLiteral(", "))));
     }
     return loaded;
+}
+
+void BridgeRouter::registerBuiltInPlugin(const PluginDescriptor &descriptor, IPlugin *instance)
+{
+    if (m_pluginManager)
+        m_pluginManager->registerBuiltInPlugin(descriptor, instance);
 }
 
 void BridgeRouter::emitOutbound(const QVariant &message)

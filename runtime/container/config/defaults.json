@@ -23,10 +23,5 @@
   },
   "deepLinks": {
     "schemes": ["aurobore-demo"]
-  },
-  "systemChrome": {
-    "insets": "auto",
-    "overlayWebView": false,
-    "statusBarStyle": "default"
   }
 }

@@ -6,10 +6,14 @@
 
 namespace Aurobore {
 
-struct SystemChromeConfig {
-    QString insets = QStringLiteral("auto");
-    bool overlayWebView = false;
-    QString statusBarStyle = QStringLiteral("default");
+struct CoverActionConfig {
+    QString id;
+    QString label;
+    QString icon;
+};
+
+struct CoverConfig {
+    QList<CoverActionConfig> actions;
 };
 
 struct AppConfig {
@@ -17,9 +21,10 @@ struct AppConfig {
     static const char *kAppScheme;
     static const char *kAppHost;
     static int splashTimeoutMs();
+    static QString appName();
     static QStringList grantedPermissions();
     static QStringList deepLinkSchemes();
-    static SystemChromeConfig systemChrome();
+    static CoverConfig cover();
 };
 
 } // namespace Aurobore

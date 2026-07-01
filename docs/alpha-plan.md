@@ -119,22 +119,28 @@ status bar на эмуляторе/устройстве; разработчик 
       переменных insets, без требований к `app.css` проекта. Шаблоны **не** дублируют safe-area логику.
 - [x] **`viewport-fit=cover`:** выставляется контейнером (meta в шаблоне + runtime-нормализация, если entry
       подменён dev-сервером), чтобы `env()` и native insets согласованы.
-- [x] **Конфиг `systemChrome` в `aurobore.config`** (все поля опциональны, разумные defaults):
-      - `insets`: `auto` (default) | `manual` — `manual` = opt-out встроенного padding для immersive UI;
-      - `overlayWebView`: `false` (default) | `true` — контент под status bar + chrome.css даёт отступы;
-      - `statusBarStyle`: `light` | `dark` | `default` — цвет иконок/текста status bar (native API, где доступен).
+- [x] **Fullscreen WebView:** контейнер всегда рендерит WebView на 100% экрана; отступы под status bar /
+      cutout / клавиатуру — только через CSS vars + `aurobore-chrome.css` (без конфига).
 - [x] **Edge-to-edge opt-in, не обязанность:** для фиксированных header/toolbar — утилиты
       `.aurobore-edge-to-edge` / `env()` в `@aurobore/core` CSS; документация — один короткий раздел
       «immersive UI», не основной путь.
 - [x] **Событие `systemChrome:insetsChanged`** (payload: insets в px) — для кастомных fixed-элементов;
       не требуется для типичного приложения.
-- [x] **V-16:** верификация на Aurora SDK (эмулятор): vanilla без safe-area CSS не перекрывается status bar; rotation; keyboard inset через `virtualKeyboardMargin`. Полная проверка на физическом устройстве — по возможности (Alpha).
+- [x] **V-16:** верификация на Aurora SDK (эмулятор): vanilla без safe-area CSS не перекрывается status bar; rotation; клавиатура **overlay** (`KeyboardInput` выключен, `innerHeight` стабилен); bottom inset через **visualViewport → native** (`injectInsets`). Полная проверка на физическом устройстве — по возможности (Alpha).
+
+### Обложка (cover API, opt-in)
+
+- [x] **Формальная обложка по умолчанию:** `DefaultCover.qml` + `app.name`; без обязательного JS/конфига.
+- [x] **Runtime API:** встроенный плагин `Cover` — `setState`, `setActions`, `reset`; события `cover:action`, `cover:active`, `cover:inactive`.
+- [x] **Конфиг `cover.actions`:** декларативные кнопки (до 4) → `defaults.json` → `CoverBridge`.
+- [x] **Документация:** [api/cover.md](api/cover.md), [tutorials/cover.md](tutorials/cover.md).
+- [ ] **V-cover:** ручная проверка tap на обложке с `?coverDemo=1` на эмуляторе.
 
 
 
 **Выход A2:** deep links и scopes работают; **vanilla из коробки** без знания CSS env — корректные
 
-отступы под системный chrome; power-users настраивают через `systemChrome` / opt-out `insets: manual`.
+отступы под системный chrome; power-users сбрасывают padding в своём CSS при необходимости immersive UI.
 
 
 

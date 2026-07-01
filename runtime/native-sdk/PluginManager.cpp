@@ -58,6 +58,19 @@ bool PluginManager::loadFromRegistry()
     return anyLoaded;
 }
 
+void PluginManager::registerBuiltInPlugin(const PluginDescriptor &descriptor, IPlugin *instance)
+{
+    if (!instance)
+        return;
+    instance->setParent(this);
+    m_descriptors.insert(descriptor.display, descriptor);
+    m_plugins.insert(descriptor.display, instance);
+    qInfo("[aurobore-plugin] registered built-in %s v%s (%d methods)",
+          qPrintable(descriptor.display),
+          qPrintable(descriptor.version),
+          descriptor.methods.size());
+}
+
 bool PluginManager::hasRequiredPermissions(const PluginDescriptor &descriptor) const
 {
     for (const QString &perm : descriptor.permissions) {

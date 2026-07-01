@@ -32,6 +32,8 @@ add_executable(${PROJECT_NAME}
     src/LoopbackTlsCredentials.cpp
     src/LifecycleBridge.cpp
     src/DeepLinkHandler.cpp
+    src/CoverBridge.cpp
+    src/CoverPlugin.cpp
     generated/PluginRegistry.cpp
     ${BRIDGE_NATIVE_DIR}/BridgeRouter.cpp
     ${NATIVE_SDK_DIR}/IPlugin.cpp

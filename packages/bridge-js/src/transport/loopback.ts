@@ -90,6 +90,12 @@ export class LoopbackNativeStub {
             mimeType: "text/plain",
             size: 28,
           });
+        } else if (plugin === "Cover" && method === "setState") {
+          this.reply(id, true, { ok: true });
+        } else if (plugin === "Cover" && method === "setActions") {
+          this.reply(id, true, { ok: true });
+        } else if (plugin === "Cover" && method === "reset") {
+          this.reply(id, true, { ok: true });
         } else {
           this.reply(id, false, {
             code: "BRIDGE_METHOD_NOT_FOUND",

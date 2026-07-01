@@ -4,7 +4,10 @@
 #include <QObject>
 #include <QVariant>
 
+#include "PluginDescriptor.h"
+
 class PluginManager;
+class IPlugin;
 
 class BridgeRouter : public QObject
 {
@@ -20,6 +23,7 @@ public:
 
     void setGrantedPermissions(const QStringList &permissions);
     bool initializePlugins();
+    void registerBuiltInPlugin(const PluginDescriptor &descriptor, IPlugin *instance);
 
     Q_INVOKABLE QVariant handleMessage(const QVariant &inbound);
 

@@ -21,6 +21,7 @@ public:
 
     void setGrantedPermissions(const QStringList &permissions);
     bool loadFromRegistry();
+    void registerBuiltInPlugin(const PluginDescriptor &descriptor, IPlugin *instance);
 
     QVariant dispatchInvoke(const QString &plugin, const QString &method,
                             const QVariant &args, const QString &id, bool isStream,

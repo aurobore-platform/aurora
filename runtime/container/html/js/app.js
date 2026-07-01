@@ -141,14 +141,45 @@
     });
   }
 
+  var coverDemoEnabled = /(?:\?|&)coverDemo=1(?:&|$)/.test(location.search);
+
+  function initCoverDemo() {
+    if (!window.Aurobore || typeof Aurobore.invoke !== "function") return;
+
+    Aurobore.on("cover:action", function (data) {
+      setStatus("cover:action: " + JSON.stringify(data));
+      console.log("[aurobore-web] cover:action", data);
+    });
+
+    Aurobore.invoke("Cover", "setActions", {
+      actions: [{ id: "demo", label: "Demo", icon: "icon-m-sync" }],
+    }).catch(function (err) {
+      console.error("[aurobore-web] cover setActions failed:", err);
+    });
+  }
+
   Aurobore.on("ready", function () {
     setStatus("ready | origin: " + location.origin);
+    if (coverDemoEnabled) initCoverDemo();
   });
   Aurobore.on("pause", function () {
     setStatus("pause");
+    if (coverDemoEnabled) {
+      Aurobore.invoke("Cover", "setState", {
+        primaryText: "Cover demo",
+        secondaryText: "Paused — check the home screen",
+      }).catch(function (err) {
+        console.error("[aurobore-web] cover setState failed:", err);
+      });
+    }
   });
   Aurobore.on("resume", function () {
     setStatus("resume");
+    if (coverDemoEnabled) {
+      Aurobore.invoke("Cover", "reset").catch(function (err) {
+        console.error("[aurobore-web] cover reset failed:", err);
+      });
+    }
   });
   Aurobore.on("backbutton", function () {
     setStatus("backbutton (no SPA history)");
@@ -297,16 +328,24 @@
   function runA2Checks() {
     var root = document.documentElement;
     var top = getComputedStyle(root).getPropertyValue("--aurobore-safe-area-top").trim();
-    var overlay = systemChromeConfigOverlay();
-    if ((top && top !== "0px") || overlay === false) {
+    if (top && top !== "0px") {
       a2Checks.chrome = true;
-      console.log("[aurobore-container] A2 chrome OK: safe-area-top=" + (top || "0px (native margin)"));
+      console.log("[aurobore-container] A2 chrome OK: safe-area-top=" + top);
     }
 
     var viewportMeta = document.querySelector('meta[name="viewport"]');
     if (viewportMeta && /viewport-fit=cover/.test(viewportMeta.getAttribute("content") || "")) {
       a2Checks.viewport = true;
       console.log("[aurobore-container] A2 chrome OK: viewport-fit=cover");
+    }
+
+    var keyboardInput = document.getElementById("a2-keyboard-test");
+    var innerHeightBeforeKeyboard = 0;
+    if (keyboardInput) {
+      keyboardInput.addEventListener("focus", function () {
+        innerHeightBeforeKeyboard = window.innerHeight;
+        setStatus("A2: focus input — ожидаем keyboard inset");
+      });
     }
 
     Aurobore.on("systemChrome:insetsChanged", function (insets) {
@@ -317,23 +356,22 @@
       if (insets && insets.bottom > 0) {
         a2Checks.keyboard = true;
         console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + insets.bottom);
+        if (innerHeightBeforeKeyboard > 0) {
+          var delta = Math.abs(window.innerHeight - innerHeightBeforeKeyboard);
+          if (delta === 0) {
+            console.log("[aurobore-container] A2 keyboard OK: innerHeight stable (" + window.innerHeight + ")");
+          } else {
+            console.warn(
+              "[aurobore-container] A2 keyboard WARN: innerHeight changed by " + delta +
+                " (" + innerHeightBeforeKeyboard + " → " + window.innerHeight + ")"
+            );
+          }
+        }
       }
       maybeA2Ok();
     });
 
-    var keyboardInput = document.getElementById("a2-keyboard-test");
-    if (keyboardInput) {
-      keyboardInput.addEventListener("focus", function () {
-        setStatus("A2: focus input — ожидаем keyboard inset");
-      });
-    }
-
     maybeA2Ok();
-  }
-
-  function systemChromeConfigOverlay() {
-    // Dev container defaults: overlayWebView false → native top margin, CSS top may be 0.
-    return false;
   }
 
   function onReady() {

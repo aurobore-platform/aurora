@@ -23,6 +23,8 @@
 #include "DeepLinkHandler.h"
 #include "BridgeRouter.h"
 #include "LoopbackTlsCredentials.h"
+#include "CoverBridge.h"
+#include "CoverPlugin.h"
 
 int main(int argc, char *argv[])
 {
@@ -77,6 +79,22 @@ int main(int argc, char *argv[])
 
     LifecycleBridge lifecycleBridge;
     BridgeRouter bridgeRouter;
+    CoverBridge coverBridge(&bridgeRouter);
+
+    const Aurobore::CoverConfig coverConfig = Aurobore::AppConfig::cover();
+    QVariantList defaultCoverActions;
+    for (const Aurobore::CoverActionConfig &action : coverConfig.actions) {
+        QVariantMap entry;
+        entry.insert(QStringLiteral("id"), action.id);
+        entry.insert(QStringLiteral("label"), action.label);
+        if (!action.icon.isEmpty())
+            entry.insert(QStringLiteral("icon"), action.icon);
+        defaultCoverActions.append(entry);
+    }
+    coverBridge.setDefaultAppName(Aurobore::AppConfig::appName());
+    coverBridge.setDefaultActions(defaultCoverActions);
+    coverBridge.initializeFromDefaults();
+
     DeepLinkHandler deepLinkHandler(&bridgeRouter);
     deepLinkHandler.setSchemes(Aurobore::AppConfig::deepLinkSchemes());
     deepLinkHandler.captureFromArguments(application->arguments());
@@ -84,6 +102,9 @@ int main(int argc, char *argv[])
     if (!bridgeRouter.initializePlugins()) {
         qWarning("[aurobore-container] no plugins registered");
     }
+    CoverPlugin *coverPlugin =
+        new CoverPlugin(&bridgeRouter, &coverBridge);
+    bridgeRouter.registerBuiltInPlugin(CoverPlugin::descriptor(), coverPlugin);
     QObject::connect(
         application.data(), &QGuiApplication::applicationStateChanged,
         &lifecycleBridge, &LifecycleBridge::onApplicationStateChanged);
@@ -94,16 +115,18 @@ int main(int argc, char *argv[])
         });
     QObject::connect(
         &lifecycleBridge, &LifecycleBridge::lifecycleEvent,
+        &coverBridge, [&coverBridge](const QString &event) {
+            if (event == QStringLiteral("pause"))
+                coverBridge.setAppPaused(true);
+            else if (event == QStringLiteral("resume"))
+                coverBridge.onResume();
+        });
+    QObject::connect(
+        &lifecycleBridge, &LifecycleBridge::lifecycleEvent,
         &deepLinkHandler, [&deepLinkHandler, &application](const QString &event) {
             if (event == QStringLiteral("resume"))
                 deepLinkHandler.captureFromArguments(application->arguments());
         });
-
-    const Aurobore::SystemChromeConfig systemChrome = Aurobore::AppConfig::systemChrome();
-    QVariantMap systemChromeMap;
-    systemChromeMap.insert(QStringLiteral("insets"), systemChrome.insets);
-    systemChromeMap.insert(QStringLiteral("overlayWebView"), systemChrome.overlayWebView);
-    systemChromeMap.insert(QStringLiteral("statusBarStyle"), systemChrome.statusBarStyle);
 
     auto *rootContext = view->rootContext();
     rootContext->setContextProperty(QStringLiteral("htmlRootPath"), htmlRoot);
@@ -111,8 +134,8 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("assetServerOrigin"), assetServer.origin());
     rootContext->setContextProperty(QStringLiteral("lifecycleBridge"), &lifecycleBridge);
     rootContext->setContextProperty(QStringLiteral("deepLinkHandler"), &deepLinkHandler);
-    rootContext->setContextProperty(QStringLiteral("systemChromeConfig"), systemChromeMap);
     rootContext->setContextProperty(QStringLiteral("bridgeRouter"), &bridgeRouter);
+    rootContext->setContextProperty(QStringLiteral("coverBridge"), &coverBridge);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());

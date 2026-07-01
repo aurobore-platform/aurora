@@ -39,6 +39,8 @@ off("pause", handler);
 | `orientationchange` | native → JS | Смена ориентации |
 | `destroy` | native → JS | Выгрузка WebView |
 
+События обложки (`cover:action`, `cover:active`, `cover:inactive`): см. [cover.md](../api/cover.md).
+
 Подробнее: [event-system.md](../architecture/event-system.md).
 
 ## Сигнал готовности приложения

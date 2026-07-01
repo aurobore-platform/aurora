@@ -184,4 +184,23 @@ describe("Bridge (loopback)", () => {
     });
     expect(ticks.length).toBeLessThan(5);
   });
+
+  it("Cover setState resolves", async () => {
+    const { bridge } = setup();
+    const result = await bridge.invoke("Cover", "setState", { primaryText: "Hi" });
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("cover:action event доставляется подписчику", async () => {
+    const { bridge, nativeTransport } = setup();
+    const handler = vi.fn();
+    bridge.on("cover:action", handler);
+    nativeTransport.sendRaw({
+      type: "event",
+      name: "cover:action",
+      data: { id: "play" },
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(handler).toHaveBeenCalledWith({ id: "play" });
+  });
 });

@@ -12,10 +12,6 @@ html {
     var(--aurobore-safe-area-left, var(--safe-area-inset-left, 0px));
 }
 
-html.aurobore-insets-manual {
-  padding: 0;
-}
-
 body {
   margin: 0;
 }

@@ -76,3 +76,10 @@ export {
   resolveResourceUrl,
   type ResourceRef,
 } from "./resource.js";
+
+export {
+  cover,
+  type CoverAction,
+  type CoverActionEvent,
+  type CoverState,
+} from "./cover.js";

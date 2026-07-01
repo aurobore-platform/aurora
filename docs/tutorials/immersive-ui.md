@@ -2,34 +2,23 @@
 
 > **Основной путь:** приложения из `aurobore create` (vanilla/minimal) **сразу** корректно ложатся под status bar — писать safe-area CSS не нужно.
 
-Runtime по умолчанию:
+Runtime всегда работает в единственном режиме (без настроек в конфиге):
 
-1. Инъектирует CSS-переменные `--aurobore-safe-area-*` (и алиасы `--safe-area-inset-*`).
-2. Подключает `aurobore-chrome.css` — padding на `html` из этих переменных.
-3. Нормализует `viewport-fit=cover` в meta viewport (в т.ч. при dev-сервере).
-4. Обновляет bottom inset при клавиатуре: native `virtualKeyboardMargin` (Gecko) или **visualViewport** (Chromium).
-
-## Конфиг `systemChrome`
-
-В `aurobore.config.json` (все поля опциональны):
-
-```json
-{
-  "systemChrome": {
-    "insets": "auto",
-    "overlayWebView": false,
-    "statusBarStyle": "default"
-  }
-}
-```
-
-| Поле | Значения | Поведение |
-|------|----------|-----------|
-| `insets` | `auto` (default) \| `manual` | `manual` — opt-out встроенного padding (immersive / edge-to-edge) |
-| `overlayWebView` | `false` (default) \| `true` | `false` — WebView под status bar нативно; `true` — контент на весь экран, отступы только через CSS |
-| `statusBarStyle` | `light` \| `dark` \| `default` | Рекомендация для native chrome; на Aurora SDK 5.2.x status bar управляется ОС |
+1. WebView **на весь экран** (`anchors.fill`), без native top margin.
+2. Инъектирует CSS-переменные `--aurobore-safe-area-*` (и алиасы `--safe-area-inset-*`) из `SafeZoneRect` / status bar.
+3. Подключает `aurobore-chrome.css` — padding на `html` из этих переменных.
+4. Нормализует `viewport-fit=cover` в meta viewport (в т.ч. при dev-сервере).
+5. Клавиатура **overlay** (`KeyboardInput` выключен, WebView не сжимается, `window.innerHeight` стабилен): bottom inset через **visualViewport → native** `injectInsets` и событие `systemChrome:insetsChanged`.
 
 ## Edge-to-edge и fixed header
+
+Для immersive UI без padding на всём `html` — сбросьте padding в своём CSS; CSS vars и событие `insetsChanged` остаются доступны:
+
+```css
+html {
+  padding: 0;
+}
+```
 
 Для фиксированных toolbar/header поверх контента:
 
@@ -46,8 +35,6 @@ Runtime по умолчанию:
 ```html
 <header class="aurobore-edge-to-edge">…</header>
 ```
-
-При `insets: "manual"` runtime добавляет класс `aurobore-insets-manual` на `<html>` — padding на `html` сбрасывается.
 
 ## Событие `systemChrome:insetsChanged`
 

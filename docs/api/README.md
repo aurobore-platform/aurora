@@ -23,6 +23,17 @@
 
 Тип `LifecycleEvent`: `ready` | `pause` | `resume` | `backbutton` | `memoryWarning` | `orientationchange` | `destroy`.
 
+### Обложка (cover)
+
+| API | Описание |
+|---|---|
+| `cover.setState({ primaryText?, secondaryText? })` | Динамический текст на обложке |
+| `cover.setActions(actions)` | Кнопки быстрых действий (до 4) |
+| `cover.reset()` | Сброс к имени приложения и actions из конфига |
+| `cover.onAction(handler)` | Подписка на `cover:action` |
+
+См. [cover.md](cover.md).
+
 ### Ошибки
 
 | Класс | Код |

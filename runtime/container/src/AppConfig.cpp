@@ -99,24 +99,39 @@ QStringList AppConfig::deepLinkSchemes()
     return readStringArray(deepLinksValue.toObject(), QStringLiteral("schemes"));
 }
 
-SystemChromeConfig AppConfig::systemChrome()
+QString AppConfig::appName()
 {
-    SystemChromeConfig config;
     const QJsonObject root = loadConfigObject();
-    const QJsonValue chromeValue = root.value(QStringLiteral("systemChrome"));
-    if (!chromeValue.isObject())
+    const QJsonValue appValue = root.value(QStringLiteral("app"));
+    if (!appValue.isObject())
+        return QString();
+    const QJsonValue name = appValue.toObject().value(QStringLiteral("name"));
+    return name.isString() ? name.toString() : QString();
+}
+
+CoverConfig AppConfig::cover()
+{
+    CoverConfig config;
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue coverValue = root.value(QStringLiteral("cover"));
+    if (!coverValue.isObject())
         return config;
 
-    const QJsonObject chrome = chromeValue.toObject();
-    const QJsonValue insets = chrome.value(QStringLiteral("insets"));
-    if (insets.isString())
-        config.insets = insets.toString();
-    const QJsonValue overlay = chrome.value(QStringLiteral("overlayWebView"));
-    if (overlay.isBool())
-        config.overlayWebView = overlay.toBool();
-    const QJsonValue statusBarStyle = chrome.value(QStringLiteral("statusBarStyle"));
-    if (statusBarStyle.isString())
-        config.statusBarStyle = statusBarStyle.toString();
+    const QJsonValue actionsValue = coverValue.toObject().value(QStringLiteral("actions"));
+    if (!actionsValue.isArray())
+        return config;
+
+    for (const QJsonValue &item : actionsValue.toArray()) {
+        if (!item.isObject())
+            continue;
+        const QJsonObject action = item.toObject();
+        CoverActionConfig entry;
+        entry.id = action.value(QStringLiteral("id")).toString();
+        entry.label = action.value(QStringLiteral("label")).toString();
+        entry.icon = action.value(QStringLiteral("icon")).toString();
+        if (!entry.id.isEmpty() && !entry.label.isEmpty())
+            config.actions.append(entry);
+    }
     return config;
 }
 
