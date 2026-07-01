@@ -17,7 +17,7 @@
 **Из npm** (для приложений и демо — рекомендуется):
 
 ```bash
-npm install -g @aurobore/cli@^0.0.2
+npm install -g @aurobore/cli@^0.0.3
 aurobore --version
 aurobore doctor
 ```

@@ -1,6 +1,6 @@
 {
   "name": "aurobore",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "type": "module",
   "description": "Открытая платформа для WebView-приложений под ОС Аврора (мост + плагины + CLI).",
@@ -38,6 +38,7 @@
     "docs:build:full": "cross-env DOCS_AUDIENCE=full vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "gen-api-reference": "pnpm --filter @aurobore/build build && node packages/build/scripts/gen-api-reference.mjs",
+    "version:bump": "node scripts/bump-version.mjs",
     "publish": "node scripts/check-npm-publish.mjs && pnpm build && pnpm changeset publish"
   },
   "repository": {

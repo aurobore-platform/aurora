@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/react",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "React hooks for Aurobore lifecycle and bridge events",
   "license": "MIT",
   "type": "module",

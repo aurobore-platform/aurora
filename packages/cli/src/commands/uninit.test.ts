@@ -37,7 +37,7 @@ describe("aurobore uninit command", () => {
       webRoot: "dist",
       webEntry: "index.html",
       internet: true,
-      cliVersion: "0.0.2",
+      cliVersion: "0.0.3",
     });
 
     const code = await runUninitCommand({ flags: { y: true }, positional: [] });

@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/echo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Echo conformance plugin for Aurobore bridge",
   "license": "MIT",
   "type": "module",

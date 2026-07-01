@@ -32,7 +32,7 @@ aurobore doctor
 **Глобально** (удобно для демо):
 
 ```bash
-npm install -g @aurobore/cli@^0.0.2
+npm install -g @aurobore/cli@^0.0.3
 aurobore --version
 aurobore --help
 ```
@@ -40,7 +40,7 @@ aurobore --help
 **Или** в корне Vue-проекта как dev-зависимость (рекомендуется — `aurobore init` добавляет автоматически):
 
 ```bash
-npm install -D @aurobore/cli@^0.0.2
+npm install -D @aurobore/cli@^0.0.3
 npx aurobore --version
 npx aurobore --help
 ```
@@ -165,7 +165,7 @@ aurobore dev
 |---------|---------|
 | Белый экран, 404 на `/assets/...` | `base: '/'` в Vite |
 | `web root not found: dist` | Сначала `npm run build` |
-| `aurobore: command not found` | `npm install` после init, или `npm i -g @aurobore/cli@^0.0.2` |
+| `aurobore: command not found` | `npm install` после init, или `npm i -g @aurobore/cli@^0.0.3` |
 | Ошибки `mb2` / sfdk | Git Bash, Aurora SDK, `aurobore doctor` |
 | API не работает | `"Internet"` в `permissions` |
 

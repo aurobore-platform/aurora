@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/build",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Сборка и кодогенерация: генерация нативного проекта Аврора (CMake/.spec/.desktop) и JS/TS-обёрток.",
   "license": "MIT",
   "type": "module",

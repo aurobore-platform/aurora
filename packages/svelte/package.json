@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/svelte",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Svelte stores for Aurobore lifecycle and bridge events",
   "license": "MIT",
   "type": "module",

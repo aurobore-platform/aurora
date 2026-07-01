@@ -45,6 +45,6 @@ describe("init CLI", () => {
     };
     expect(pkg.scripts["aurora:build"]).toBe("aurobore build");
     expect(pkg.scripts["build:aurora"]).toContain("aurobore build");
-    expect(pkg.devDependencies?.["@aurobore/cli"]).toBe("^0.0.2");
+    expect(pkg.devDependencies?.["@aurobore/cli"]).toBe("^0.0.3");
   });
 });

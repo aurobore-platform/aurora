@@ -148,13 +148,13 @@ describe("project init", () => {
       webRoot: "dist",
       webEntry: "index.html",
       internet: true,
-      cliVersion: "0.0.2",
+      cliVersion: "0.0.3",
     });
 
     const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")) as {
       devDependencies: Record<string, string>;
     };
-    expect(pkg.devDependencies["@aurobore/cli"]).toBe("^0.0.2");
+    expect(pkg.devDependencies["@aurobore/cli"]).toBe("^0.0.3");
   });
 
   it("applyInitToProject отклоняет существующий конфиг без force", () => {
@@ -212,7 +212,7 @@ describe("project init", () => {
       webRoot: "dist",
       webEntry: "index.html",
       internet: true,
-      cliVersion: "0.0.2",
+      cliVersion: "0.0.3",
     });
 
     fs.mkdirSync(path.join(root, ".aurobore", "cache"), { recursive: true });

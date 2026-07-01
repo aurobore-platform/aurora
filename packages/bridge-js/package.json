@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/bridge-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Низкоуровневая JS-сторона моста: корреляция, Promise, события, стримы, сериализация.",
   "license": "MIT",
   "type": "module",

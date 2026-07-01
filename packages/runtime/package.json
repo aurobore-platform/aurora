@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/runtime",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Aurobore native runtime sources (container, bridge-native, native-sdk) for npm consumers.",
   "license": "MIT",
   "type": "module",

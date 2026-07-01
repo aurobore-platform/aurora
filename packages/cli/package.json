@@ -1,6 +1,6 @@
 {
   "name": "@aurobore/cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CLI Aurobore: create/dev/build/run/plugin/doctor.",
   "license": "MIT",
   "type": "module",
