@@ -73,11 +73,12 @@
 - [x] Команды create/dev/build/run/plugin/doctor работают (FR-C1…C6). → [`packages/cli/src/cli.ts`](../packages/cli/src/cli.ts).
 - [x] Понятные ошибки и подсказки; `doctor` даёт actionable-советы (NFR-6). → [`packages/cli/src/doctor.ts`](../packages/cli/src/doctor.ts).
 - [x] Валидация конфига на каждом запуске. → `loadConfig` / `config validate`.
-- [x] dev: live reload (и hot reload на Alpha+).
+- [x] dev: live reload + HMR (Vite) / esbuild watch для vanilla.
 - [x] plugin add/remove/list корректно меняют артефакты без ручной правки.
 - [x] Иконки лаунчера генерируются в native-проект и попадают в RPM (86/108/128/172, `hicolor`). → [`packages/build/src/native/icons.ts`](../packages/build/src/native/icons.ts), V-15.
 - [x] Переводы нативного UI: `translations/*.ts`, `qt5_add_translation`, `.qm` в RPM. → [`packages/build/src/native/translations.ts`](../packages/build/src/native/translations.ts).
-- [ ] (SHOULD) plugin create, generate, publish, migrate.
+- [x] (SHOULD) plugin create. → `aurobore plugin create`, [`packages/build/src/plugins/create.ts`](../packages/build/src/plugins/create.ts).
+- [ ] (SHOULD) generate, publish, migrate.
 
 ## 8. SDK чек-лист
 - [x] `@aurobore/core` публикует API, события, модель ошибок, типы.

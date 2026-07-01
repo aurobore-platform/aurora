@@ -11,6 +11,9 @@ import {
   checkProjectIcons,
   validateConfig,
   probeDockerDaemon,
+  resolveDevHost,
+  isPortAvailable,
+  probeTcpHost,
 } from "@aurobore/build";
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -191,8 +194,88 @@ function checkDocker(): DoctorCheck {
   };
 }
 
+function checkDevHost(): DoctorCheck {
+  const host = resolveDevHost();
+  if (host === "127.0.0.1") {
+    return {
+      name: "Dev host (LAN)",
+      status: "warn",
+      detail:
+        "только loopback; эмулятор не достучится до dev server — подключите Wi-Fi/Ethernet или VPN",
+    };
+  }
+  return {
+    name: "Dev host (LAN)",
+    status: "ok",
+    detail: `${host} (эмулятор грузит http://${host}:<port>/)`,
+  };
+}
+
+async function checkDevPort(cwd: string): Promise<DoctorCheck> {
+  const configPath = findConfigFile(cwd);
+  let port = 5173;
+  if (configPath) {
+    try {
+      const { config } = loadConfig(cwd);
+      port = config.web.devServer?.port ?? 5173;
+    } catch {
+      /* keep default */
+    }
+  }
+  const free = await isPortAvailable(port);
+  if (free) {
+    return { name: "Dev server port", status: "ok", detail: `port ${port} свободен` };
+  }
+  return {
+    name: "Dev server port",
+    status: "fail",
+    detail: `port ${port} занят; укажите --port или освободите порт (Windows: проверьте файрвол)`,
+  };
+}
+
+async function checkEmulatorSsh(): Promise<DoctorCheck> {
+  const reachable = await probeTcpHost("127.0.0.1", 2223);
+  if (reachable) {
+    return { name: "Emulator SSH", status: "ok", detail: "127.0.0.1:2223 доступен" };
+  }
+  return {
+    name: "Emulator SSH",
+    status: "warn",
+    detail: "127.0.0.1:2223 недоступен; запустите эмулятор (`sfdk emulator start`) перед run/dev",
+  };
+}
+
+function checkDevInternetPermission(cwd: string): DoctorCheck {
+  const configPath = findConfigFile(cwd);
+  if (!configPath) {
+    return {
+      name: "Dev permissions",
+      status: "warn",
+      detail: "aurobore.config не найден",
+    };
+  }
+  try {
+    const { config } = loadConfig(cwd);
+    const perms = config.permissions ?? [];
+    if (perms.includes("Internet")) {
+      return { name: "Dev permissions", status: "ok", detail: "Internet granted для dev server" };
+    }
+    return {
+      name: "Dev permissions",
+      status: "warn",
+      detail: 'нет "Internet" в permissions — WebView не загрузит http:// dev server',
+    };
+  } catch (err) {
+    return {
+      name: "Dev permissions",
+      status: "warn",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
 /** Выполняет проверки окружения разработчика Aurobore. */
-export function runDoctor(cwd: string = process.cwd()): DoctorReport {
+export async function runDoctor(cwd: string = process.cwd()): Promise<DoctorReport> {
   const checks = [
     checkNode(),
     checkPnpm(),
@@ -202,6 +285,10 @@ export function runDoctor(cwd: string = process.cwd()): DoctorReport {
     checkProjectConfig(cwd),
     checkProjectIconsDoctor(cwd),
     checkSfdkTarget(cwd),
+    checkDevHost(),
+    await checkDevPort(cwd),
+    await checkEmulatorSsh(),
+    checkDevInternetPermission(cwd),
   ];
   const ok = checks.every((c) => c.status !== "fail");
   return { checks, ok };

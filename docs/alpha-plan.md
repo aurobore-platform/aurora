@@ -205,15 +205,15 @@ FR-C7, FR-C8. См. [architecture/dev-server.md](architecture/dev-server.md), [a
 
 
 
-- [ ] **Hot Reload (HMR)** в `aurobore dev`: интеграция с HMR веб-сборщика (Vite и аналоги), без блокировки
+- [x] **Hot Reload (HMR)** в `aurobore dev`: интеграция с HMR веб-сборщика (Vite и аналоги), без блокировки
 
       HMR-канала dev-контейнером; откат к live reload при неподдерживаемой замене модуля.
 
-- [ ] **`aurobore plugin create <name>`** — скелет плагина (манифест, native stub, package.json, README)
+- [x] **`aurobore plugin create <name>`** — скелет плагина (манифест, native stub, package.json, README)
 
       по шаблону из [dev/native-plugin-guide.md](dev/native-plugin-guide.md).
 
-- [ ] Диагностика типичных проблем dev-режима (хост недоступен с эмулятора, порт, файрвол).
+- [x] Диагностика типичных проблем dev-режима (хост недоступен с эмулятора, порт, файрвол).
 
 
 

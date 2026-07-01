@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "name": "{{name}}",
+  "display": "{{display}}",
+  "version": "1.0.0",
+  "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
+  "permissions": [],
+  "methods": {
+    "ping": { "args": {}, "result": "void" }
+  },
+  "errors": {
+    "{{ERROR_CODE}}": {
+      "message": "{{name}} not available",
+      "description": "Stub scaffold — implement native logic or remove stub error"
+    }
+  }
+}

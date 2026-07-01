@@ -1,0 +1,21 @@
+{
+  "name": "@aurobore/{{name}}",
+  "version": "0.0.1",
+  "description": "{{display}} plugin for Aurobore",
+  "license": "MIT",
+  "type": "module",
+  "files": ["plugin.manifest", "native", "generated"],
+  "exports": {
+    ".": {
+      "types": "./generated/index.d.ts",
+      "import": "./generated/index.js"
+    },
+    "./plugin.manifest": "./plugin.manifest"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*"
+  }
+}

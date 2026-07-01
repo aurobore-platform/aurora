@@ -1,15 +1,16 @@
 import process from "node:process";
-import { addPlugin, formatPluginList, listPlugins, removePlugin } from "@aurobore/build";
-import { flagBool, type ParsedArgs } from "../args.js";
+import { addPlugin, createPluginScaffold, formatPluginList, listPlugins, removePlugin } from "@aurobore/build";
+import { flagBool, flagString, type ParsedArgs } from "../args.js";
 
 export function runPluginCommand(args: ParsedArgs): number {
   const sub = args.positional[0];
   if (flagBool(args.flags, "help") || !sub) {
-    console.log(`aurobore plugin add|remove|list <name>
+    console.log(`aurobore plugin add|remove|list|create <name>
 
   add <name>       Добавить плагин (built-in без npm; --external для npm install)
   remove <name>    Удалить плагин (--keep-npm оставить node_modules)
-  list             Список плагинов с версиями и совместимостью`);
+  list             Список плагинов с версиями и совместимостью
+  create <name>    Скелет плагина в ./plugins/<name>/ (--display, --force)`);
     return sub ? 0 : 1;
   }
 
@@ -19,6 +20,25 @@ export function runPluginCommand(args: ParsedArgs): number {
     switch (sub) {
       case "list": {
         console.log(formatPluginList(listPlugins(projectRoot)));
+        return 0;
+      }
+      case "create": {
+        const name = args.positional[1];
+        if (!name) {
+          console.error("[plugin] usage: aurobore plugin create <name> [--display \"My Plugin\"] [--force]");
+          return 1;
+        }
+        const result = createPluginScaffold(projectRoot, name, {
+          display: flagString(args.flags, "display"),
+          force: flagBool(args.flags, "force"),
+        });
+        console.log(`[plugin] created ${result.pluginDir}`);
+        if (result.monorepoPatched) {
+          console.log("[plugin] monorepo: updated PLUGIN_NAMES and CMakeLists.txt");
+        }
+        for (const step of result.nextSteps) {
+          console.log(`[plugin] → ${step}`);
+        }
         return 0;
       }
       case "add": {

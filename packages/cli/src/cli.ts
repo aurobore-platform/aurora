@@ -40,11 +40,11 @@ function printUsage(): void {
       "  create <name>     Создать проект из шаблона",
       "  init              Подключить существующий web-проект",
       "  uninit            Откатить init (конфиг, скрипты, CLI)",
-      "  dev               Dev server + live reload",
+      "  dev               Dev server + HMR/live reload",
       "  build             Собрать RPM-пакет",
       "  run               Установить и запустить на эмуляторе",
       "  doctor            Диагностика окружения",
-      "  plugin add|remove|list  Управление плагинами",
+      "  plugin add|remove|list|create  Управление плагинами",
       "  config [validate] Показать/валидировать конфиг",
       "  generate          Перегенерировать кодоген плагинов",
       "  clean             Удалить .aurobore/",
@@ -73,7 +73,7 @@ async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
 
   switch (command) {
     case "doctor": {
-      const report = runDoctor();
+      const report = await runDoctor();
       console.log(formatReport(report));
       exitCode = report.ok ? 0 : 1;
       break;

@@ -5,6 +5,9 @@
 
 ## Поток изменений
 
+Быстрый путь для нового core-плагина: `aurobore plugin create <name>` — создаёт `./plugins/<name>/`
+(манифест, native stub, package.json, README) и в монорепо патчит `PLUGIN_NAMES` + `CMakeLists.txt`.
+
 ```mermaid
 flowchart LR
   manifest["plugin.manifest"]
