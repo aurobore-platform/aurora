@@ -26,16 +26,26 @@ aurobore dev
 
 ## Chrome на ПК
 
-1. Откройте `chrome://inspect` (не вкладку `http://localhost:9222` — в CEF 100+ landing deprecated).
-2. **Configure** рядом с «Discover network targets» → добавьте `localhost:9222`, если нет в списке.
-3. Запустите приложение с WebView — в **Remote Target** появится страница (например `https://127.0.0.1:…/index.html`).
-4. **inspect** → DevTools.
+**Важно:** вкладка `chrome://inspect/#devices` — это **USB/Android-устройства**. WebView CEF появляется в секции **«Remote Target»** ниже на той же странице `chrome://inspect` (без привязки к USB).
 
-Проверка туннеля на Windows:
+1. Откройте `chrome://inspect` в **Google Chrome** на ПК (не Edge, если не настроен аналогично).
+2. Включите **Discover network targets**.
+3. **Configure** → добавьте **оба** адреса (Chrome иногда видит только один):
+   - `127.0.0.1:9222`
+   - `localhost:9222`
+4. Подождите 5–10 с или обновите страницу — в **Remote Target** должна появиться «Aurobore Container M1» → **inspect**.
+
+### Обходной путь (если Remote Target пустой)
+
+Туннель и CEF уже работают, если `curl http://127.0.0.1:9222/json/list` возвращает JSON. Скопируйте **прямую ссылку** из вывода `pnpm container:run` (блок `[cef-debug] WebView targets`) или получите вручную:
 
 ```powershell
-curl http://localhost:9222/json/version
+node -e "fetch('http://127.0.0.1:9222/json/list').then(r=>r.json()).then(j=>{const p=j.find(x=>x.url.startsWith('https://127')); console.log('http://127.0.0.1:9222'+p.devtoolsFrontendUrl)})"
 ```
+
+Вставьте напечатанный URL **в адресную строку Chrome** — откроется DevTools для WebView.
+
+Не открывайте голый `http://localhost:9222` — в CEF 100+ там пустая страница (это нормально).
 
 ## Эмулятор (разработка платформы)
 

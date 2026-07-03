@@ -61,8 +61,11 @@ export {
   resolveCefDebugPort,
   startCefDebugTunnel,
   printCefDebugBanner,
+  fetchCefDebugTargets,
+  printInspectableTargets,
+  waitAndPrintInspectableTargets,
 } from "./aurora/cefDebug.js";
-export type { CefDebugTunnel } from "./aurora/cefDebug.js";
+export type { CefDebugTunnel, StartCefDebugTunnelOptions, CefDebugTarget } from "./aurora/cefDebug.js";
 
 export { buildApp, runApp } from "./pipeline/buildApp.js";
 export type { BuildAppOptions, BuildResult, BuildReport, RunAppOptions } from "./pipeline/buildApp.js";

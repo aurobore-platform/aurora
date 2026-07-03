@@ -176,6 +176,28 @@ async function main() {
       remoteScriptName: `run-${project}.sh`,
       env,
     });
+
+    if (project === "container") {
+      const cefPort = build.resolveCefDebugPort({ envPort: env.AUROBORE_CEF_DEBUG_PORT });
+      if (cefPort != null) {
+        try {
+          const tunnel = await build.startCefDebugTunnel(env, cefPort, { detached: true });
+          build.printCefDebugBanner(tunnel.localPort);
+          await build.waitAndPrintInspectableTargets(tunnel.localPort);
+          log(
+            `cef-debug: SSH tunnel running in background (pid ${tunnel.pid ?? "?"}) — stop when done`,
+          );
+        } catch (err) {
+          log(
+            `cef-debug: tunnel failed (${err instanceof Error ? err.message : String(err)}); see docs/dev/web-debugging.md`,
+          );
+        }
+      } else {
+        log(
+          "cef-debug: set AUROBORE_CEF_DEBUG_PORT=9222 in tools/aurora/local.env for chrome://inspect",
+        );
+      }
+    }
   }
 
   if (cmd === "emulator") {

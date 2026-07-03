@@ -11,6 +11,7 @@ import {
   runApp,
   startCefDebugTunnel,
   startDevBackend,
+  waitAndPrintInspectableTargets,
   type CefDebugTunnel,
   type DevBackendResult,
 } from "@aurobore/build";
@@ -92,6 +93,10 @@ Options:
       }
 
       await runApp({ projectRoot: cwd, cefDebugPort: cefDebugPort ?? undefined });
+
+      if (cefDebugPort != null && tunnel) {
+        await waitAndPrintInspectableTargets(tunnel.localPort);
+      }
     } else if (cefDebugPort != null) {
       console.log(
         "[dev] CEF debug port resolved but --no-run: start app manually and run SSH tunnel if needed",

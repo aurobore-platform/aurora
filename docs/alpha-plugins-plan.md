@@ -112,13 +112,11 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Зафиксировать рабочий стек на Aurora 5.1.x / 5.2.x: `Sailfish.Pickers`, `Sailfish.Camera`, Qt Multimedia
+- [x] Зафиксировать рабочий стек на Aurora 5.2.1.200: `pickPhoto` — `Sailfish.Pickers` / `sailfish-components-pickers-qt5`; `getPhoto` — Qt5 `QtMultimedia` / `qt5-qtmultimedia`. 5.1.x — по документации, прогон pending.
 
-      или harbour-обёртки — что доступно в песочнице с `Permissions=Camera`.
+- [ ] Проверить сценарии на **физическом устройстве**: съёмка с задней камеры, выбор из галереи, отмена пользователем. На эмуляторе x86: `getPhoto` → `CAMERA_UNAVAILABLE` (ожидаемо), `pickPhoto` — при наличии галереи.
 
-- [ ] Проверить сценарии: съёмка с задней камеры, выбор из галереи, отмена пользователем.
-
-- [ ] Записать выводы в [aurora/verification-status.md](aurora/verification-status.md) (новая запись V-camera).
+- [x] Записать выводы в [aurora/verification-status.md](aurora/verification-status.md) (запись V-camera).
 
 
 
@@ -126,21 +124,19 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`getPhoto`:** открыть UI съёмки → сохранить JPEG/PNG в app-data через `AuroboreResource::writeAppDataFile`
+- [x] **`getPhoto`:** `CameraCapturePage.qml` (QtMultimedia) → `writeAppDataFile` → `Photo` (`width`/`height`/`format` опционально).
 
-      → вернуть `Photo` (`kind: "resource"`, `url`, `mimeType`, `size`; опционально `width`/`height`/`format`).
+- [x] **`pickPhoto`:** `PickPhotoPage.qml` (`ImagePickerPage`) → копирование в app-data, в JSON только resource URL.
 
-- [ ] **`pickPhoto`:** системный picker галереи → тот же путь через app-data (копирование, не отдача чужого пути в JSON).
+- [x] Учесть аргументы `quality`, `allowEditing` — `quality` (JPEG re-encode); `allowEditing` — no-op, задокументировано в [plugins/camera.md](plugins/camera.md).
 
-- [ ] Учесть аргументы `quality`, `allowEditing` — в пределах возможностей выбранного API (или задокументировать ограничения).
+- [x] **`CAMERA_CANCELLED`** — back/закрытие picker/capture UI, `cancel()`.
 
-- [ ] **`CAMERA_CANCELLED`** — пользователь закрыл камеру/picker без результата.
+- [x] **`CAMERA_CAPTURE_FAILED`** — ошибка записи, параллельный вызов, сбой capture.
 
-- [ ] **`CAMERA_CAPTURE_FAILED`** — ошибка записи, нет места, сбой камеры.
+- [x] **`CAMERA_UNAVAILABLE`** — нет `CameraBridge`, камера недоступна (`Camera.available`), не дефолт stub.
 
-- [ ] **`CAMERA_UNAVAILABLE`** — только если API/железо реально недоступны (не дефолт stub).
-
-- [ ] Async: `invoke` не блокирует UI-поток; результат — по завершении UI (callback/signal → `BridgeRouter`).
+- [x] Async: deferred `invoke` (пустой `QVariant`) → `emitOutbound` по сигналу `CameraBridge` (см. [native-sdk/README.md](../runtime/native-sdk/README.md)).
 
 
 
@@ -148,11 +144,13 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`camera-demo`:** preview через `resolveResourceUrl(photo)`; journal без `CAMERA_UNAVAILABLE` на устройстве с камерой.
+- [x] **`camera-demo`:** preview через `resolveResourceUrl(photo)`; код и UI обновлены.
 
-- [ ] Обновить [plugins/camera.md](plugins/camera.md) и [compatibility-matrix.md](aurora/compatibility-matrix.md) — убрать пометку A3 scaffold.
+- [ ] **Sign-off на физическом устройстве:** journal без `CAMERA_UNAVAILABLE` при успешной съёмке/выборе.
 
-- [ ] `pnpm container:all` — плагин регистрируется, M3 OK.
+- [x] Обновить [plugins/camera.md](plugins/camera.md) и [compatibility-matrix.md](aurora/compatibility-matrix.md) — убрать пометку A3 scaffold.
+
+- [x] `pnpm container:all` — плагин Camera registered, M3 OK (SDK 5.2.1.200 эмулятор).
 
 
 

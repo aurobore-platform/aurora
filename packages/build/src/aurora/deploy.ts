@@ -43,12 +43,10 @@ export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void
     cefDebugPort != null
       ? String(cefDebugPort)
       : env.AUROBORE_CEF_DEBUG_PORT?.trim() || "";
-  const envPrefix = cefPort ? `AUROBORE_CEF_DEBUG_PORT=${cefPort} ` : "";
-  runCommand(
-    openSshTool(env, "ssh"),
-    sshArgs(env, `${envPrefix}sudo sh /tmp/${remoteScriptName}`),
-    { env },
-  );
+  const remoteCmd = cefPort
+    ? `export AUROBORE_CEF_DEBUG_PORT=${cefPort}; sudo -E sh /tmp/${remoteScriptName}`
+    : `sudo sh /tmp/${remoteScriptName}`;
+  runCommand(openSshTool(env, "ssh"), sshArgs(env, remoteCmd), { env });
 }
 
 /** Генерирует run-script для приложения на эмуляторе. */
