@@ -1,0 +1,23 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.sharedemo",
+    "name": "Share Demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "resources/icon.svg"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "devServer": {
+      "port": 5179
+    }
+  },
+  "permissions": ["Internet"],
+  "plugins": ["@aurobore/echo", "@aurobore/share"],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}

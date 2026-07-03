@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications Demo</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main>
+    <h1>Notifications Demo</h1>
+    <p id="status">Initializing…</p>
+
+    <section>
+      <h2>Notifications plugin (P4)</h2>
+      <p class="hint">Tap a notification in the system shade to see <code>notification:tap</code> below.</p>
+      <div class="actions">
+        <button type="button" id="btn-notify">Notify now</button>
+        <button type="button" id="btn-schedule">Schedule (+5s)</button>
+        <button type="button" id="btn-cancel-last" disabled>Cancel last</button>
+        <button type="button" id="btn-cancel-all" disabled>Cancel all</button>
+      </div>
+      <pre id="log" class="log"></pre>
+    </section>
+  </main>
+  <script src="js/aurobore-bridge.js"></script>
+  <script src="js/aurobore-plugins.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

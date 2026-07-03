@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Share Demo</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main>
+    <h1>Share Demo</h1>
+    <p id="status">Initializing…</p>
+
+    <section>
+      <h2>Share plugin (P5)</h2>
+      <p class="hint">Opens the system share sheet. Press back to dismiss — expect <code>SHARE_CANCELLED</code>.</p>
+      <div class="actions">
+        <button type="button" id="btn-share-text">Share text</button>
+        <button type="button" id="btn-share-url">Share URL</button>
+        <button type="button" id="btn-share-file">Share file</button>
+      </div>
+      <pre id="log" class="log"></pre>
+    </section>
+  </main>
+  <script src="js/aurobore-bridge.js"></script>
+  <script src="js/aurobore-plugins.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

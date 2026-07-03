@@ -296,9 +296,9 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] API локальных уведомлений Аврора (Nemo / Lipstick / D-Bus) — создание, отложенные, отмена, payload для tap.
+- [x] API локальных уведомлений Аврора (Nemo / Lipstick / D-Bus) — создание, отложенные, отмена, payload для tap.
 
-- [ ] Жизненный цикл: приложение в фоне / cover / killed — что гарантируем в Alpha+ (минимум: foreground + resume).
+- [x] Жизненный цикл: приложение в фоне / cover / killed — что гарантируем в Alpha+ (минимум: foreground + resume).
 
 
 
@@ -306,17 +306,17 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`notify`:** показать уведомление, вернуть `{ id }` (стабильный id из args или UUID).
+- [x] **`notify`:** показать уведомление, вернуть `{ id }` (стабильный id из args или UUID).
 
-- [ ] **`schedule`:** отложенное по `scheduleAt` (мс); ограничения ОС задокументировать.
+- [x] **`schedule`:** отложенное по `scheduleAt` (мс); ограничения ОС задокументировать.
 
-- [ ] **`cancel` / `cancelAll`:** снять с публикации / таймера.
+- [x] **`cancel` / `cancelAll`:** снять с публикации / таймера.
 
-- [ ] **`notification:tap`:** `router()->emitEvent("notification:tap", { id, action? })` при активации из шторки.
+- [x] **`notification:tap`:** `router()->emitEvent("notification:tap", { id, action? })` при активации из шторки.
 
-- [ ] **`NOTIFICATIONS_UNAVAILABLE`** — сервис уведомлений недоступен.
+- [x] **`NOTIFICATIONS_UNAVAILABLE`** — сервис уведомлений недоступен.
 
-- [ ] Хранение активных id в плагине (map id → native handle) для cancel.
+- [x] Хранение активных id в плагине (map id → native handle) для cancel.
 
 
 
@@ -324,11 +324,11 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Демо `notifications-demo` или расширение существующего example (`notify` + подписка на tap).
+- [x] Демо `notifications-demo` или расширение существующего example (`notify` + подписка на tap).
 
 - [ ] Ручная проверка tap → JS handler на эмуляторе/устройстве.
 
-- [ ] Обновить [plugins/notifications.md](plugins/notifications.md).
+- [x] Обновить [plugins/notifications.md](plugins/notifications.md).
 
 
 
@@ -356,9 +356,9 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Sailfish Share / `QShareInterface` / harbour-share — что доступно в sandbox без доп. permissions.
+- [x] Sailfish Share / `Sailfish.Share` `ShareAction` (`sailfish-components-share-qt5`) — Harbour-allowed с SFOS 4.2; доп. permissions не нужны.
 
-- [ ] Передача файла: локальный путь из `AssetResolver::toFilesystemPath(url)` в share intent.
+- [x] Передача файла: локальный путь из `ScopeValidator::resolveAppDataPath` для `aurobore-app://localhost/app-data/...`.
 
 
 
@@ -366,13 +366,13 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`shareText` / `shareUrl`:** системный диалог шаринга.
+- [x] **`shareText` / `shareUrl`:** системный диалог шаринга.
 
-- [ ] **`shareFile`:** resolve `aurobore-app://localhost/app-data/...` → файл в app-data → share.
+- [x] **`shareFile`:** resolve `aurobore-app://localhost/app-data/...` → файл в app-data → share.
 
-- [ ] **`SHARE_CANCELLED`** — пользователь закрыл sheet.
+- [x] **`SHARE_CANCELLED`** — пользователь закрыл sheet.
 
-- [ ] **`SHARE_UNAVAILABLE`** — API шаринга недоступен.
+- [x] **`SHARE_UNAVAILABLE`** — API шаринга недоступен.
 
 
 
@@ -380,9 +380,9 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Демо: шаринг текста и файла (файл из Camera или FileSystem).
+- [x] Демо: шаринг текста и файла (файл из Echo `getSampleResource`).
 
-- [ ] Обновить [plugins/share.md](plugins/share.md).
+- [x] Обновить [plugins/share.md](plugins/share.md).
 
 
 
@@ -402,11 +402,11 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 - [x] **NFR-7:** исключения в плагине не роняют Runtime — `try/catch` в `PluginManager` (уже есть; не регрессировать).
 
-- [x] **Permissions (P1–P3):** `camera-demo` → `Camera`, `geo-demo` → `Location`; `sensors-demo` — без motion. P4 demo — pending.
+- [x] **Permissions (P1–P4):** `camera-demo` → `Camera`, `geo-demo` → `Location`; `sensors-demo` — без motion; `notifications-demo` → `Notifications`.
 
-- [x] **Документация (P1–P3):** [camera.md](plugins/camera.md), [geolocation.md](plugins/geolocation.md), [sensors.md](plugins/sensors.md), [plugins/README.md](plugins/README.md), [using-plugins.md](tutorials/using-plugins.md) — без scaffold. P4/P5 — stub-блоки в `notifications.md`, `share.md`.
+- [x] **Документация (P1–P5):** [camera.md](plugins/camera.md), [geolocation.md](plugins/geolocation.md), [sensors.md](plugins/sensors.md), [notifications.md](plugins/notifications.md), [share.md](plugins/share.md), [plugins/README.md](plugins/README.md), [using-plugins.md](tutorials/using-plugins.md).
 
-- [x] **Compatibility matrix (P1–P3):** [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md) — три demo, UNAVAILABLE на эмуляторе. P4/P5 — pending.
+- [x] **Compatibility matrix (P1–P5):** [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md) — пять plugin-demos.
 
 - [ ] **Conformance (Beta, FR-T1):** после реализации — тесты в conformance-suite (вне этого плана, см. [checklists.md](checklists.md) §6).
 
@@ -460,9 +460,9 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 | V-sensors | Qt Sensors на реальном устройстве | P3 | 🟡 реализовано; sign-off на устройстве |
 
-| V-notif | Local notifications + tap → JS | P4 | 🔴 не начато |
+| V-notif | Local notifications + tap → JS | P4 | 🟡 реализовано; sign-off tap на устройстве |
 
-| V-share | Share sheet + file from app-data | P5 | 🔴 не начато |
+| V-share | Share sheet + file from app-data | P5 | 🟡 реализовано; sign-off на устройстве |
 
 
 

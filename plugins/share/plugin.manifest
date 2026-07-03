@@ -5,6 +5,9 @@
   "version": "1.0.0",
   "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
   "permissions": [],
+  "nativeDeps": {
+    "rpm": ["sailfish-components-share-qt5"]
+  },
   "types": {
     "ShareTextArgs": {
       "text": "string",

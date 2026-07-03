@@ -293,6 +293,17 @@ Page {
     }
 
     Connections {
+        target: typeof shareBridge !== "undefined" ? shareBridge : null
+        onShareRequested: {
+            pageStack.push(Qt.resolvedUrl("ShareSheetPage.qml"), payload)
+        }
+        onDismissRequested: {
+            if (pageStack.depth > 1)
+                pageStack.pop()
+        }
+    }
+
+    Connections {
         target: Qt.inputMethod
         onVisibleChanged: page.updateKeyboardInset()
         onKeyboardRectangleChanged: page.updateKeyboardInset()
@@ -406,6 +417,8 @@ Page {
                 console.log("[aurobore-container] web ready signal")
                 console.log("[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works")
                 deepLinkHandler.deliverPending()
+                if (typeof notificationsBridge !== "undefined" && notificationsBridge)
+                    notificationsBridge.deliverPending()
                 page.hideSplash()
             } else if (name === "aurobore:back") {
                 page.handleBackNavigation()

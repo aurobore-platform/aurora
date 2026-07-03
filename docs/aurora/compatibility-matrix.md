@@ -26,7 +26,7 @@
 Команды прогона на текущем SDK:
 
 ```powershell
-pnpm demos:verify          # 8 examples: web + RPM (~30–60 мин)
+pnpm demos:verify          # 10 examples: web + RPM (~30–60 мин)
 pnpm compat:verify         # container:all на эмуляторе (без повторного demos)
 ```
 
@@ -41,11 +41,13 @@ pnpm compat:verify -- --run-demo hello-world
 | Сценарий | 5.2.1.200 | 5.1.x |
 |---|---|---|
 | `pnpm container:all` (M1/M2/M3 journal) | OK (2026-07-01, re-verify): M1/M2/M3 OK | pending |
-| `pnpm demos:verify` (8 examples, RPM) | OK (2026-07-03): 8/8 (включая `camera-demo`, `geo-demo`, `sensors-demo`) | pending |
+| `pnpm demos:verify` (10 examples, RPM) | OK (2026-07-03): 10/10 (включая `camera-demo`, `geo-demo`, `sensors-demo`, `notifications-demo`, `share-demo`) | pending |
 | `aurobore run` — `hello-world` | manual (кнопка Benchmark → journal) | pending |
 | `aurobore run` — `camera-demo` | manual: pick/capture на устройстве; эмулятор — `getPhoto` UNAVAILABLE | pending |
 | `aurobore run` — `geo-demo` | manual: GPS на устройстве; эмулятор — `GEOLOCATION_UNAVAILABLE` | pending |
 | `aurobore run` — `sensors-demo` | manual: IMU на устройстве; эмулятор — `SENSORS_UNAVAILABLE` | pending |
+| `aurobore run` — `notifications-demo` | manual: notify в шторке; tap → `notification:tap` в UI | pending |
+| `aurobore run` — `share-demo` | manual: share text/url/file → системный sheet; back → `SHARE_CANCELLED` | pending |
 | Bridge benchmark (V-7, hello-world) | manual: кнопка Benchmark в UI | pending |
 
 ### Journal-маркеры контейнера (5.2.1.200)
@@ -76,6 +78,7 @@ pnpm compat:verify -- --run-demo hello-world
 | [`camera-demo`](../../examples/camera-demo/) | Camera, Echo | P1 native; `getPhoto` → `CAMERA_UNAVAILABLE` без камеры; `pickPhoto` — при наличии галереи |
 | [`geo-demo`](../../examples/geo-demo/) | Geolocation, Echo | P2 native; `GEOLOCATION_UNAVAILABLE` без mock GPS |
 | [`sensors-demo`](../../examples/sensors-demo/) | Sensors, Echo | P3 native; `SENSORS_UNAVAILABLE` без IMU |
+| [`notifications-demo`](../../examples/notifications-demo/) | Notifications, Echo | P4 native; notify/schedule на эмуляторе; tap — manual |
 
 Путь create→build→run:
 

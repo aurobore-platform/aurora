@@ -11,11 +11,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/cef")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-find_package(Qt5 COMPONENTS Core Gui Qml Quick Network Multimedia Positioning Sensors LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Qml Quick Network Multimedia Positioning Sensors DBus LinguistTools REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
 pkg_check_modules(AuroraWebView aurorawebview REQUIRED IMPORTED_TARGET)
+pkg_check_modules(Nemonotifications nemonotifications-qt5 REQUIRED IMPORTED_TARGET)
 
 file(GLOB TsFiles "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 qt5_add_translation(QmFiles ${TsFiles})
@@ -51,7 +52,9 @@ add_executable(${PROJECT_NAME}
     ${PLUGIN_NATIVE_DIR}/camera/native/CameraPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/geolocation/native/GeolocationMapping.cpp
     ${PLUGIN_NATIVE_DIR}/geolocation/native/GeolocationPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/notifications/native/NotificationsBridge.cpp
     ${PLUGIN_NATIVE_DIR}/notifications/native/NotificationsPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/share/native/ShareBridge.cpp
     ${PLUGIN_NATIVE_DIR}/share/native/SharePlugin.cpp
     ${PLUGIN_NATIVE_DIR}/sensors/native/SensorsMapping.cpp
     ${PLUGIN_NATIVE_DIR}/sensors/native/SensorsPlugin.cpp
@@ -85,8 +88,10 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Multimedia
         Qt5::Positioning
         Qt5::Sensors
+        Qt5::DBus
         PkgConfig::Auroraapp
         PkgConfig::AuroraWebView
+        PkgConfig::Nemonotifications
 )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

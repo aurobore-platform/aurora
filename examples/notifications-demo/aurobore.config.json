@@ -1,0 +1,23 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.notificationsdemo",
+    "name": "Notifications Demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "resources/icon.svg"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "devServer": {
+      "port": 5178
+    }
+  },
+  "permissions": ["Internet", "Notifications"],
+  "plugins": ["@aurobore/echo", "@aurobore/notifications"],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}

@@ -109,6 +109,16 @@ QString AppConfig::appName()
     return name.isString() ? name.toString() : QString();
 }
 
+QString AppConfig::appId()
+{
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue appValue = root.value(QStringLiteral("app"));
+    if (!appValue.isObject())
+        return QString();
+    const QJsonValue id = appValue.toObject().value(QStringLiteral("id"));
+    return id.isString() ? id.toString() : QString();
+}
+
 CoverConfig AppConfig::cover()
 {
     CoverConfig config;

@@ -17,8 +17,8 @@
 | Camera | `@aurobore/camera` | `Camera` | [camera.md](camera.md) (P1) |
 | Geolocation | `@aurobore/geolocation` | `Location` | [geolocation.md](geolocation.md) (P2) |
 | Sensors | `@aurobore/sensors` | — | [sensors.md](sensors.md) (P3) |
-| Notifications | `@aurobore/notifications` | `Notifications` | [notifications.md](notifications.md) (A3 stub, P4) |
-| Share | `@aurobore/share` | — | [share.md](share.md) (A3 stub, P5) |
+| Notifications | `@aurobore/notifications` | `Notifications` | [notifications.md](notifications.md) (P4) |
+| Share | `@aurobore/share` | — | [share.md](share.md) (P5) |
 
 ## Импорт
 
@@ -76,4 +76,6 @@ try {
 - [examples/camera-demo/](../../examples/camera-demo/) — Camera (P1)
 - [examples/geo-demo/](../../examples/geo-demo/) — Geolocation (P2)
 - [examples/sensors-demo/](../../examples/sensors-demo/) — Sensors (P3)
+- [examples/notifications-demo/](../../examples/notifications-demo/) — Notifications (P4)
+- [examples/share-demo/](../../examples/share-demo/) — Share (P5)
 - [docs/tutorials/using-plugins.md](../tutorials/using-plugins.md) — добавление плагинов в проект

@@ -27,6 +27,10 @@
 #include "CoverPlugin.h"
 #include "CameraBridge.h"
 #include "CameraPlugin.h"
+#include "NotificationsBridge.h"
+#include "NotificationsPlugin.h"
+#include "ShareBridge.h"
+#include "SharePlugin.h"
 
 int main(int argc, char *argv[])
 {
@@ -97,6 +101,8 @@ int main(int argc, char *argv[])
     BridgeRouter bridgeRouter;
     CoverBridge coverBridge(&bridgeRouter);
     CameraBridge cameraBridge;
+    NotificationsBridge notificationsBridge;
+    ShareBridge shareBridge;
 
     const Aurobore::CoverConfig coverConfig = Aurobore::AppConfig::cover();
     QVariantList defaultCoverActions;
@@ -117,6 +123,9 @@ int main(int argc, char *argv[])
     deepLinkHandler.captureFromArguments(application->arguments());
     bridgeRouter.setGrantedPermissions(Aurobore::AppConfig::grantedPermissions());
     CameraPlugin::setCameraBridge(&cameraBridge);
+    notificationsBridge.initialize(Aurobore::AppConfig::appId(), &bridgeRouter);
+    NotificationsPlugin::setNotificationsBridge(&notificationsBridge);
+    SharePlugin::setShareBridge(&shareBridge);
     if (!bridgeRouter.initializePlugins()) {
         qWarning("[aurobore-container] no plugins registered");
     }
@@ -155,6 +164,8 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("bridgeRouter"), &bridgeRouter);
     rootContext->setContextProperty(QStringLiteral("coverBridge"), &coverBridge);
     rootContext->setContextProperty(QStringLiteral("cameraBridge"), &cameraBridge);
+    rootContext->setContextProperty(QStringLiteral("notificationsBridge"), &notificationsBridge);
+    rootContext->setContextProperty(QStringLiteral("shareBridge"), &shareBridge);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());

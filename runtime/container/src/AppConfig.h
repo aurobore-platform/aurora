@@ -22,6 +22,7 @@ struct AppConfig {
     static const char *kAppHost;
     static int splashTimeoutMs();
     static QString appName();
+    static QString appId();
     static QStringList grantedPermissions();
     static QStringList deepLinkSchemes();
     static CoverConfig cover();

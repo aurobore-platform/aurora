@@ -84,6 +84,20 @@ describe("generateCMakeLists nativeDeps.qt", () => {
     expect(cmake).not.toContain("Qt5::LinguistTools");
   });
 
+  it("добавляет Qt5::DBus и nemonotifications для notifications", () => {
+    const notificationsManifest = JSON.parse(
+      fs.readFileSync(
+        path.join(REPO_ROOT, "plugins", "notifications", "plugin.manifest"),
+        "utf8",
+      ),
+    ) as PluginManifest;
+    const cmake = generateCMakeLists("ru.example.app", "1.0.0", [notificationsManifest]);
+    expect(cmake).toContain("Qt5::DBus");
+    expect(cmake).toContain("nemonotifications-qt5");
+    expect(cmake).toContain("NotificationsBridge.cpp");
+    expect(cmake).toContain("PkgConfig::nemonotificationsqt5");
+  });
+
   it("collectQtComponents не дублирует базовые компоненты", () => {
     const components = collectQtComponents([loadManifest(GEO_MANIFEST_PATH)]);
     expect(components.filter((c) => c === "Core")).toHaveLength(1);

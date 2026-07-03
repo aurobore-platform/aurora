@@ -1,0 +1,19 @@
+{
+  "name": "@aurobore/example-notifications-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Notifications plugin demo — notify/schedule/tap with P4 native",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/echo": "workspace:*",
+    "@aurobore/notifications": "workspace:*"
+  },
+  "devDependencies": {
+    "@aurobore/build": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}

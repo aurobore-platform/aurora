@@ -118,10 +118,10 @@ try {
 | `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | **P1** — pick/capture → `Photo` URL; sign-off на устройстве pending |
 | `@aurobore/geolocation` | Geolocation | [geo-demo](../../examples/geo-demo/) | **P2** — GPS watch + getCurrentPosition; sign-off на устройстве pending |
 | `@aurobore/sensors` | Sensors | [sensors-demo](../../examples/sensors-demo/) | **P3** — accel/gyro streams; sign-off на устройстве pending |
-| `@aurobore/notifications` | Notifications | — | **P4** — A3 stub |
-| `@aurobore/share` | Share | — | **P5** — A3 stub |
+| `@aurobore/notifications` | Notifications | [notifications-demo](../../examples/notifications-demo/) | **P4** — notify/schedule/cancel + `notification:tap`; sign-off tap на устройстве pending |
+| `@aurobore/share` | Share | — | [share-demo](../../examples/share-demo/) (P5) |
 
-См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md), [plugins/sensors.md](../plugins/sensors.md).
+См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md), [plugins/sensors.md](../plugins/sensors.md), [plugins/notifications.md](../plugins/notifications.md).
 
 ## Написание своего плагина
 

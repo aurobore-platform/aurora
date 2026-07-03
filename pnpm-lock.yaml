@@ -105,6 +105,25 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  examples/notifications-demo:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@aurobore/echo':
+        specifier: workspace:*
+        version: link:../../plugins/echo
+      '@aurobore/notifications':
+        specifier: workspace:*
+        version: link:../../plugins/notifications
+    devDependencies:
+      '@aurobore/build':
+        specifier: workspace:*
+        version: link:../../packages/build
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   examples/react-demo:
     dependencies:
       '@aurobore/core':
@@ -156,6 +175,25 @@ importers:
       '@aurobore/sensors':
         specifier: workspace:*
         version: link:../../plugins/sensors
+    devDependencies:
+      '@aurobore/build':
+        specifier: workspace:*
+        version: link:../../packages/build
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  examples/share-demo:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@aurobore/echo':
+        specifier: workspace:*
+        version: link:../../plugins/echo
+      '@aurobore/share':
+        specifier: workspace:*
+        version: link:../../plugins/share
     devDependencies:
       '@aurobore/build':
         specifier: workspace:*

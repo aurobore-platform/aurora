@@ -5,7 +5,7 @@
 **Пакет:** `@aurobore/notifications`  
 **Разрешения:** `Notifications`
 
-> **Статус A3 scaffold:** native-реализация — stub. Все методы возвращают `NOTIFICATIONS_UNAVAILABLE`. Реальные уведомления Авроры — следующая итерация.
+Native-реализация (P4): Nemo `Notification` API (`nemonotifications-qt5`) + D-Bus `remoteAction` для tap из шторки.
 
 ## Методы
 
@@ -22,8 +22,8 @@
 
 | Поле | Тип | Описание |
 |------|-----|----------|
-| `id` | `string?` | Идентификатор (генерируется, если не задан) |
-| `title` | `string` | Заголовок |
+| `id` | `string?` | Идентификатор (генерируется UUID, если не задан) |
+| `title` | `string` | Заголовок (`summary` в Nemo) |
 | `body` | `string` | Текст |
 | `scheduleAt` | `number?` | Unix timestamp (мс) для `schedule` |
 
@@ -35,11 +35,22 @@
 
 Подписка: `on("notification:tap", handler)` из `@aurobore/core` или `Aurobore.on(...)`.
 
+Tap доставляется при активации из шторки (D-Bus `remoteAction`) или когда приложение на переднем плане (`actionInvoked` / `clicked`). События, пришедшие до `aurobore:ready`, ставятся в очередь и доставляются после загрузки WebView.
+
+## Ограничения (Alpha+)
+
+| Сценарий | Поведение |
+|----------|-----------|
+| `schedule` | Таймер **в процессе приложения** (`QTimer`); не сработает, если процесс убит |
+| Tap из шторки | Требует живой процесс + permission `Notifications`; wake из killed — best-effort |
+| Push / action buttons | Вне scope P4 |
+
 ## Коды ошибок
 
 | Код | Сообщение | Когда |
-|-----|-----------|-------|
-| `NOTIFICATIONS_UNAVAILABLE` | notifications not available | Stub-режим, нет уведомлений на устройстве |
+|-----|-----------|-----|
+| `NOTIFICATIONS_UNAVAILABLE` | notifications not available | Нет сервиса уведомлений, D-Bus недоступен, пустые `title`/`body` |
+| `NOTIFICATIONS_CANCELLED` | user cancelled | Зарезервировано для UI-итерации |
 
 Также возможны ошибки моста: `BRIDGE_PERMISSION_DENIED` (нет `Notifications` в granted permissions проекта).
 
@@ -50,19 +61,22 @@ import { Notifications } from "@aurobore/notifications";
 import { isAuroboreError, on, wrapBridgeError } from "@aurobore/core";
 
 on("notification:tap", (payload) => {
-  console.log("tapped", payload.id);
+  console.log("tapped", payload.id, payload.action);
 });
 
 try {
-  await Notifications.notify({ title: "Hello", body: "A3 scaffold" });
+  const { id } = await Notifications.notify({ title: "Hello", body: "P4 native" });
+  console.log("shown", id);
 } catch (err) {
   const error = isAuroboreError(err)
     ? err
     : wrapBridgeError(err as { code: string; message: string });
   if (error.code === "NOTIFICATIONS_UNAVAILABLE") {
-    console.log("Notifications not available yet (A3 scaffold)");
+    console.log("Notifications unavailable");
   }
 }
 ```
+
+Демо: [`examples/notifications-demo/`](../../examples/notifications-demo/).
 
 См. также [standard-plugins.md](standard-plugins.md) §3.

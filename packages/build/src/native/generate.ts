@@ -262,7 +262,45 @@ export const BASE_QT_BUILD_COMPONENTS = ["LinguistTools"] as const;
 const EXTRA_PLUGIN_NATIVE_SOURCES: Record<string, string[]> = {
   geolocation: ["GeolocationMapping.cpp"],
   sensors: ["SensorsMapping.cpp"],
+  notifications: ["NotificationsBridge.cpp"],
 };
+
+/** pkgconfig-модули плагинов (не покрываются nativeDeps.qt). */
+const PLUGIN_PKGCONFIG_MODULES: Record<string, string> = {
+  notifications: "nemonotifications-qt5",
+};
+
+function hasPluginPkgConfig(manifests: PluginManifest[]): boolean {
+  return manifests.some((m) => PLUGIN_PKGCONFIG_MODULES[m.name] !== undefined);
+}
+
+function pluginPkgConfigCmakeBlock(manifests: PluginManifest[]): string {
+  const modules = new Set<string>();
+  for (const manifest of manifests) {
+    const mod = PLUGIN_PKGCONFIG_MODULES[manifest.name];
+    if (mod)
+      modules.add(mod);
+  }
+  if (modules.size === 0)
+    return "";
+  const checks = [...modules]
+    .sort((a, b) => a.localeCompare(b))
+    .map((mod) => {
+      const varName = mod.replace(/[^a-zA-Z0-9]/g, "");
+      return `pkg_check_modules(${varName} ${mod} REQUIRED IMPORTED_TARGET)`;
+    })
+    .join("\n");
+  const links = [...modules]
+    .sort((a, b) => a.localeCompare(b))
+    .map((mod) => {
+      const varName = mod.replace(/[^a-zA-Z0-9]/g, "");
+      return `        PkgConfig::${varName}`;
+    })
+    .join("\n");
+  return `${checks}
+
+`;
+}
 
 /** main.cpp контейнера всегда использует CameraBridge (см. runtime/container/src/main.cpp). */
 const ALWAYS_SYNC_PLUGINS = ["camera"] as const;
@@ -334,6 +372,17 @@ export function generateCMakeLists(
   const nativeSdkSources = NATIVE_SDK_SOURCES.map(
     (file) => `    \${NATIVE_SDK_DIR}/${file}`,
   ).join("\n");
+  const pkgConfigBlock = pluginPkgConfigCmakeBlock(manifests);
+  const pkgConfigLinks = hasPluginPkgConfig(manifests)
+    ? [...new Set(
+        manifests
+          .map((m) => PLUGIN_PKGCONFIG_MODULES[m.name])
+          .filter((mod): mod is string => mod !== undefined),
+      )]
+        .sort((a, b) => a.localeCompare(b))
+        .map((mod) => `        PkgConfig::${mod.replace(/[^a-zA-Z0-9]/g, "")}`)
+        .join("\n")
+    : "";
 
   return `cmake_minimum_required(VERSION 3.5)
 
@@ -352,7 +401,7 @@ find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
 pkg_check_modules(AuroraWebView aurorawebview REQUIRED IMPORTED_TARGET)
-
+${pkgConfigBlock}
 ${CMAKE_TRANSLATIONS_BLOCK}
 
 set(PLUGIN_NATIVE_DIR \${CMAKE_CURRENT_SOURCE_DIR}/../plugins)
@@ -388,7 +437,7 @@ target_link_libraries(\${PROJECT_NAME}
 ${qtLinkLines}
         PkgConfig::Auroraapp
         PkgConfig::AuroraWebView
-)
+${pkgConfigLinks ? pkgConfigLinks + "\n" : ""})
 
 install(TARGETS \${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(DIRECTORY html DESTINATION share/\${PROJECT_NAME})
