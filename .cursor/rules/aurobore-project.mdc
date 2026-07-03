@@ -24,6 +24,15 @@ alwaysApply: true
 | `runtime/container` | M1 нативный контейнер (ApplicationWindow, asset loader, lifecycle) |
 | `tools/aurora/` | Оркестратор эмулятора (`poc.mjs`: poc-bridge + container) |
 | `docs/aurora/` | Факты SDK, verification-status |
+| `docs/alpha-plugins-plan.md` | Доработка A3-плагинов (Camera, Geo, …) с stub до native |
+
+## Native-плагины и Flutter-референс
+
+A3-плагины (Camera, Geolocation, Notifications, Share, Sensors) — пока stub; план доработки:
+`docs/alpha-plugins-plan.md`. При реализации native-части: если аналог есть в
+[@flutter-community-plugins](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins) —
+смотреть **platform-код** (C++/Qt) и логику интеграции с ОС, не копипастить Dart. См.
+`docs/dev/native-plugin-guide.md` §Flutter-референс.
 
 ## Нативная проверка на эмуляторе
 

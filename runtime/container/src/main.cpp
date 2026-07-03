@@ -25,6 +25,8 @@
 #include "LoopbackTlsCredentials.h"
 #include "CoverBridge.h"
 #include "CoverPlugin.h"
+#include "CameraBridge.h"
+#include "CameraPlugin.h"
 
 int main(int argc, char *argv[])
 {
@@ -65,6 +67,20 @@ int main(int argc, char *argv[])
         qInfo("[aurobore-container] InitBrowser: trust loopback SPKI fingerprint");
     }
 
+    const QByteArray cefDebugPortEnv = qgetenv("AUROBORE_CEF_DEBUG_PORT");
+    if (!cefDebugPortEnv.isEmpty()) {
+        bool ok = false;
+        const int cefDebugPort = cefDebugPortEnv.toInt(&ok);
+        if (ok && cefDebugPort > 0 && cefDebugPort <= 65535) {
+            browserArgs.push_back("--remote-debugging-port=" + std::to_string(cefDebugPort));
+            browserArgs.push_back("--remote-allow-origins=*");
+            qInfo("[aurobore] InitBrowser: remote debugging on 127.0.0.1:%d", cefDebugPort);
+        } else {
+            qWarning("[aurobore] AUROBORE_CEF_DEBUG_PORT invalid: %s",
+                     cefDebugPortEnv.constData());
+        }
+    }
+
     Aurora::WebView::WebEngineContext::InitBrowser(argc, argv, browserArgs);
 
     AssetSchemeServer assetServer;
@@ -80,6 +96,7 @@ int main(int argc, char *argv[])
     LifecycleBridge lifecycleBridge;
     BridgeRouter bridgeRouter;
     CoverBridge coverBridge(&bridgeRouter);
+    CameraBridge cameraBridge;
 
     const Aurobore::CoverConfig coverConfig = Aurobore::AppConfig::cover();
     QVariantList defaultCoverActions;
@@ -99,6 +116,7 @@ int main(int argc, char *argv[])
     deepLinkHandler.setSchemes(Aurobore::AppConfig::deepLinkSchemes());
     deepLinkHandler.captureFromArguments(application->arguments());
     bridgeRouter.setGrantedPermissions(Aurobore::AppConfig::grantedPermissions());
+    CameraPlugin::setCameraBridge(&cameraBridge);
     if (!bridgeRouter.initializePlugins()) {
         qWarning("[aurobore-container] no plugins registered");
     }
@@ -136,6 +154,7 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("deepLinkHandler"), &deepLinkHandler);
     rootContext->setContextProperty(QStringLiteral("bridgeRouter"), &bridgeRouter);
     rootContext->setContextProperty(QStringLiteral("coverBridge"), &coverBridge);
+    rootContext->setContextProperty(QStringLiteral("cameraBridge"), &cameraBridge);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());

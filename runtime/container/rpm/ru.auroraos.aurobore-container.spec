@@ -12,10 +12,13 @@ BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
+BuildRequires:  pkgconfig(Qt5Multimedia)
 BuildRequires:  pkgconfig(aurorawebview)
 BuildRequires:  ru.auroraos.webview-devel
 
 Requires:       ru.auroraos.webview
+Requires:       qt5-qtmultimedia
+Requires:       sailfish-components-pickers-qt5
 
 %description
 M1 runtime-контейнер Aurobore: ApplicationWindow + WebView (CEF), asset loader

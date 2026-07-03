@@ -29,6 +29,7 @@
 
 | Что | Источник | Где использовано |
 |---|---|---|
+| Flutter-плагины и пакеты, адаптированные под Аврору (референс platform-кода при реализации Aurobore-плагинов) | https://hub.mos.ru/auroraos/flutter/flutter-community-plugins | [alpha-plugins-plan.md](../alpha-plugins-plan.md), [native-plugin-guide.md](../dev/native-plugin-guide.md) |
 | Демо «WebView Browser» (CEF engine, зависимости `ru.aurora.webview`/`libcef`) | https://hub.mos.ru/auroraos/demos/WebViewBrowser | [webview.md](webview.md), [verification-status.md](verification-status.md) |
 | Демо «WebView API» (async messages, runJavaScript, SSL, download — с 5.1.3) | https://hub.mos.ru/auroraos/demos/WebViewAPI | [webview.md](webview.md), [verification-status.md](verification-status.md) |
 | Практика сборки WebView (CMake `find_library(aurorawebview)`, `.spec`, RPATH, `ru.auroraos.webview(-devel)`) | https://gelassen.github.io/blog/2025/08/23/developing-application-for-aurora-os-system-programming.html | [webview.md](webview.md), [verification-status.md](verification-status.md) |

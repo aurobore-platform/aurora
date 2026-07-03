@@ -2,6 +2,11 @@
 # Запуск M1/M3 container на эмуляторе (вызывается через SSH от poc.mjs deploy/run).
 set -eu
 
+cef_debug_export=""
+if [ -n "${AUROBORE_CEF_DEBUG_PORT:-}" ]; then
+  cef_debug_export="export AUROBORE_CEF_DEBUG_PORT=${AUROBORE_CEF_DEBUG_PORT}"
+fi
+
 pkill -f ru.auroraos.aurobore-container 2>/dev/null || true
 sleep 1
 rm -f /tmp/container.log
@@ -21,13 +26,14 @@ if ! test -S /run/display/wayland-0; then
   exit 1
 fi
 
-su "${POC_RUN_USER:-defaultuser}" -s /bin/sh -c '
+su "${POC_RUN_USER:-defaultuser}" -s /bin/sh -c "
   export XDG_RUNTIME_DIR=/run/user/100000
   export WAYLAND_DISPLAY=/run/display/wayland-0
   export QT_QPA_PLATFORM=wayland
-  export LD_LIBRARY_PATH=/usr/lib/cef:${LD_LIBRARY_PATH:-}
+  export LD_LIBRARY_PATH=/usr/lib/cef:\${LD_LIBRARY_PATH:-}
+  ${cef_debug_export}
   nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
-'
+"
 
 sleep 2
 if ! pgrep -f ru.auroraos.aurobore-container >/dev/null 2>&1; then

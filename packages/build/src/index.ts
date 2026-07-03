@@ -56,6 +56,13 @@ export { syncDir, syncProject, runCommand, pathsEqual } from "./aurora/sync.js";
 export { sfdkBuild, findRpm } from "./aurora/sdk.js";
 export { ensureEmulator } from "./aurora/emulator.js";
 export { deployRpm, runOnEmulator, generateRunScript } from "./aurora/deploy.js";
+export {
+  DEFAULT_CEF_DEBUG_PORT,
+  resolveCefDebugPort,
+  startCefDebugTunnel,
+  printCefDebugBanner,
+} from "./aurora/cefDebug.js";
+export type { CefDebugTunnel } from "./aurora/cefDebug.js";
 
 export { buildApp, runApp } from "./pipeline/buildApp.js";
 export type { BuildAppOptions, BuildResult, BuildReport, RunAppOptions } from "./pipeline/buildApp.js";

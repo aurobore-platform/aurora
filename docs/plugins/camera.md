@@ -5,7 +5,7 @@
 **Пакет:** `@aurobore/camera`  
 **Разрешения:** `Camera`
 
-> **Статус A3 scaffold:** native-реализация — stub. Методы `getPhoto` и `pickPhoto` возвращают `CAMERA_UNAVAILABLE`. Реальный UI (камера / `Sailfish.Pickers`) — следующая итерация.
+Native: `getPhoto` открывает UI съёмки (QtMultimedia `Camera`); `pickPhoto` — системный picker (`Sailfish.Pickers` `ImagePickerPage`). Файл копируется в app-data; в JSON только `aurobore-app://localhost/app-data/...`.
 
 ## Методы
 
@@ -13,6 +13,15 @@
 |-------|-----------|-----------|----------|
 | `getPhoto` | `{ quality?: number; allowEditing?: boolean }` | `Photo` | Съёмка с камеры |
 | `pickPhoto` | `{ allowEditing?: boolean }` | `Photo` | Выбор из галереи |
+
+### Ограничения
+
+| Аргумент | Поведение |
+|----------|-----------|
+| `quality` (0–100) | Перекодирование в JPEG при сохранении в app-data; по умолчанию 80. Только для `getPhoto`. |
+| `allowEditing` | Зарезервировано; редактирование после выбора пока не реализовано (no-op). |
+
+На **эмуляторе без камеры** `getPhoto` возвращает `CAMERA_UNAVAILABLE`. `pickPhoto` работает, если в образе доступна галерея.
 
 ## Типы
 
@@ -34,9 +43,9 @@
 
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
-| `CAMERA_UNAVAILABLE` | camera or gallery not available | Stub-режим, нет камеры/галереи на устройстве |
-| `CAMERA_CANCELLED` | user cancelled | Пользователь отменил операцию (UI-итерация) |
-| `CAMERA_CAPTURE_FAILED` | capture failed | Ошибка съёмки или записи в app-data (UI-итерация) |
+| `CAMERA_UNAVAILABLE` | camera or gallery not available | Нет камеры/галереи, `CameraBridge` недоступен |
+| `CAMERA_CANCELLED` | user cancelled | Пользователь отменил операцию или `cancel()` |
+| `CAMERA_CAPTURE_FAILED` | capture failed | Ошибка съёмки, записи в app-data, или параллельный вызов |
 
 Также возможны ошибки моста: `BRIDGE_PERMISSION_DENIED` (нет `Camera` в granted permissions проекта).
 
@@ -55,7 +64,7 @@ try {
     ? err
     : wrapBridgeError(err as { code: string; message: string });
   if (error.code === "CAMERA_UNAVAILABLE") {
-    console.log("Camera not available yet (A3 scaffold)");
+    console.log("Camera not available on this device");
   }
 }
 ```

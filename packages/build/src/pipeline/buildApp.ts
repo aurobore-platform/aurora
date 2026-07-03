@@ -37,6 +37,8 @@ export interface RunAppOptions {
   projectRoot?: string;
   rpmPath?: string;
   stagingDir?: string;
+  /** CEF remote debugging port for the app process on device. */
+  cefDebugPort?: number;
 }
 
 function resolveProjectRoot(projectRoot?: string): string {
@@ -87,7 +89,13 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<BuildResu
   const rpmGlob = `${appId}-*.rpm`;
   const rpmPath = findRpm(stagingDir, rpmGlob);
 
-  const meta = { appId, rpmPath, stagingDir, builtAt: new Date().toISOString() };
+  const meta = {
+    appId,
+    rpmPath,
+    stagingDir,
+    mode,
+    builtAt: new Date().toISOString(),
+  };
   fs.mkdirSync(path.join(projectRoot, ".aurobore"), { recursive: true });
   fs.writeFileSync(
     path.join(projectRoot, ".aurobore", "last-build.json"),
@@ -140,7 +148,7 @@ export async function runApp(options: RunAppOptions = {}): Promise<void> {
     env,
   });
 
-  const runScript = generateRunScript(appId, env);
+  const runScript = generateRunScript(appId, env, options.cefDebugPort);
   const runScriptPath = path.join(projectRoot, ".aurobore", "run-app.sh");
   fs.mkdirSync(path.dirname(runScriptPath), { recursive: true });
   fs.writeFileSync(runScriptPath, runScript, "utf8");
@@ -149,5 +157,6 @@ export async function runApp(options: RunAppOptions = {}): Promise<void> {
     runScriptPath,
     remoteScriptName: "run-aurobore-app.sh",
     env,
+    cefDebugPort: options.cefDebugPort,
   });
 }

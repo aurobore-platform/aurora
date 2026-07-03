@@ -5,6 +5,10 @@
   "version": "1.0.0",
   "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
   "permissions": ["Camera"],
+  "nativeDeps": {
+    "rpm": ["qt5-qtmultimedia", "sailfish-components-pickers-qt5"],
+    "qt": ["Multimedia"]
+  },
   "types": {
     "Photo": {
       "kind": "string",
@@ -30,7 +34,7 @@
   "errors": {
     "CAMERA_UNAVAILABLE": {
       "message": "camera or gallery not available",
-      "description": "Нет камеры/галереи на устройстве или плагин в stub-режиме (A3 scaffold)"
+      "description": "Нет камеры/галереи на устройстве или CameraBridge недоступен"
     },
     "CAMERA_CANCELLED": {
       "message": "user cancelled",

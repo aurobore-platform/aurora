@@ -41,6 +41,7 @@ protected:
 | Случай | Возврат |
 |---|---|
 | Успех (обычный вызов) | `QVariant` с результатом (например `QVariantMap`) |
+| Длительный вызов (UI, сеть) | Запустить работу, вернуть пустой `QVariant`; по завершении — `router()->emitOutbound(router()->makeOkResponse(id, result))` или `makeErrorResponse` |
 | Стрим (`isStream == true`) | Запустить источник, вернуть пустой `QVariant`; данные через `router()->emitStream(id, "data", payload)`; завершение — `"complete"` |
 | Ошибка плагина | `makeError("FOO_ERROR", "message", optionalData)` → PluginManager превратит в ответ моста |
 | Неизвестный method | `makeMethodNotFound(method)` → `BRIDGE_METHOD_NOT_FOUND` |

@@ -43,7 +43,7 @@ pnpm compat:verify -- --run-demo hello-world
 | `pnpm container:all` (M1/M2/M3 journal) | OK (2026-07-01, re-verify): M1/M2/M3 OK | pending |
 | `pnpm demos:verify` (7 examples, RPM) | OK (2026-07-01, re-verify): 7/7 | pending |
 | `aurobore run` — `hello-world` | manual (кнопка Benchmark → journal) | pending |
-| `aurobore run` — `camera-demo` | manual (stub `CAMERA_UNAVAILABLE`) | pending |
+| `aurobore run` — `camera-demo` | manual: pick/capture на устройстве; эмулятор — `getPhoto` UNAVAILABLE | pending |
 | `aurobore run` — `geo-demo` | manual (stub `GEOLOCATION_UNAVAILABLE`) | pending |
 | Bridge benchmark (V-7, hello-world) | manual: кнопка Benchmark в UI | pending |
 
@@ -72,7 +72,7 @@ pnpm compat:verify -- --run-demo hello-world
 
 | Demo | Плагины | Stub-поведение на эмуляторе |
 |---|---|---|
-| [`camera-demo`](../../examples/camera-demo/) | Camera, Echo | `CAMERA_UNAVAILABLE` — ожидаемо (A3 scaffold) |
+| [`camera-demo`](../../examples/camera-demo/) | Camera, Echo | Реализовано (P1); `getPhoto` → UNAVAILABLE на эмуляторе без камеры |
 | [`geo-demo`](../../examples/geo-demo/) | Geolocation, Echo | `GEOLOCATION_UNAVAILABLE` — ожидаемо (A3 scaffold) |
 
 Путь create→build→run:

@@ -128,6 +128,24 @@ this->router()->emitStream(...);
 На M3 список granted permissions задаётся в `main.cpp` (`setGrantedPermissions`).
 Агрегация permissions в `.desktop` — **M4** (`aurobore.config` + build).
 
+## Flutter-референс (platform-код Авроры)
+
+При реализации или доработке native-плагина (особенно Camera, Geolocation, Notifications, Share, Sensors)
+сначала проверьте каталог [Flutter community plugins](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins)
+(в Cursor — `@flutter-community-plugins`).
+
+**Если аналог есть в каталоге** — изучите исходники **до** написания своего `*Plugin.cpp`:
+
+| Что смотреть | Зачем |
+|---|---|
+| Platform implementation (C++/Qt, `linux/`, native channel) | Какие API ОС Авроры реально вызываются |
+| Permissions и зависимости в `.spec` / CMake | Что декларировать в `plugin.manifest` и RPM |
+| Обработка ошибок и отмены UI | Коды `*_UNAVAILABLE`, `*_CANCELLED` в нашем манифесте |
+
+Не копируйте Dart/MethodChannel-обвязку — переносите **логику доступа к ОС** в `IPlugin::invoke` /
+`cancel` / `emitStream` / `emitEvent`. Контракт Aurobore — [plugin-api.md](../plugins/plugin-api.md);
+план доработки A3-плагинов — [alpha-plugins-plan.md](../alpha-plugins-plan.md).
+
 ## См. также
 
 - [adding-a-plugin.md](adding-a-plugin.md) — пошаговый чеклист

@@ -15,10 +15,10 @@ function handleCameraError(err: unknown, action: string): void {
     ? err
     : wrapBridgeError(err as { code: string; message: string });
   console.log(`[camera-demo] plugin OK: ${action} round-trip (${error.code})`);
-  if (error.code === "CAMERA_UNAVAILABLE") {
-    log(`${action} → ${error.code} (expected A3 stub)`);
-  } else if (error.code === "CAMERA_CANCELLED") {
+  if (error.code === "CAMERA_CANCELLED") {
     log(`${action} → cancelled by user`);
+  } else if (error.code === "CAMERA_UNAVAILABLE") {
+    log(`${action} → ${error.code} (no camera/gallery on this device)`);
   } else {
     log(`${action} → ${error.code}: ${error.message}`);
   }

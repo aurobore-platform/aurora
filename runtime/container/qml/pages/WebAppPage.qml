@@ -274,6 +274,25 @@ Page {
     }
 
     Connections {
+        target: typeof cameraBridge !== "undefined" ? cameraBridge : null
+        onPickRequested: {
+            pageStack.push(Qt.resolvedUrl("PickPhotoPage.qml"), {
+                allowEditing: allowEditing
+            })
+        }
+        onCaptureRequested: {
+            pageStack.push(Qt.resolvedUrl("CameraCapturePage.qml"), {
+                quality: quality,
+                allowEditing: allowEditing
+            })
+        }
+        onDismissRequested: {
+            if (pageStack.depth > 1)
+                pageStack.pop()
+        }
+    }
+
+    Connections {
         target: Qt.inputMethod
         onVisibleChanged: page.updateKeyboardInset()
         onKeyboardRectangleChanged: page.updateKeyboardInset()

@@ -124,6 +124,17 @@ CMake в staging ссылается на `../plugins`, `../native-sdk`, `../brid
 
 `run-container.sh` ждёт **M3 OK** (таймаут `POC_RUN_WAIT_SEC`, по умолчанию 90 с).
 
+## CEF Web DevTools (опционально)
+
+Для отладки web-слоя через `chrome://inspect` задайте в `local.env`:
+
+```env
+AUROBORE_CEF_DEBUG_PORT=9222
+```
+
+После `pnpm container:run` поднимите SSH-туннель вручную (см. [docs/dev/web-debugging.md](../../docs/dev/web-debugging.md)).
+В `aurobore dev` туннель поднимается автоматически.
+
 ## Конфигурация (`local.env`)
 
 | Переменная | По умолчанию | Назначение |
@@ -136,6 +147,7 @@ CMake в staging ссылается на `../plugins`, `../native-sdk`, `../brid
 | `EMULATOR_SSH_KEY` | ключ из vmshare SDK | Приватный ключ |
 | `EMULATOR_BOOT_TIMEOUT` | `300` | Секунд ожидания после `emulator start` |
 | `POC_RUN_WAIT_SEC` | `90` | Секунд опроса journal на M3 OK |
+| `AUROBORE_CEF_DEBUG_PORT` | — | CEF remote debugging для `container:run` (см. web-debugging.md) |
 
 ## Файлы
 

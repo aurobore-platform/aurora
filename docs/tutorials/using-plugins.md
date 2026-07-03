@@ -115,7 +115,7 @@ try {
 
 | Пакет | Плагин | Demo | Статус native |
 |---|---|---|---|
-| `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | stub → `CAMERA_UNAVAILABLE` |
+| `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | P1: pick/capture → `Photo` URL |
 | `@aurobore/geolocation` | Geolocation | [geo-demo](../../examples/geo-demo/) | stub → `GEOLOCATION_UNAVAILABLE` |
 
 См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md).

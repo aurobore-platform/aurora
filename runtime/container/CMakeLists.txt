@@ -11,7 +11,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/cef")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-find_package(Qt5 COMPONENTS Core Gui Qml Quick Network LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Qml Quick Network Multimedia LinguistTools REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
@@ -47,6 +47,7 @@ add_executable(${PROJECT_NAME}
     ${PLUGIN_NATIVE_DIR}/filesystem/native/FileSystemPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/clipboard/native/ClipboardPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/network/native/NetworkPlugin.cpp
+    ${PLUGIN_NATIVE_DIR}/camera/native/CameraBridge.cpp
     ${PLUGIN_NATIVE_DIR}/camera/native/CameraPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/geolocation/native/GeolocationPlugin.cpp
     ${PLUGIN_NATIVE_DIR}/notifications/native/NotificationsPlugin.cpp
@@ -79,6 +80,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Qml
         Qt5::Quick
         Qt5::Network
+        Qt5::Multimedia
         PkgConfig::Auroraapp
         PkgConfig::AuroraWebView
 )

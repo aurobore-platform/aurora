@@ -1,6 +1,6 @@
 # Camera Demo
 
-Демо плагина **Camera** (A3 scaffold): `getPhoto`, `pickPhoto`, обработка `CAMERA_UNAVAILABLE`.
+Демо плагина **Camera** (P1): `getPhoto`, `pickPhoto`, preview через `resolveResourceUrl`.
 
 См. [docs/plugins/camera.md](../../docs/plugins/camera.md).
 
@@ -20,7 +20,5 @@ aurobore run
 | Get Photo | `Camera.getPhoto({ quality: 80 })` |
 | Pick Photo | `Camera.pickPhoto({})` |
 
-На эмуляторе с A3 stub ожидается `CAMERA_UNAVAILABLE` — это корректное поведение; journal:
-`[camera-demo] plugin OK: … round-trip (CAMERA_UNAVAILABLE)`.
-
-При реальной реализации UI — preview через `resolveResourceUrl(photo)`.
+На эмуляторе без камеры `getPhoto` → `CAMERA_UNAVAILABLE`; `pickPhoto` может открыть галерею.
+На физическом устройстве обе кнопки должны показывать preview в `<img>`.

@@ -44,6 +44,8 @@ pnpm container:all
 
 Отдельные шаги: `container:sync|build|deploy|run`. См. [tools/aurora/README.md](../../tools/aurora/README.md).
 
+**Web DevTools:** в dev-режиме (`aurobore dev`) или с `AUROBORE_CEF_DEBUG_PORT` — см. [docs/dev/web-debugging.md](../../docs/dev/web-debugging.md).
+
 Staging по умолчанию: `%USERPROFILE%\aurobore-spike\aurobore-container` (+ siblings `bridge-native`, `native-sdk`, `plugins`).
 
 ## Успех прогона

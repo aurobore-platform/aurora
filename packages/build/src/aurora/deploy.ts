@@ -29,19 +29,37 @@ export interface RunOnEmulatorOptions {
   runScriptPath: string;
   remoteScriptName: string;
   env: AuroraEnv;
+  /** CEF remote debugging port passed to the app process on device. */
+  cefDebugPort?: number;
 }
 
 export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void> {
-  const { runScriptPath, remoteScriptName, env } = options;
+  const { runScriptPath, remoteScriptName, env, cefDebugPort } = options;
   await ensureEmulator(env);
   runCommand(openSshTool(env, "scp"), scpArgs(env, runScriptPath, `/tmp/${remoteScriptName}`), {
     env,
   });
-  runCommand(openSshTool(env, "ssh"), sshArgs(env, `sudo sh /tmp/${remoteScriptName}`), { env });
+  const cefPort =
+    cefDebugPort != null
+      ? String(cefDebugPort)
+      : env.AUROBORE_CEF_DEBUG_PORT?.trim() || "";
+  const envPrefix = cefPort ? `AUROBORE_CEF_DEBUG_PORT=${cefPort} ` : "";
+  runCommand(
+    openSshTool(env, "ssh"),
+    sshArgs(env, `${envPrefix}sudo sh /tmp/${remoteScriptName}`),
+    { env },
+  );
 }
 
 /** Генерирует run-script для приложения на эмуляторе. */
-export function generateRunScript(appId: string, env: AuroraEnv): string {
+export function generateRunScript(
+  appId: string,
+  env: AuroraEnv,
+  cefDebugPort?: number,
+): string {
+  const cefDebugExport =
+    cefDebugPort != null ? `  export AUROBORE_CEF_DEBUG_PORT=${cefDebugPort}\n` : "";
+
   return `#!/bin/sh
 set -eu
 
@@ -64,7 +82,7 @@ su "\${POC_RUN_USER:-defaultuser}" -s /bin/sh -c '
   export WAYLAND_DISPLAY=/run/display/wayland-0
   export QT_QPA_PLATFORM=wayland
   export LD_LIBRARY_PATH=/usr/lib/cef:\${LD_LIBRARY_PATH:-}
-  nohup /usr/bin/${appId} >/tmp/app.log 2>&1 &
+${cefDebugExport}  nohup /usr/bin/${appId} >/tmp/app.log 2>&1 &
 '
 
 sleep 5

@@ -20,6 +20,8 @@ export interface AuroraEnv {
   POC_RUN_WAIT_SEC: string;
   AURORA_SDK_BIN: string;
   SystemRoot: string;
+  /** CEF remote debugging port for monorepo container:run (optional). */
+  AUROBORE_CEF_DEBUG_PORT?: string;
 }
 
 function expandPath(s: string): string {
