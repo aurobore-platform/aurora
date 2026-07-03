@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sensors Demo</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main>
+    <h1>Sensors Demo</h1>
+    <p id="status">Initializing…</p>
+
+    <section>
+      <h2>Accelerometer</h2>
+      <p class="hint">На эмуляторе без IMU — <code>SENSORS_UNAVAILABLE</code>.</p>
+      <div class="actions">
+        <button type="button" id="btn-accel-start">Start Accel</button>
+        <button type="button" id="btn-accel-stop" disabled>Stop Accel</button>
+      </div>
+      <pre id="log-accel" class="log">—</pre>
+    </section>
+
+    <section>
+      <h2>Gyroscope</h2>
+      <div class="actions">
+        <button type="button" id="btn-gyro-start">Start Gyro</button>
+        <button type="button" id="btn-gyro-stop" disabled>Stop Gyro</button>
+      </div>
+      <pre id="log-gyro" class="log">—</pre>
+    </section>
+  </main>
+  <script src="js/aurobore-bridge.js"></script>
+  <script src="js/aurobore-plugins.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

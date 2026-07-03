@@ -46,7 +46,7 @@
 
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
-| `CAMERA_UNAVAILABLE` | camera or gallery not available | Нет камеры/галереи на устройстве или плагин в stub-режиме (A3 scaffold) |
+| `CAMERA_UNAVAILABLE` | camera or gallery not available | Нет камеры/галереи на устройстве или CameraBridge недоступен |
 | `CAMERA_CANCELLED` | user cancelled | Пользователь отменил съёмку или выбор из галереи |
 | `CAMERA_CAPTURE_FAILED` | capture failed | Ошибка при съёмке или сохранении фото в app-data |
 ## Импорт

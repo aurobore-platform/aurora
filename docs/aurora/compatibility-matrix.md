@@ -26,7 +26,7 @@
 Команды прогона на текущем SDK:
 
 ```powershell
-pnpm demos:verify          # 7 examples: web + RPM (~30–60 мин)
+pnpm demos:verify          # 8 examples: web + RPM (~30–60 мин)
 pnpm compat:verify         # container:all на эмуляторе (без повторного demos)
 ```
 
@@ -41,10 +41,11 @@ pnpm compat:verify -- --run-demo hello-world
 | Сценарий | 5.2.1.200 | 5.1.x |
 |---|---|---|
 | `pnpm container:all` (M1/M2/M3 journal) | OK (2026-07-01, re-verify): M1/M2/M3 OK | pending |
-| `pnpm demos:verify` (7 examples, RPM) | OK (2026-07-01, re-verify): 7/7 | pending |
+| `pnpm demos:verify` (8 examples, RPM) | OK (2026-07-03): 8/8 (включая `camera-demo`, `geo-demo`, `sensors-demo`) | pending |
 | `aurobore run` — `hello-world` | manual (кнопка Benchmark → journal) | pending |
 | `aurobore run` — `camera-demo` | manual: pick/capture на устройстве; эмулятор — `getPhoto` UNAVAILABLE | pending |
-| `aurobore run` — `geo-demo` | manual (stub `GEOLOCATION_UNAVAILABLE`) | pending |
+| `aurobore run` — `geo-demo` | manual: GPS на устройстве; эмулятор — `GEOLOCATION_UNAVAILABLE` | pending |
+| `aurobore run` — `sensors-demo` | manual: IMU на устройстве; эмулятор — `SENSORS_UNAVAILABLE` | pending |
 | Bridge benchmark (V-7, hello-world) | manual: кнопка Benchmark в UI | pending |
 
 ### Journal-маркеры контейнера (5.2.1.200)
@@ -70,10 +71,11 @@ pnpm compat:verify -- --run-demo hello-world
 
 ## Демо-приложения на плагинах A3
 
-| Demo | Плагины | Stub-поведение на эмуляторе |
+| Demo | Плагины | Поведение на эмуляторе x86 |
 |---|---|---|
-| [`camera-demo`](../../examples/camera-demo/) | Camera, Echo | Реализовано (P1); `getPhoto` → UNAVAILABLE на эмуляторе без камеры |
-| [`geo-demo`](../../examples/geo-demo/) | Geolocation, Echo | `GEOLOCATION_UNAVAILABLE` — ожидаемо (A3 scaffold) |
+| [`camera-demo`](../../examples/camera-demo/) | Camera, Echo | P1 native; `getPhoto` → `CAMERA_UNAVAILABLE` без камеры; `pickPhoto` — при наличии галереи |
+| [`geo-demo`](../../examples/geo-demo/) | Geolocation, Echo | P2 native; `GEOLOCATION_UNAVAILABLE` без mock GPS |
+| [`sensors-demo`](../../examples/sensors-demo/) | Sensors, Echo | P3 native; `SENSORS_UNAVAILABLE` без IMU |
 
 Путь create→build→run:
 

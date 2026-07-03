@@ -145,6 +145,25 @@ importers:
         specifier: ^6.0.6
         version: 6.4.3(@types/node@22.20.0)
 
+  examples/sensors-demo:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@aurobore/echo':
+        specifier: workspace:*
+        version: link:../../plugins/echo
+      '@aurobore/sensors':
+        specifier: workspace:*
+        version: link:../../plugins/sensors
+    devDependencies:
+      '@aurobore/build':
+        specifier: workspace:*
+        version: link:../../packages/build
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   examples/svelte-demo:
     dependencies:
       '@aurobore/core':

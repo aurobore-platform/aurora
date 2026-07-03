@@ -57,7 +57,7 @@
 
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
-| `GEOLOCATION_UNAVAILABLE` | geolocation not available | Нет GPS/геолокации на устройстве или плагин в stub-режиме (A3 scaffold) |
+| `GEOLOCATION_UNAVAILABLE` | geolocation not available | Нет GPS/геолокации на устройстве или источник позиции недоступен |
 | `GEOLOCATION_CANCELLED` | user cancelled | Пользователь отменил запрос геолокации (UI-итерация) |
 ## Импорт
 

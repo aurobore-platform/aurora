@@ -1,0 +1,23 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.sensorsdemo",
+    "name": "Sensors Demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "resources/icon.svg"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "devServer": {
+      "port": 5177
+    }
+  },
+  "permissions": ["Internet"],
+  "plugins": ["@aurobore/echo", "@aurobore/sensors"],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}

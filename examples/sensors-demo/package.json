@@ -1,0 +1,19 @@
+{
+  "name": "@aurobore/example-sensors-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sensors plugin demo — watchAccelerometer/watchGyroscope with P3 native handling",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*",
+    "@aurobore/echo": "workspace:*",
+    "@aurobore/sensors": "workspace:*"
+  },
+  "devDependencies": {
+    "@aurobore/build": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}

@@ -5,6 +5,10 @@
   "version": "1.0.0",
   "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
   "permissions": [],
+  "nativeDeps": {
+    "rpm": ["qt5-qtsensors"],
+    "qt": ["Sensors"]
+  },
   "types": {
     "SensorReading": {
       "x": "number",
@@ -20,7 +24,7 @@
   "errors": {
     "SENSORS_UNAVAILABLE": {
       "message": "sensors not available",
-      "description": "Нет акселерометра/гироскопа на устройстве или плагин в stub-режиме (A3 scaffold)"
+      "description": "Нет акселерометра/гироскопа на устройстве или сенсор недоступен (эмулятор без IMU)"
     },
     "SENSORS_CANCELLED": {
       "message": "user cancelled",

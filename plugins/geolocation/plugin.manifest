@@ -5,6 +5,10 @@
   "version": "1.0.0",
   "engineCompat": { "runtime": ">=0.1.0", "bridgeProtocol": 1 },
   "permissions": ["Location"],
+  "nativeDeps": {
+    "rpm": ["qt5-qtpositioning"],
+    "qt": ["Positioning"]
+  },
   "types": {
     "Position": {
       "latitude": "number",
@@ -38,7 +42,7 @@
   "errors": {
     "GEOLOCATION_UNAVAILABLE": {
       "message": "geolocation not available",
-      "description": "Нет GPS/геолокации на устройстве или плагин в stub-режиме (A3 scaffold)"
+      "description": "Нет GPS/геолокации на устройстве или источник позиции недоступен"
     },
     "GEOLOCATION_CANCELLED": {
       "message": "user cancelled",

@@ -111,14 +111,17 @@ try {
 
 Подробнее по каждому: [plugins/README.md](../plugins/README.md).
 
-## Плагины A3 (Alpha scaffold)
+## Плагины post-A3 (P1–P5)
 
 | Пакет | Плагин | Demo | Статус native |
 |---|---|---|---|
-| `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | P1: pick/capture → `Photo` URL |
-| `@aurobore/geolocation` | Geolocation | [geo-demo](../../examples/geo-demo/) | stub → `GEOLOCATION_UNAVAILABLE` |
+| `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | **P1** — pick/capture → `Photo` URL; sign-off на устройстве pending |
+| `@aurobore/geolocation` | Geolocation | [geo-demo](../../examples/geo-demo/) | **P2** — GPS watch + getCurrentPosition; sign-off на устройстве pending |
+| `@aurobore/sensors` | Sensors | [sensors-demo](../../examples/sensors-demo/) | **P3** — accel/gyro streams; sign-off на устройстве pending |
+| `@aurobore/notifications` | Notifications | — | **P4** — A3 stub |
+| `@aurobore/share` | Share | — | **P5** — A3 stub |
 
-См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md).
+См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md), [plugins/sensors.md](../plugins/sensors.md).
 
 ## Написание своего плагина
 

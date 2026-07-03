@@ -1,6 +1,6 @@
 # Geo Demo
 
-Демо плагина **Geolocation** (A3 scaffold): `getCurrentPosition`, `watch`, обработка `GEOLOCATION_UNAVAILABLE`.
+Демо плагина **Geolocation** (P2): `getCurrentPosition`, `watch`, `clearWatch`, обработка ошибок GPS.
 
 См. [docs/plugins/geolocation.md](../../docs/plugins/geolocation.md).
 
@@ -17,9 +17,12 @@ aurobore run
 
 | Кнопка | API |
 |---|---|
-| Get Position | `Geolocation.getCurrentPosition({ enableHighAccuracy: true })` |
+| Get Position | `Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 30000 })` |
 | Start Watch | `Geolocation.watch({ enableHighAccuracy: true })` |
 | Stop Watch | `sub.stop()` |
+| Clear Watch | `Geolocation.clearWatch({ watchId: sub.subscriptionId })` |
 
-На эмуляторе с A3 stub ожидается `GEOLOCATION_UNAVAILABLE` — journal:
+На **устройстве с GPS** — реальные координаты в UI и journal (`[geo-demo] plugin OK: getCurrentPosition success`).
+
+На **эмуляторе без mock GPS** — `GEOLOCATION_UNAVAILABLE` (ожидаемо), journal:
 `[geo-demo] plugin OK: … round-trip (GEOLOCATION_UNAVAILABLE)`.

@@ -246,7 +246,68 @@ export function generateDefaultsJson(effective: EffectiveConfig, mode: "prod" | 
   return `${JSON.stringify(defaults, null, 2)}\n`;
 }
 
-/** Источники native-sdk в app CMake — паритет с runtime/container/CMakeLists.txt */
+/** Базовые Qt-компоненты контейнера (без plugin-specific nativeDeps.qt). */
+export const BASE_QT_COMPONENTS = [
+  "Core",
+  "Gui",
+  "Qml",
+  "Quick",
+  "Network",
+] as const;
+
+/** Только для find_package (не линковать как Qt5::LinguistTools). */
+export const BASE_QT_BUILD_COMPONENTS = ["LinguistTools"] as const;
+
+/** Доп. .cpp помимо *Plugin.cpp (паритет с runtime/container/CMakeLists.txt). */
+const EXTRA_PLUGIN_NATIVE_SOURCES: Record<string, string[]> = {
+  geolocation: ["GeolocationMapping.cpp"],
+  sensors: ["SensorsMapping.cpp"],
+};
+
+/** main.cpp контейнера всегда использует CameraBridge (см. runtime/container/src/main.cpp). */
+const ALWAYS_SYNC_PLUGINS = ["camera"] as const;
+
+const ALWAYS_PLUGIN_NATIVE_SOURCES = [
+  "camera/native/CameraBridge.cpp",
+  "camera/native/CameraPlugin.cpp",
+] as const;
+
+const ALWAYS_PLUGIN_NATIVE_INCLUDES = ["camera/native"] as const;
+
+/** CameraBridge в main.cpp требует Qt Multimedia даже без плагина Camera в конфиге. */
+const ALWAYS_QT_LINK_COMPONENTS = ["Multimedia"] as const;
+export function collectQtComponents(manifests: PluginManifest[]): string[] {
+  const extra = new Set<string>(ALWAYS_QT_LINK_COMPONENTS);
+  for (const manifest of manifests) {
+    for (const component of manifest.nativeDeps?.qt ?? []) {
+      if (!(BASE_QT_COMPONENTS as readonly string[]).includes(component)) {
+        extra.add(component);
+      }
+    }
+  }
+  return [...BASE_QT_COMPONENTS, ...[...extra].sort((a, b) => a.localeCompare(b))];
+}
+
+export function collectQtFindPackageComponents(manifests: PluginManifest[]): string[] {
+  return [...collectQtComponents(manifests), ...BASE_QT_BUILD_COMPONENTS];
+}
+
+function pluginNativeSourceLines(manifests: PluginManifest[]): string {
+  const lines: string[] = [];
+  for (const rel of ALWAYS_PLUGIN_NATIVE_SOURCES) {
+    lines.push(`    \${PLUGIN_NATIVE_DIR}/${rel}`);
+  }
+  for (const manifest of manifests) {
+    lines.push(
+      `    \${PLUGIN_NATIVE_DIR}/${manifest.name}/native/${manifest.display}Plugin.cpp`,
+    );
+    for (const extra of EXTRA_PLUGIN_NATIVE_SOURCES[manifest.name] ?? []) {
+      lines.push(`    \${PLUGIN_NATIVE_DIR}/${manifest.name}/native/${extra}`);
+    }
+  }
+  return lines.join("\n");
+}
+
 export const NATIVE_SDK_SOURCES = [
   "IPlugin.cpp",
   "PluginManager.cpp",
@@ -260,15 +321,15 @@ export function generateCMakeLists(
   version: string,
   manifests: PluginManifest[],
 ): string {
-  const pluginSources = manifests
-    .map(
-      (m) =>
-        `    \${PLUGIN_NATIVE_DIR}/${m.name}/native/${m.display}Plugin.cpp`,
-    )
-    .join("\n");
-  const pluginIncludes = manifests
-    .map((m) => `    \${PLUGIN_NATIVE_DIR}/${m.name}/native`)
-    .join("\n");
+  const qtLinkComponents = collectQtComponents(manifests);
+  const qtFindPackageComponents = collectQtFindPackageComponents(manifests);
+  const qtFindPackage = qtFindPackageComponents.join(" ");
+  const qtLinkLines = qtLinkComponents.map((c) => `        Qt5::${c}`).join("\n");
+  const pluginSources = pluginNativeSourceLines(manifests);
+  const pluginIncludes = [
+    ...ALWAYS_PLUGIN_NATIVE_INCLUDES.map((rel) => `    \${PLUGIN_NATIVE_DIR}/${rel}`),
+    ...manifests.map((m) => `    \${PLUGIN_NATIVE_DIR}/${m.name}/native`),
+  ].join("\n");
 
   const nativeSdkSources = NATIVE_SDK_SOURCES.map(
     (file) => `    \${NATIVE_SDK_DIR}/${file}`,
@@ -286,7 +347,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/cef")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-find_package(Qt5 COMPONENTS Core Gui Qml Quick Network LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS ${qtFindPackage} REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
@@ -324,11 +385,7 @@ ${pluginIncludes}
 
 target_link_libraries(\${PROJECT_NAME}
     PRIVATE
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Qml
-        Qt5::Quick
-        Qt5::Network
+${qtLinkLines}
         PkgConfig::Auroraapp
         PkgConfig::AuroraWebView
 )
@@ -472,17 +529,14 @@ export function syncRuntimeSiblings(
   copyDirFiltered(path.join(runtime, "bridge-native"), path.join(stagingParent, "bridge-native"), new Set());
   copyDirFiltered(path.join(runtime, "native-sdk"), path.join(stagingParent, "native-sdk"), new Set());
 
-  if (pluginNames.length === 0) {
-    return;
-  }
-
   const pluginsDst = path.join(stagingParent, "plugins");
   if (fs.existsSync(pluginsDst)) fs.rmSync(pluginsDst, { recursive: true, force: true });
   fs.mkdirSync(pluginsDst, { recursive: true });
 
   const root = projectRoot ?? process.cwd();
+  const namesToSync = [...new Set([...ALWAYS_SYNC_PLUGINS, ...pluginNames])];
 
-  for (const name of pluginNames) {
+  for (const name of namesToSync) {
     const pluginSrc = resolvePluginNativeDir(root, name);
     if (!pluginSrc) {
       throw new Error(

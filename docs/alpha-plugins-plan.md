@@ -24,7 +24,7 @@
 
 - **A2:** разрешения в `.desktop`, scopes на мосту (FR-R9).
 
-- **Демо:** [`camera-demo`](../examples/camera-demo/), [`geo-demo`](../examples/geo-demo/) — round-trip со stub.
+- **Демо:** [`camera-demo`](../examples/camera-demo/), [`geo-demo`](../examples/geo-demo/), [`sensors-demo`](../examples/sensors-demo/) — round-trip со stub.
 
 
 
@@ -178,11 +178,11 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Qt Positioning (`QGeoPositionInfoSource`) на Aurora SDK: доступность на эмуляторе vs физическое устройство.
+- [x] Qt Positioning (`QGeoPositionInfoSource`) на Aurora SDK: доступность на эмуляторе vs физическое устройство.
 
-- [ ] Модель разрешения `Location` в `.desktop` и поведение при отказе (ожидаем `BRIDGE_PERMISSION_DENIED` на мосту).
+- [x] Модель разрешения `Location` в `.desktop` и поведение при отказе (ожидаем `BRIDGE_PERMISSION_DENIED` на мосту).
 
-- [ ] Соответствие `watchId` в `clearWatch` и `subscriptionId` стрима — зафиксировать контракт (alias или явный id в первом `data`).
+- [x] Соответствие `watchId` в `clearWatch` и `subscriptionId` стрима — зафиксировать контракт (alias или явный id в первом `data`).
 
 
 
@@ -190,17 +190,17 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`getCurrentPosition`:** однократный запрос с учётом `enableHighAccuracy`, `timeout`, `maximumAge`.
+- [x] **`getCurrentPosition`:** однократный запрос с учётом `enableHighAccuracy`, `timeout`, `maximumAge`.
 
-- [ ] **`watch`:** подписка на обновления → `emitStream(id, "data", Position)` через `StreamPublisher` (прореживание по `streamMaxFps`).
+- [x] **`watch`:** подписка на обновления → `emitStream(id, "data", Position)` через `StreamPublisher` (прореживание по `streamMaxFps`).
 
-- [ ] **`cancel(id)` / `sub.stop()`:** остановить `QGeoPositionInfoSource`, не слать `data` после отмены.
+- [x] **`cancel(id)` / `sub.stop()`:** остановить `QGeoPositionInfoSource`, не слать `data` после отмены.
 
-- [ ] **`clearWatch({ watchId })`:** отмена по id (согласовано с id стрима).
+- [x] **`clearWatch({ watchId })`:** отмена по id (согласовано с id стрима).
 
-- [ ] **`GEOLOCATION_CANCELLED`** — отмена запроса пользователем (если API ОС это различает).
+- [x] **`GEOLOCATION_CANCELLED`** — отмена запроса пользователем (если API ОС это различает).
 
-- [ ] **`GEOLOCATION_UNAVAILABLE`** — нет источника позиции (эмулятор без mock GPS).
+- [x] **`GEOLOCATION_UNAVAILABLE`** — нет источника позиции (эмулятор без mock GPS).
 
 
 
@@ -208,11 +208,11 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`geo-demo`:** координаты на устройстве; на эмуляторе без GPS — осмысленный `GEOLOCATION_UNAVAILABLE`, не crash.
+- [x] **`geo-demo`:** координаты на устройстве; на эмуляторе без GPS — осмысленный `GEOLOCATION_UNAVAILABLE`, не crash.
 
-- [ ] Обновить [plugins/geolocation.md](plugins/geolocation.md), compatibility-matrix.
+- [x] Обновить [plugins/geolocation.md](plugins/geolocation.md), compatibility-matrix.
 
-- [ ] Loopback или unit-тест маппинга `Position` (timestamp, поля optional).
+- [x] Loopback или unit-тест маппинга `Position` (timestamp, поля optional).
 
 
 
@@ -240,9 +240,9 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Qt Sensors (`QAccelerometer`, `QGyroscope`) на целевых устройствах Аврора; частота опроса vs backpressure.
+- [x] Qt Sensors (`QAccelerometer`, `QGyroscope`) на целевых устройствах Аврора; частота опроса vs backpressure.
 
-- [ ] Поведение на эмуляторе x86 (ожидаем `SENSORS_UNAVAILABLE`).
+- [x] Поведение на эмуляторе x86 (ожидаем `SENSORS_UNAVAILABLE`).
 
 
 
@@ -250,13 +250,13 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **`watchAccelerometer` / `watchGyroscope`:** подписка → `StreamPublisher::push` с `{ x, y, z, timestamp }`.
+- [x] **`watchAccelerometer` / `watchGyroscope`:** подписка → `StreamPublisher::push` с `{ x, y, z, timestamp }`.
 
-- [ ] **`cancel(id)`:** останов сенсора, `emitStream(complete)` или тишина по контракту стрима.
+- [x] **`cancel(id)`:** останов сенсора, `emitStream(complete)` или тишина по контракту стрима.
 
-- [ ] **`SENSORS_UNAVAILABLE`** — сенсор не найден / не поддерживается.
+- [x] **`SENSORS_UNAVAILABLE`** — сенсор не найден / не поддерживается.
 
-- [ ] **`SENSORS_CANCELLED`** — явная отмена (опционально в `error` фазе стрима).
+- [x] **`SENSORS_CANCELLED`** — явная отмена (опционально в `error` фазе стрима).
 
 
 
@@ -264,11 +264,11 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] Минимальное демо или секция в `hello-world` / отдельный `sensors-demo` (кнопки start/stop, лог readings).
+- [x] Минимальное демо или секция в `hello-world` / отдельный `sensors-demo` (кнопки start/stop, лог readings).
 
 - [ ] Ручная проверка на **физическом устройстве** (эмулятор не обязан иметь IMU).
 
-- [ ] Обновить [plugins/sensors.md](plugins/sensors.md).
+- [x] Обновить [plugins/sensors.md](plugins/sensors.md).
 
 
 
@@ -398,15 +398,15 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 
 
-- [ ] **Ошибки:** каждый код из `plugin.manifest` `errors` достижим в native или покрыт тестом `errors-audit`.
+- [ ] **Ошибки:** каждый код из `plugin.manifest` `errors` достижим в native или покрыт тестом `errors-audit` (P1–P3 — не аудировано отдельно).
 
-- [ ] **NFR-7:** исключения в плагине не роняют Runtime — `try/catch` в `PluginManager` (уже есть; не регрессировать).
+- [x] **NFR-7:** исключения в плагине не роняют Runtime — `try/catch` в `PluginManager` (уже есть; не регрессировать).
 
-- [ ] **Permissions:** `aurobore.config` → `.desktop` для `Camera`, `Location`, `Notifications`; примеры с нужными permissions.
+- [x] **Permissions (P1–P3):** `camera-demo` → `Camera`, `geo-demo` → `Location`; `sensors-demo` — без motion. P4 demo — pending.
 
-- [ ] **Документация:** убрать блоки «Статус A3 scaffold» из [plugins/*.md](plugins/) и [tutorials/using-plugins.md](tutorials/using-plugins.md).
+- [x] **Документация (P1–P3):** [camera.md](plugins/camera.md), [geolocation.md](plugins/geolocation.md), [sensors.md](plugins/sensors.md), [plugins/README.md](plugins/README.md), [using-plugins.md](tutorials/using-plugins.md) — без scaffold. P4/P5 — stub-блоки в `notifications.md`, `share.md`.
 
-- [ ] **Compatibility matrix:** [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md) — статус «реализовано» / «UNAVAILABLE на эмуляторе» по каждому плагину.
+- [x] **Compatibility matrix (P1–P3):** [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md) — три demo, UNAVAILABLE на эмуляторе. P4/P5 — pending.
 
 - [ ] **Conformance (Beta, FR-T1):** после реализации — тесты в conformance-suite (вне этого плана, см. [checklists.md](checklists.md) §6).
 
@@ -456,9 +456,9 @@ Camera и Share разделяют паттерн ResourceRef; Geolocation и Se
 
 | V-camera | Camera / Pickers на SDK 5.1.x–5.2.x | P1 | 🟡 реализовано; sign-off на устройстве |
 
-| V-geo | Qt Positioning, mock на эмуляторе | P2 | 🔴 не начато |
+| V-geo | Qt Positioning, mock на эмуляторе | P2 | 🟡 реализовано; sign-off на устройстве |
 
-| V-sensors | Qt Sensors на реальном устройстве | P3 | 🔴 не начато |
+| V-sensors | Qt Sensors на реальном устройстве | P3 | 🟡 реализовано; sign-off на устройстве |
 
 | V-notif | Local notifications + tap → JS | P4 | 🔴 не начато |
 

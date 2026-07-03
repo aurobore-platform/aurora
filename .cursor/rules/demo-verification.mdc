@@ -13,7 +13,7 @@ alwaysApply: true
 pnpm demos:verify
 ```
 
-Скрипт: `tools/aurora/verify-demos.mjs` (web + `aurobore build` для всех 7 examples, fail-fast).
+Скрипт: `tools/aurora/verify-demos.mjs` (web + `aurobore build` для всех 8 examples, fail-fast).
 
 ## Совместимость (A6)
 

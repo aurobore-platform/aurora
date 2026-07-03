@@ -21,6 +21,7 @@ const DEMOS = [
   { name: "hello-world-stub" },
   { name: "camera-demo", web: { filter: "@aurobore/example-camera-demo", script: "build:web" } },
   { name: "geo-demo", web: { filter: "@aurobore/example-geo-demo", script: "build:web" } },
+  { name: "sensors-demo", web: { filter: "@aurobore/example-sensors-demo", script: "build:web" } },
 ];
 
 function log(msg) {

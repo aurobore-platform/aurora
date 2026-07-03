@@ -14,11 +14,11 @@
 | FileSystem | `@aurobore/filesystem` | — (scope: `appData`) | [filesystem.md](filesystem.md) |
 | Clipboard | `@aurobore/clipboard` | — | [clipboard.md](clipboard.md) |
 | Network | `@aurobore/network` | `Internet` | [network.md](network.md) |
-| Camera | `@aurobore/camera` | `Camera` | [camera.md](camera.md) (A3 scaffold) |
-| Geolocation | `@aurobore/geolocation` | `Location` | [geolocation.md](geolocation.md) (A3 scaffold) |
-| Notifications | `@aurobore/notifications` | `Notifications` | [notifications.md](notifications.md) (A3 scaffold) |
-| Share | `@aurobore/share` | — | [share.md](share.md) (A3 scaffold) |
-| Sensors | `@aurobore/sensors` | — | [sensors.md](sensors.md) (A3 scaffold) |
+| Camera | `@aurobore/camera` | `Camera` | [camera.md](camera.md) (P1) |
+| Geolocation | `@aurobore/geolocation` | `Location` | [geolocation.md](geolocation.md) (P2) |
+| Sensors | `@aurobore/sensors` | — | [sensors.md](sensors.md) (P3) |
+| Notifications | `@aurobore/notifications` | `Notifications` | [notifications.md](notifications.md) (A3 stub, P4) |
+| Share | `@aurobore/share` | — | [share.md](share.md) (A3 stub, P5) |
 
 ## Импорт
 
@@ -73,4 +73,7 @@ try {
 ## Примеры
 
 - [examples/hello-world/](../../examples/hello-world/) — Echo, Device, lifecycle
+- [examples/camera-demo/](../../examples/camera-demo/) — Camera (P1)
+- [examples/geo-demo/](../../examples/geo-demo/) — Geolocation (P2)
+- [examples/sensors-demo/](../../examples/sensors-demo/) — Sensors (P3)
 - [docs/tutorials/using-plugins.md](../tutorials/using-plugins.md) — добавление плагинов в проект
