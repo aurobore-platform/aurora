@@ -124,6 +124,21 @@ CMake в staging ссылается на `../plugins`, `../native-sdk`, `../brid
 
 `run-container.sh` ждёт **M3 OK** (таймаут `POC_RUN_WAIT_SEC`, по умолчанию 90 с).
 
+## Native debugging (journal, Valgrind)
+
+| npm / node | Действие |
+|---|---|
+| `pnpm container:journal` | live `journalctl` с фильтром `aurobore-*` |
+| `pnpm container:journal -- -n 200` | снимок journal |
+| `pnpm container:logs` | `tail -f /tmp/container.log` |
+| `pnpm container:stop` | остановить контейнер на эмуляторе |
+| `pnpm container:restart` | stop + `container:run` |
+| `pnpm container:ssh` | SSH на эмулятор |
+| `pnpm container:valgrind` | запуск под Valgrind (dev) |
+| `pnpm container:valgrind:fetch` | скачать отчёт Valgrind на ПК |
+
+Подробности: [docs/dev/native-debugging.md](../../docs/dev/native-debugging.md).
+
 ## CEF Web DevTools (опционально)
 
 Для отладки web-слоя через `chrome://inspect` задайте в `local.env`:
@@ -148,12 +163,16 @@ AUROBORE_CEF_DEBUG_PORT=9222
 | `EMULATOR_BOOT_TIMEOUT` | `300` | Секунд ожидания после `emulator start` |
 | `POC_RUN_WAIT_SEC` | `90` | Секунд опроса journal на M3 OK |
 | `AUROBORE_CEF_DEBUG_PORT` | — | CEF remote debugging для `container:run` (см. web-debugging.md) |
+| `AUROBORE_QT_LOGGING_RULES` | — | Qt logging rules при `container:run` (см. native-debugging.md) |
+| `VALGRIND_OPTS` | см. valgrind-container.sh | Доп. флаги для `container:valgrind` |
 
 ## Файлы
 
 - `poc.mjs` — оркестратор (Node, Windows/Linux/macOS); проекты `poc-bridge` и `container`
 - `run-poc.sh` — запуск PoC на устройстве (LD_LIBRARY_PATH, journal-проверка)
 - `run-container.sh` — запуск контейнера (journal M3 OK)
+- `native-debug.mjs` — journal, logs, ssh, valgrind (см. native-debugging.md)
+- `valgrind-container.sh` — Valgrind на эмуляторе
 - `local.env.example` — шаблон конфига
 
 ## Связь с M4
@@ -164,4 +183,5 @@ Dev-toolkit останется для CI и разработки самого м
 ## См. также
 
 - [docs/dev/native-plugin-guide.md](../../docs/dev/native-plugin-guide.md) — workflow плагинов
+- [docs/dev/native-debugging.md](../../docs/dev/native-debugging.md) — отладка C++/плагинов
 - [runtime/container/README.md](../../runtime/container/README.md) — структура контейнера

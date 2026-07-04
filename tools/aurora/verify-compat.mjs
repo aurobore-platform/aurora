@@ -82,7 +82,7 @@ function main() {
       // По умолчанию demos:verify пропускается — его запускайте отдельно (`pnpm demos:verify`).
       // Полный прогон: `pnpm compat:verify -- --with-demos`
       if (flags.withDemos) {
-        log("step 1/2: demos:verify (7 RPM builds, может занять 30–60 мин)");
+        log("step 1/2: demos:verify (10 RPM builds, может занять 30–60 мин)");
         runStep("demos:verify", () => pnpm(["demos:verify"]));
       } else if (flags.skipDemos) {
         log("step 1/2: demos:verify skipped (--skip-demos)");

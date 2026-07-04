@@ -32,6 +32,17 @@ pnpm container:sync | build | deploy | run | emulator | all
 
 `container:build` вызывает codegen автоматически (пропуск, если fingerprint в `.codegen-plugins.stamp` не изменился).
 
+### Native debugging (плагины, C++)
+
+```powershell
+pnpm container:journal          # live journal (aurobore-*)
+pnpm container:logs             # tail /tmp/container.log
+pnpm container:restart          # stop + run
+pnpm container:valgrind         # утечки памяти (медленно)
+```
+
+См. `docs/dev/native-debugging.md`.
+
 Эквивалент: `node tools/aurora/poc.mjs <команда> [poc-bridge|container]`. Подробности: `tools/aurora/README.md`.
 
 ## Обязательно для агента
@@ -54,6 +65,7 @@ pnpm container:sync | build | deploy | run | emulator | all
 | Только manifest / генератор | `pnpm test` + `pnpm codegen:plugins` |
 | Только пересборка RPM | `pnpm container:build` |
 | RPM уже собран, нужен деплой/запуск | `pnpm container:deploy` / `pnpm container:run` |
+| Отладка плагина (логи, Valgrind) | `pnpm container:journal` / `container:valgrind` — см. `docs/dev/native-debugging.md` |
 | Правишь сам `tools/aurora/poc.mjs` | тестируй затронутую подкоманду |
 | Только JS/TS монорепо | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm run doctor` |
 

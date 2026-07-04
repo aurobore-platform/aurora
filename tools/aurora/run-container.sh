@@ -4,7 +4,14 @@ set -eu
 
 cef_debug_export=""
 if [ -n "${AUROBORE_CEF_DEBUG_PORT:-}" ]; then
-  cef_debug_export="export AUROBORE_CEF_DEBUG_PORT=${AUROBORE_CEF_DEBUG_PORT}"
+  cef_debug_export="export AUROBORE_CEF_DEBUG_PORT=${AUROBORE_CEF_DEBUG_PORT}
+"
+fi
+
+qt_logging_export=""
+if [ -n "${AUROBORE_QT_LOGGING_RULES:-}" ]; then
+  qt_logging_export="export QT_LOGGING_RULES=\"${AUROBORE_QT_LOGGING_RULES}\"
+"
 fi
 
 pkill -f ru.auroraos.aurobore-container 2>/dev/null || true
@@ -31,8 +38,7 @@ su "${POC_RUN_USER:-defaultuser}" -s /bin/sh -c "
   export WAYLAND_DISPLAY=/run/display/wayland-0
   export QT_QPA_PLATFORM=wayland
   export LD_LIBRARY_PATH=/usr/lib/cef:\${LD_LIBRARY_PATH:-}
-  ${cef_debug_export}
-  nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
+  ${cef_debug_export}${qt_logging_export}  nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
 "
 
 sleep 2

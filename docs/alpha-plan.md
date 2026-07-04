@@ -186,6 +186,7 @@ FR-P6. См. [plugins/standard-plugins.md](plugins/standard-plugins.md) §3, [de
 **Выход A3:** расширенный набор плагинов доступен через `plugin add` и типизированный SDK (контракт + stub).
 
 Полноценная работа на устройстве/эмуляторе — критерий **post-A3** (отдельные задачи на UI и нативные API).
+См. [alpha-plugins-plan.md](alpha-plugins-plan.md) (P1 Camera … P5 Share).
 
 
 

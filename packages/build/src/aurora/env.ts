@@ -22,6 +22,10 @@ export interface AuroraEnv {
   SystemRoot: string;
   /** CEF remote debugging port for monorepo container:run (optional). */
   AUROBORE_CEF_DEBUG_PORT?: string;
+  /** Qt logging rules passed to container on emulator (optional). */
+  AUROBORE_QT_LOGGING_RULES?: string;
+  /** Extra Valgrind flags for container:valgrind (optional). */
+  VALGRIND_OPTS?: string;
 }
 
 function expandPath(s: string): string {

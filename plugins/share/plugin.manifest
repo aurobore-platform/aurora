@@ -32,7 +32,7 @@
   "errors": {
     "SHARE_UNAVAILABLE": {
       "message": "share sheet not available",
-      "description": "Нет системного шаринга на устройстве или плагин в stub-режиме (A3 scaffold)"
+      "description": "Нет Share API, пустые args, файл не найден, параллельный вызов"
     },
     "SHARE_CANCELLED": {
       "message": "user cancelled",

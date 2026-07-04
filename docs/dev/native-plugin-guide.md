@@ -148,6 +148,7 @@ this->router()->emitStream(...);
 
 ## См. также
 
+- [native-debugging.md](native-debugging.md) — journal, Valgrind, GDB, команды `container:journal` / `container:valgrind`
 - [adding-a-plugin.md](adding-a-plugin.md) — пошаговый чеклист
 - [runtime/native-sdk/README.md](../../runtime/native-sdk/README.md) — контракт `IPlugin`
 - [tools/aurora/README.md](../../tools/aurora/README.md) — команды dev-toolkit

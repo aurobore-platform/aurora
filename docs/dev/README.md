@@ -5,6 +5,7 @@
 | Документ | Когда читать |
 |---|---|
 | [native-plugin-guide.md](native-plugin-guide.md) | Цикл разработки плагинов, staging, codegen, сборка, Qt-подводные камни |
+| [native-debugging.md](native-debugging.md) | Journal, Valgrind, GDB, отладка плагинов на эмуляторе |
 | [adding-a-plugin.md](adding-a-plugin.md) | Пошаговый чеклист добавления нового плагина |
 | [web-debugging.md](web-debugging.md) | CEF DevTools (`chrome://inspect`) для web-слоя на эмуляторе/устройстве |
 

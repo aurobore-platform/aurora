@@ -45,7 +45,7 @@
 
 | Код | Сообщение | Когда |
 |-----|-----------|-------|
-| `SHARE_UNAVAILABLE` | share sheet not available | Нет системного шаринга на устройстве или плагин в stub-режиме (A3 scaffold) |
+| `SHARE_UNAVAILABLE` | share sheet not available | Нет Share API, пустые args, файл не найден, параллельный вызов |
 | `SHARE_CANCELLED` | user cancelled | Пользователь отменил шаринг (UI-итерация) |
 ## Импорт
 

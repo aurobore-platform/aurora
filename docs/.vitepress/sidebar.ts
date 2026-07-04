@@ -111,7 +111,9 @@ export const architectureSidebar: SidebarItem[] = [
 export const devSidebar: SidebarItem[] = [
   { text: "Обзор", link: "/dev/" },
   { text: "Native plugin guide", link: "/dev/native-plugin-guide" },
+  { text: "Native debugging", link: "/dev/native-debugging" },
   { text: "Adding a plugin", link: "/dev/adding-a-plugin" },
+  { text: "Web debugging (CEF)", link: "/dev/web-debugging" },
 ];
 
 export const adrSidebar: SidebarItem[] = [

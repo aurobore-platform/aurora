@@ -8,7 +8,31 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../../../..");
 const PLUGINS_DIR = path.join(REPO_ROOT, "plugins");
 
-const PLUGIN_NAMES = ["echo", "device", "storage", "filesystem", "clipboard", "network"];
+const PLUGIN_NAMES = [
+  "echo",
+  "device",
+  "storage",
+  "filesystem",
+  "clipboard",
+  "network",
+  "camera",
+  "geolocation",
+  "sensors",
+  "notifications",
+  "share",
+];
+
+/** Коды, объявленные в манифесте для будущей UI-итерации (ещё нет QStringLiteral в native). */
+function reservedManifestErrorCodes(manifest: { errors?: Record<string, { description?: string }> }): Set<string> {
+  const reserved = new Set<string>();
+  for (const [code, meta] of Object.entries(manifest.errors ?? {})) {
+    const description = meta.description ?? "";
+    if (description.includes("Зарезервировано") || description.includes("UI-итераци")) {
+      reserved.add(code);
+    }
+  }
+  return reserved;
+}
 
 /** Извлекает plugin-specific коды из QStringLiteral("PREFIX_...") в native/*.cpp */
 export function extractNativeErrorCodes(cppSource: string, prefix: string): Set<string> {
@@ -52,8 +76,15 @@ describe("manifest errors audit", () => {
       const prefix = pluginErrorPrefix(manifest.name);
       const nativeCodes = extractNativeErrorCodes(readNativeCpp(pluginName, manifest), prefix);
       const manifestCodes = new Set(Object.keys(manifest.errors ?? {}));
+      const reservedCodes = reservedManifestErrorCodes(manifest);
+      const expectedManifestCodes = new Set(
+        [...manifestCodes].filter((code) => !reservedCodes.has(code)),
+      );
 
-      expect(manifestCodes).toEqual(nativeCodes);
+      expect(expectedManifestCodes).toEqual(nativeCodes);
+      for (const code of nativeCodes) {
+        expect(manifestCodes.has(code)).toBe(true);
+      }
     });
   }
 });

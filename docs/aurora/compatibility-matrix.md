@@ -79,6 +79,7 @@ pnpm compat:verify -- --run-demo hello-world
 | [`geo-demo`](../../examples/geo-demo/) | Geolocation, Echo | P2 native; `GEOLOCATION_UNAVAILABLE` без mock GPS |
 | [`sensors-demo`](../../examples/sensors-demo/) | Sensors, Echo | P3 native; `SENSORS_UNAVAILABLE` без IMU |
 | [`notifications-demo`](../../examples/notifications-demo/) | Notifications, Echo | P4 native; notify/schedule на эмуляторе; tap — manual |
+| [`share-demo`](../../examples/share-demo/) | Share, Echo | P5 native; share text/url/file; back → `SHARE_CANCELLED` |
 
 Путь create→build→run:
 

@@ -13,7 +13,7 @@ alwaysApply: true
 pnpm demos:verify
 ```
 
-Скрипт: `tools/aurora/verify-demos.mjs` (web + `aurobore build` для всех 8 examples, fail-fast).
+Скрипт: `tools/aurora/verify-demos.mjs` (web + `aurobore build` для всех 10 examples, fail-fast).
 
 ## Совместимость (A6)
 
@@ -22,7 +22,7 @@ pnpm compat:verify
 ```
 
 Скрипт: `tools/aurora/verify-compat.mjs` (`container:all` на текущем SDK).
-По умолчанию **без** повторного `demos:verify` (чтобы не гонять 7 RPM дважды).
+По умолчанию **без** повторного `demos:verify` (чтобы не гонять 10 RPM дважды).
 Полный прогон: `pnpm compat:verify -- --with-demos`.
 Опционально: `pnpm compat:verify -- --run-demo hello-world`.
 

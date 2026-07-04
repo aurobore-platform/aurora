@@ -29,6 +29,7 @@
 ```
 
 Каждый код в `errors` должен совпадать с `QStringLiteral("FOO_...")` в native `.cpp` (проверяется тестом `errors-audit.test.ts`).
+Исключение: коды с `description`, содержащим «Зарезервировано» или «UI-итераци» — объявлены в манифесте заранее, native добавляется в следующей итерации (см. `SENSORS_CANCELLED`, `NOTIFICATIONS_CANCELLED`).
 
 Проверка без эмулятора: `pnpm test` (пакет `@aurobore/build`, тесты manifest/codegen).
 

@@ -43,9 +43,19 @@ export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void
     cefDebugPort != null
       ? String(cefDebugPort)
       : env.AUROBORE_CEF_DEBUG_PORT?.trim() || "";
-  const remoteCmd = cefPort
-    ? `export AUROBORE_CEF_DEBUG_PORT=${cefPort}; sudo -E sh /tmp/${remoteScriptName}`
-    : `sudo sh /tmp/${remoteScriptName}`;
+  const exports: string[] = [];
+  if (cefPort) exports.push(`AUROBORE_CEF_DEBUG_PORT=${cefPort}`);
+  const qtRules = env.AUROBORE_QT_LOGGING_RULES?.trim();
+  if (qtRules) {
+    const escaped = qtRules.replace(/'/g, "'\\''");
+    exports.push(`AUROBORE_QT_LOGGING_RULES='${escaped}'`);
+  }
+  const exportPrefix =
+    exports.length > 0 ? `${exports.map((e) => `export ${e}`).join("; ")}; ` : "";
+  const remoteCmd =
+    exports.length > 0
+      ? `${exportPrefix}sudo -E sh /tmp/${remoteScriptName}`
+      : `sudo sh /tmp/${remoteScriptName}`;
   runCommand(openSshTool(env, "ssh"), sshArgs(env, remoteCmd), { env });
 }
 
