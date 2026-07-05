@@ -1,0 +1,19 @@
+[
+  {
+    "id": "webview-flutter",
+    "description": "Flutter webview_flutter Aurora implementation (OMP community)",
+    "url": "https://hub.mos.ru/auroraos/flutter/flutter-community-plugins/webview-flutter.git",
+    "ref": "flutter-aurora-3.35.7",
+    "path": "flutter/webview-flutter",
+    "keyFiles": [
+      "packages/webview_flutter_aurora/README.md",
+      "packages/webview_flutter_aurora/CHANGELOG.md",
+      "packages/webview_flutter_aurora/aurora/webview_flutter_aurora_plugin.cpp",
+      "packages/webview_flutter_aurora/aurora/webview_controller.cpp",
+      "packages/webview_flutter_aurora/aurora/http_auth_handler.cpp",
+      "packages/webview_flutter/example/aurora/main.cpp",
+      "packages/webview_flutter/example/aurora/CMakeLists.txt",
+      "packages/webview_flutter/example/aurora/rpm"
+    ]
+  }
+]

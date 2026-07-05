@@ -114,6 +114,7 @@ export const devSidebar: SidebarItem[] = [
   { text: "Native debugging", link: "/dev/native-debugging" },
   { text: "Adding a plugin", link: "/dev/adding-a-plugin" },
   { text: "Web debugging (CEF)", link: "/dev/web-debugging" },
+  { text: "WebView improvements", link: "/dev/webview-improvements-plan" },
 ];
 
 export const adrSidebar: SidebarItem[] = [

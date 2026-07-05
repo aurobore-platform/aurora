@@ -39,6 +39,7 @@
     "container:valgrind:fetch": "node tools/aurora/native-debug.mjs valgrind-fetch",
     "demos:verify": "node tools/aurora/verify-demos.mjs",
     "compat:verify": "node tools/aurora/verify-compat.mjs",
+    "external:sync": "node tools/aurora/sync-external-examples.mjs",
     "docs:dev": "vitepress dev docs",
     "docs:dev:full": "cross-env DOCS_AUDIENCE=full vitepress dev docs",
     "docs:build": "vitepress build docs",

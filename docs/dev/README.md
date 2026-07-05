@@ -8,6 +8,7 @@
 | [native-debugging.md](native-debugging.md) | Journal, Valgrind, GDB, отладка плагинов на эмуляторе |
 | [adding-a-plugin.md](adding-a-plugin.md) | Пошаговый чеклист добавления нового плагина |
 | [web-debugging.md](web-debugging.md) | CEF DevTools (`chrome://inspect`) для web-слоя на эмуляторе/устройстве |
+| [webview-improvements-plan.md](webview-improvements-plan.md) | План улучшений runtime WebView (референс webview-flutter) |
 
 Связанные документы:
 

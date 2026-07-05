@@ -48,3 +48,8 @@ tools/aurora/local.env
 # VitePress
 docs/.vitepress/cache
 docs/.vitepress/dist
+
+# External reference clones (not committed)
+examples_external/*
+!examples_external/README.md
+!examples_external/manifest.json

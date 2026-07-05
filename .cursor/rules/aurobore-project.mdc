@@ -23,6 +23,7 @@ alwaysApply: true
 | `runtime/poc-bridge` | PoC C++/QML (источник; сборка через staging) |
 | `runtime/container` | M1 нативный контейнер (ApplicationWindow, asset loader, lifecycle) |
 | `tools/aurora/` | Оркестратор эмулятора (`poc.mjs`: poc-bridge + container) |
+| `examples_external/` | Локальные клоны внешних референсов (gitignored; `pnpm external:sync`) |
 | `docs/aurora/` | Факты SDK, verification-status |
 | `docs/alpha-plugins-plan.md` | Доработка A3-плагинов (Camera, Geo, …) с stub до native |
 

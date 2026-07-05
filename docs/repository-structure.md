@@ -61,6 +61,9 @@ aurobore/
 │   ├── geo-demo/
 │   └── …
 │
+├── examples_external/         # локальные клоны внешних референсов (gitignored; README + manifest в git)
+│   └── flutter/webview-flutter/   # pnpm external:sync
+│
 ├── tests/                     # сквозные/совместимостные тесты (см. §tests)
 │   ├── e2e/
 │   ├── conformance/           # conformance suite для плагинов/моста

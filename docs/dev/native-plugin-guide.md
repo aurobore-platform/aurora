@@ -131,8 +131,11 @@ this->router()->emitStream(...);
 ## Flutter-референс (platform-код Авроры)
 
 При реализации или доработке native-плагина (особенно Camera, Geolocation, Notifications, Share, Sensors)
-сначала проверьте каталог [Flutter community plugins](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins)
+или runtime WebView сначала проверьте каталог [Flutter community plugins](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins)
 (в Cursor — `@flutter-community-plugins`).
+
+**Локальные клоны** (не в git): [`examples_external/`](../../examples_external/) — синхронизация `pnpm external:sync`.
+План улучшений WebView по мотивам `webview-flutter`: [webview-improvements-plan.md](webview-improvements-plan.md).
 
 **Если аналог есть в каталоге** — изучите исходники **до** написания своего `*Plugin.cpp`:
 
