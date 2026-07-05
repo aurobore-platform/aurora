@@ -2,10 +2,10 @@
 
 import QtQuick 2.6
 import Sailfish.Silica 1.0
-import ru.auroraos.WebView 1.0
 import "../components"
 import "../logic/UrlPolicy.js" as UrlPolicy
 import "../logic/WebChrome.js" as WebChrome
+import "../logic/BridgeMessages.js" as BridgeMessages
 
 Page {
     id: page
@@ -20,56 +20,11 @@ Page {
     property var webView: webViewLoader.item
 
     function statusBarHeightPx() {
-        var h = Theme.statusBarHeight || 0
-        return h > 0 ? h : 32
-    }
-
-    function computeCutoutInsets() {
-        var result = { top: 0, right: 0, bottom: 0, left: 0 }
-
-        if (typeof SafeZoneRect !== "undefined") {
-            switch (page.orientation) {
-            case Orientation.Portrait:
-                result.top = Math.max(SafeZoneRect.insets.top, SafeZoneRect.appInsets.top)
-                result.left = SafeZoneRect.insets.left
-                result.right = SafeZoneRect.insets.right
-                break
-            case Orientation.Landscape:
-                result.top = Math.max(SafeZoneRect.insets.left, SafeZoneRect.appInsets.top)
-                result.left = SafeZoneRect.insets.top
-                result.right = SafeZoneRect.insets.bottom
-                break
-            case Orientation.PortraitInverted:
-                result.top = Math.max(SafeZoneRect.insets.bottom, SafeZoneRect.appInsets.top)
-                result.left = SafeZoneRect.insets.right
-                result.right = SafeZoneRect.insets.left
-                break
-            case Orientation.LandscapeInverted:
-                result.top = Math.max(SafeZoneRect.insets.right, SafeZoneRect.appInsets.top)
-                result.left = SafeZoneRect.insets.bottom
-                result.right = SafeZoneRect.insets.top
-                break
-            }
-        } else {
-            result.top = statusBarHeightPx()
-        }
-
-        if (result.top <= 0)
-            result.top = statusBarHeightPx()
-
-        return result
+        return WebChrome.statusBarHeightPx(Theme.statusBarHeight)
     }
 
     function screenAxisHeight() {
-        switch (page.orientation) {
-        case Orientation.Portrait:
-        case Orientation.PortraitInverted:
-            return Screen.height
-        case Orientation.Landscape:
-        case Orientation.LandscapeInverted:
-            return Screen.width
-        }
-        return Screen.height
+        return WebChrome.screenAxisHeight(page.orientation, Screen.width, Screen.height)
     }
 
     function nativeKeyboardInsetPx() {
@@ -119,7 +74,8 @@ Page {
     function injectInsets() {
         if (!webView)
             return
-        var cutout = computeCutoutInsets()
+        var safeZone = typeof SafeZoneRect !== "undefined" ? SafeZoneRect : null
+        var cutout = WebChrome.computeCutoutInsets(page.orientation, safeZone, statusBarHeightPx())
         WebChrome.injectInsets(webView, cutout.top, cutout.right, keyboardInset, cutout.left)
         bridgeRouter.emitEvent("systemChrome:insetsChanged", {
             top: cutout.top,
@@ -168,18 +124,6 @@ Page {
             function (err) { console.log("[aurobore-container] back navigation error:", err) }
         )
         return true
-    }
-
-    function setupWebViewListeners() {
-        if (!webView)
-            return
-        webView.addMessageListener("aurobore:bridge")
-        webView.addMessageListener("aurobore:ready")
-        webView.addMessageListener("aurobore:back")
-        webView.addMessageListener("aurobore:m2-ok")
-        webView.addMessageListener("aurobore:m3-ok")
-        webView.addMessageListener("aurobore:a2-ok")
-        webView.addMessageListener("aurobore:keyboard-inset")
     }
 
     function stopWebViewTimers() {
@@ -370,99 +314,53 @@ Page {
         height: page.screenAxisHeight()
         active: true
         sourceComponent: webViewComponent
-
-        onLoaded: page.setupWebViewListeners()
     }
 
     Component {
         id: webViewComponent
 
-        WebView {
+        AuroboreWebView {
             anchors.fill: parent
-            url: "about:blank"
-
-            TouchInput { enabled: true }
-            KeyboardInput { enabled: true }
-
-            onLoadFinished: {
-                cookieOrchestrator.applyOnLoadFinished(url, httpStatusCode)
-                if (httpStatusCode >= 400 && httpStatusCode < 600
-                        && UrlPolicy.shouldEmitWebViewError(url, assetServerOrigin, allowedOrigins)) {
-                    bridgeRouter.emitEvent("webview:httpError", {
-                        url: url,
-                        statusCode: httpStatusCode
-                    })
-                    console.log("[aurobore-container] webview:httpError", httpStatusCode, url)
-                }
-            }
-
-            onLoadError: {
-                if (UrlPolicy.shouldEmitWebViewError(url, assetServerOrigin, allowedOrigins)) {
-                    bridgeRouter.emitEvent("webview:loadError", {
-                        url: url,
-                        errorCode: errorCode,
-                        isForMainFrame: true
-                    })
-                    console.log("[aurobore-container] webview:loadError", errorCode, url)
-                }
-            }
-
-            onLoadingChanged: {
-                if (loading) {
-                    page.injectChromeStylesheet()
-                    page.injectViewportMeta()
-                    page.injectKeyboardViewportListener()
-                    page.injectInsets()
-                }
-                if (!loading && assetServerOrigin && assetServerOrigin.length > 0
-                        && url.indexOf(assetServerOrigin) === 0) {
-                    page.injectViewportMeta()
-                    page.injectKeyboardViewportListener()
-                    page.injectInsets()
-                    pageLoadProbeTimer.start()
-                }
-            }
-
-            LoadRequestExtension {
-                enabled: true
-                nativeSchemeHandling: true
-
-                function beforeUrlLoad(url, userGesture, isRedirect) {
-                    var urlString = url.url
-
-                    if (url.scheme === "http" || url.scheme === "https") {
-                        var allowed = UrlPolicy.isAllowedAppUrl(
-                            urlString, assetServerOrigin, allowedOrigins, assetResolver)
-                        if (!allowed)
-                            console.log("[aurobore-container] blocked external:", urlString)
-                        return allowed
-                    }
-
-                    if (url.scheme === "aurobore-app") {
-                        var ok = assetResolver.isAllowedUrl(urlString)
-                        if (!ok)
-                            console.log("[aurobore-container] blocked aurobore-app:", urlString)
-                        else
-                            console.log("[aurobore-container] allow aurobore-app:", urlString)
-                        return ok
-                    }
-
-                    if (url.scheme === "file") {
-                        console.log("[aurobore-container] blocked file:", urlString)
-                        return false
-                    }
-
-                    return true
-                }
-            }
         }
     }
 
-    function parseBridgeData(raw) {
-        if (typeof raw === "string") {
-            try { return JSON.parse(raw) } catch (e) { return {} }
+    Connections {
+        target: webView
+        onLoadFinished: {
+            if (!webView)
+                return
+            cookieOrchestrator.applyOnLoadFinished(webView.url, webView.httpStatusCode)
         }
-        return raw
+        onLoadFinishedWhitelisted: {
+            bridgeRouter.emitEvent("webview:httpError", {
+                url: url,
+                statusCode: statusCode
+            })
+            console.log("[aurobore-container] webview:httpError", statusCode, url)
+        }
+        onLoadErrorWhitelisted: {
+            bridgeRouter.emitEvent("webview:loadError", {
+                url: url,
+                errorCode: errorCode,
+                isForMainFrame: true
+            })
+            console.log("[aurobore-container] webview:loadError", errorCode, url)
+        }
+        onChromeInjectRequested: {
+            page.injectChromeStylesheet()
+            page.injectViewportMeta()
+            page.injectKeyboardViewportListener()
+            page.injectInsets()
+        }
+        onBundledLoadComplete: {
+            page.injectViewportMeta()
+            page.injectKeyboardViewportListener()
+            page.injectInsets()
+        }
+        onReadyProbeNeeded: pageLoadProbeTimer.start()
+        onRecvAsyncMessage: BridgeMessages.handleRecvAsyncMessage(
+            name, data, page, bridgeRouter, deepLinkHandler,
+            typeof notificationsBridge !== "undefined" ? notificationsBridge : null)
     }
 
     Connections {
@@ -473,35 +371,6 @@ Page {
         onAuthResolved: {
             if (httpAuthDialog.status === PageStatus.Active)
                 httpAuthDialog.close()
-        }
-    }
-
-    Connections {
-        target: webView
-        onRecvAsyncMessage: {
-            if (name === "aurobore:bridge") {
-                bridgeRouter.handleMessage(parseBridgeData(data))
-            } else if (name === "aurobore:ready") {
-                console.log("[aurobore-container] web ready signal")
-                console.log("[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works")
-                deepLinkHandler.deliverPending()
-                if (typeof notificationsBridge !== "undefined" && notificationsBridge)
-                    notificationsBridge.deliverPending()
-                page.hideSplash()
-            } else if (name === "aurobore:back") {
-                page.handleBackNavigation()
-            } else if (name === "aurobore:m2-ok") {
-                console.log("[aurobore-container] M2 OK: bridge invoke, events, stream verified")
-            } else if (name === "aurobore:m3-ok") {
-                console.log("[aurobore-container] M3 OK: plugins registered, Device + Storage verified")
-            } else if (name === "aurobore:a2-ok") {
-                console.log("[aurobore-container] A2 OK: Runtime+ deep links, scopes, system chrome verified")
-            } else if (name === "aurobore:keyboard-inset") {
-                var inset = parseBridgeData(data)
-                var bottom = (inset && inset.bottom) ? inset.bottom : 0
-                if (page.nativeKeyboardInsetPx() === 0 && bottom > 0)
-                    page.applyKeyboardInset(bottom)
-            }
         }
     }
 

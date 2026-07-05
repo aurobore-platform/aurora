@@ -75,7 +75,6 @@ Dialog {
                 width: parent.width - Theme.horizontalPageMargin * 2
                 x: Theme.horizontalPageMargin
                 placeholderText: qsTr("Username")
-                focus: true
             }
 
             PasswordField {

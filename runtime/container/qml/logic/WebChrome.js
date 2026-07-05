@@ -1,5 +1,58 @@
 .pragma library
 
+function statusBarHeightPx(themeStatusBarHeight) {
+    var h = themeStatusBarHeight || 0
+    return h > 0 ? h : 32
+}
+
+function computeCutoutInsets(orientation, safeZoneRect, fallbackTopPx) {
+    var result = { top: 0, right: 0, bottom: 0, left: 0 }
+
+    if (safeZoneRect) {
+        switch (orientation) {
+        case 1: // Orientation.Portrait
+            result.top = Math.max(safeZoneRect.insets.top, safeZoneRect.appInsets.top)
+            result.left = safeZoneRect.insets.left
+            result.right = safeZoneRect.insets.right
+            break
+        case 2: // Orientation.Landscape
+            result.top = Math.max(safeZoneRect.insets.left, safeZoneRect.appInsets.top)
+            result.left = safeZoneRect.insets.top
+            result.right = safeZoneRect.insets.bottom
+            break
+        case 4: // Orientation.PortraitInverted
+            result.top = Math.max(safeZoneRect.insets.bottom, safeZoneRect.appInsets.top)
+            result.left = safeZoneRect.insets.right
+            result.right = safeZoneRect.insets.left
+            break
+        case 8: // Orientation.LandscapeInverted
+            result.top = Math.max(safeZoneRect.insets.right, safeZoneRect.appInsets.top)
+            result.left = safeZoneRect.insets.bottom
+            result.right = safeZoneRect.insets.top
+            break
+        }
+    } else {
+        result.top = fallbackTopPx
+    }
+
+    if (result.top <= 0)
+        result.top = fallbackTopPx
+
+    return result
+}
+
+function screenAxisHeight(orientation, screenWidth, screenHeight) {
+    switch (orientation) {
+    case 1: // Orientation.Portrait
+    case 4: // Orientation.PortraitInverted
+        return screenHeight
+    case 2: // Orientation.Landscape
+    case 8: // Orientation.LandscapeInverted
+        return screenWidth
+    }
+    return screenHeight
+}
+
 function injectChromeStylesheet(webView, href) {
     if (!webView)
         return
