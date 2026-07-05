@@ -222,8 +222,18 @@ W1 (infra) ✅ → W2 (M4 packaging) ✅ → W3 (QCA spike) ✅ → W4 (auth/err
 
 W2 блокирует prod-ready `aurobore build`; W3–W5 — по запросу гибридных приложений с external URL.
 
+## Post-W (техдолг и декомпозиция)
+
+W1–W7 закрыты; follow-up — [webview-improvements-plan-plus.md](webview-improvements-plan-plus.md):
+
+- W+1 — harness W3–W6 в `qml/verification/`, не в production WebAppPage
+- W+2 — `web.allowedOrigins` в schema/generator (gate: hybrid example)
+- W+3 — W5 `setCookie` как interim в docs
+- W+4 — декомпозиция `WebAppPage.qml` (~875 → ~350 строк)
+
 ## См. также
 
+- [webview-improvements-plan-plus.md](webview-improvements-plan-plus.md) — post-W техдолг
 - [examples_external/README.md](../../examples_external/README.md)
 - [native-plugin-guide.md](native-plugin-guide.md) §Flutter-референс
 - [runtime/container/README.md](../../runtime/container/README.md)
