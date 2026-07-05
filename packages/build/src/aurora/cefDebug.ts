@@ -5,6 +5,9 @@ import { isPortAvailable, probeTcpHost } from "../dev/networkProbe.js";
 
 export const DEFAULT_CEF_DEBUG_PORT = 9222;
 
+/** Относительный путь к документации (от корня репозитория). */
+export const CEF_DEBUG_DOC_REL = "docs/dev/web-debugging.md";
+
 export interface CefDebugTunnel {
   localPort: number;
   remotePort: number;
@@ -149,23 +152,45 @@ async function stopTunnel(child: ChildProcess | null): Promise<void> {
   });
 }
 
-/** Инструкции для подключения Chrome DevTools к WebView. */
-export function printCefDebugBanner(localPort: number): void {
+/** Краткий заголовок перед блоком journal в run-container.sh (на устройстве). */
+export function printCefDebugJournalHeader(devicePort: number): void {
+  console.log("=== CEF DEBUG (WebView / Chrome DevTools) ===");
+  console.log(`Device listens: 127.0.0.1:${devicePort}`);
+  console.log("On PC: chrome://inspect → section «Remote Target» (not USB Devices)");
+  console.log(`Full guide: ${CEF_DEBUG_DOC_REL}`);
+  console.log("=============================================");
+}
+
+/** Как включить CEF debug, если AUROBORE_CEF_DEBUG_PORT не задан. */
+export function printCefDebugSetupInstructions(): void {
   console.log("");
-  console.log("[cef-debug] Chrome DevTools (CEF remote debugging)");
-  console.log("[cef-debug]   chrome://inspect — смотрите секцию «Remote Target», НЕ «Devices» (USB)");
-  console.log("[cef-debug]   Discover network targets → Configure → добавьте ОБА:");
-  console.log(`[cef-debug]     127.0.0.1:${localPort}`);
-  console.log(`[cef-debug]     localhost:${localPort}`);
-  console.log("[cef-debug]   Если список пуст — используйте прямую ссылку inspect ниже");
-  console.log(`[cef-debug] Verify: curl http://127.0.0.1:${localPort}/json/list`);
+  console.log("[cef-debug] Chrome DevTools (CEF) — не включён");
+  console.log("[cef-debug]   1. tools/aurora/local.env → AUROBORE_CEF_DEBUG_PORT=9222");
+  console.log("[cef-debug]   2. pnpm container:build && pnpm container:run");
+  console.log(`[cef-debug]   Guide: ${CEF_DEBUG_DOC_REL}`);
   console.log("");
+}
+
+/** SSH-туннель вручную, если автоподнятие не удалось (порт занят и т.п.). */
+export function printCefDebugManualTunnel(env: AuroraEnv, port: number): void {
+  const key = env.EMULATOR_SSH_KEY || "<EMULATOR_SSH_KEY>";
+  console.log("[cef-debug] Manual SSH tunnel (separate PowerShell window):");
+  console.log(
+    `[cef-debug]   ssh -i ${key} -N -L ${port}:127.0.0.1:${port} -p ${env.EMULATOR_SSH_PORT} ${env.EMULATOR_SSH_USER}@${env.EMULATOR_SSH_HOST}`,
+  );
 }
 
 export interface CefDebugTarget {
   title: string;
   url: string;
   inspectUrl: string;
+}
+
+export interface PickCefTargetOptions {
+  /** Подстрока в title (default: «Aurobore Container»). */
+  titleIncludes?: string;
+  /** Подстрока в page URL (default: «127.0.0.1» — loopback asset server). */
+  urlIncludes?: string;
 }
 
 /** Список inspectable страниц CEF через локальный туннель. */
@@ -193,39 +218,98 @@ export async function fetchCefDebugTargets(localPort: number): Promise<CefDebugT
     }));
 }
 
-/** Печатает прямые ссылки inspect (обход пустого chrome://inspect). */
-export function printInspectableTargets(targets: CefDebugTarget[]): void {
-  if (targets.length === 0) {
-    console.log("[cef-debug] WebView targets: (пока нет — дождитесь загрузки приложения)");
-    return;
-  }
-  console.log("[cef-debug] WebView targets — вставьте ссылку в адресную строку Chrome:");
-  for (const target of targets) {
-    console.log(`[cef-debug]   ${target.title} (${target.url})`);
-    console.log(`[cef-debug]     ${target.inspectUrl}`);
-  }
+/** Выбирает WebView-страницу приложения среди targets json/list. */
+export function pickPreferredCefTarget(
+  targets: CefDebugTarget[],
+  options: PickCefTargetOptions = {},
+): CefDebugTarget | null {
+  if (targets.length === 0) return null;
+  const titleNeedle = (options.titleIncludes ?? "Aurobore Container").toLowerCase();
+  const urlNeedle = (options.urlIncludes ?? "127.0.0.1").toLowerCase();
+
+  const byTitle = targets.find((t) => t.title.toLowerCase().includes(titleNeedle));
+  if (byTitle) return byTitle;
+
+  const byUrl = targets.find((t) => t.url.toLowerCase().includes(urlNeedle));
+  if (byUrl) return byUrl;
+
+  return targets[0] ?? null;
+}
+
+/** Печатает готовую ссылку DevTools (primary output после container:run / aurobore dev). */
+export function printCefInspectUrl(target: CefDebugTarget, localPort: number): void {
+  console.log("");
+  console.log("[cef-debug] DevTools — вставьте в адресную строку Google Chrome:");
+  console.log(`[cef-debug] ${target.inspectUrl}`);
+  console.log(`[cef-debug] (${target.title} | ${target.url})`);
+  console.log(
+    `[cef-debug] Источник: http://127.0.0.1:${localPort}/json/list · опционально chrome://inspect`,
+  );
   console.log("");
 }
 
-/** Ждёт появления WebView в json/list и печатает прямые ссылки. */
-export async function waitAndPrintInspectableTargets(
+/** Ждёт WebView в json/list, выбирает по title/URL и печатает inspectUrl. */
+export async function resolveAndPrintCefInspectUrl(
   localPort: number,
-  timeoutMs = 20000,
-): Promise<void> {
+  options: PickCefTargetOptions & { timeoutMs?: number } = {},
+): Promise<CefDebugTarget | null> {
+  const timeoutMs = options.timeoutMs ?? 20000;
   const deadline = Date.now() + timeoutMs;
+
   while (Date.now() < deadline) {
     try {
       const targets = await fetchCefDebugTargets(localPort);
-      if (targets.length > 0) {
-        printInspectableTargets(targets);
-        return;
+      const picked = pickPreferredCefTarget(targets, options);
+      if (picked) {
+        printCefInspectUrl(picked, localPort);
+        if (targets.length > 1) {
+          console.log("[cef-debug] Прочие targets:");
+          for (const t of targets) {
+            if (t.inspectUrl !== picked.inspectUrl) {
+              console.log(`[cef-debug]   ${t.title}: ${t.inspectUrl}`);
+            }
+          }
+          console.log("");
+        }
+        return picked;
       }
     } catch {
       /* retry until timeout */
     }
     await sleep(1000);
   }
+
   console.log(
-    "[cef-debug] targets not found in json/list — проверьте, что приложение с WebView запущено на эмуляторе",
+    `[cef-debug] WebView не найден в http://127.0.0.1:${localPort}/json/list (таймаут ${timeoutMs}ms)`,
   );
+  console.log("[cef-debug] Проверьте SSH-туннель и что приложение с WebView запущено");
+  return null;
+}
+
+/** @deprecated Используйте resolveAndPrintCefInspectUrl */
+export function printCefDebugBanner(_localPort: number): void {
+  /* no-op: banner заменён автоподбором inspect URL */
+}
+
+/** @deprecated Используйте resolveAndPrintCefInspectUrl */
+export function printInspectableTargets(targets: CefDebugTarget[]): void {
+  const picked = pickPreferredCefTarget(targets);
+  if (picked) printCefInspectUrl(picked, DEFAULT_CEF_DEBUG_PORT);
+}
+
+/** @deprecated Используйте resolveAndPrintCefInspectUrl */
+export async function waitAndPrintInspectableTargets(
+  localPort: number,
+  timeoutMs = 20000,
+): Promise<void> {
+  await resolveAndPrintCefInspectUrl(localPort, { timeoutMs });
+}
+
+/** Пробует json/list на уже открытом localhost:port (например, если SSH-туннель уже был). */
+export async function tryResolveAndPrintCefInspectUrl(
+  localPort: number,
+  options: PickCefTargetOptions & { timeoutMs?: number } = {},
+): Promise<CefDebugTarget | null> {
+  if (!(await probeTcpHost("127.0.0.1", localPort, 500))) return null;
+  return resolveAndPrintCefInspectUrl(localPort, options);
 }

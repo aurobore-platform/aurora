@@ -24,7 +24,23 @@
   var a1Checks = { fastStream: false, resource: false };
   var m3Checks = { device: false, storage: false, plugins: false };
   var m3Display = { device: null, storage: null };
-  var a2Checks = { deeplink: false, chrome: false, viewport: false };
+  var a2Checks = { deeplink: false, chrome: false, keyboard: false, viewport: false };
+  var m2OkSent = false;
+  var a1OkSent = false;
+  var m3OkSent = false;
+  var a2OkSent = false;
+  var readySent = false;
+
+  function sendNativeMessage(name, payload) {
+    if (typeof sendAsyncMessage !== "function")
+      return;
+    if (payload === undefined || payload === null)
+      sendAsyncMessage(name, "");
+    else if (typeof payload === "object")
+      sendAsyncMessage(name, JSON.stringify(payload));
+    else
+      sendAsyncMessage(name, payload);
+  }
 
   function handleDeepLink(data) {
     if (!data || !data.url) return;
@@ -57,36 +73,33 @@
   }
 
   function maybeM2Ok() {
-    if (m2Checks.ping && m2Checks.stream && m2Checks.event) {
-      console.log(
-        "[aurobore-container] M2 OK: bridge invoke, events, stream verified"
-      );
-      if (typeof sendAsyncMessage === "function") {
-        sendAsyncMessage("aurobore:m2-ok", { ok: true });
-      }
-    }
+    if (m2OkSent || !(m2Checks.ping && m2Checks.stream && m2Checks.event))
+      return;
+    m2OkSent = true;
+    console.log(
+      "[aurobore-container] M2 OK: bridge invoke, events, stream verified"
+    );
+    sendNativeMessage("aurobore:m2-ok", "ok");
   }
 
   function maybeA1Ok() {
-    if (a1Checks.fastStream && a1Checks.resource) {
-      console.log(
-        "[aurobore-container] A1 OK: bridge backpressure + resource-ref verified"
-      );
-      if (typeof sendAsyncMessage === "function") {
-        sendAsyncMessage("aurobore:a1-ok", { ok: true });
-      }
-    }
+    if (a1OkSent || !(a1Checks.fastStream && a1Checks.resource))
+      return;
+    a1OkSent = true;
+    console.log(
+      "[aurobore-container] A1 OK: bridge backpressure + resource-ref verified"
+    );
+    sendNativeMessage("aurobore:a1-ok", "ok");
   }
 
   function maybeM3Ok() {
-    if (m3Checks.device && m3Checks.storage && m3Checks.plugins) {
-      console.log(
-        "[aurobore-container] M3 OK: plugins registered, Device + Storage verified"
-      );
-      if (typeof sendAsyncMessage === "function") {
-        sendAsyncMessage("aurobore:m3-ok", { ok: true });
-      }
-    }
+    if (m3OkSent || !(m3Checks.device && m3Checks.storage && m3Checks.plugins))
+      return;
+    m3OkSent = true;
+    console.log(
+      "[aurobore-container] M3 OK: plugins registered, Device + Storage verified"
+    );
+    sendNativeMessage("aurobore:m3-ok", "ok");
   }
 
   function updateM3Display() {
@@ -144,9 +157,7 @@
   var btnSimBack = document.getElementById("btn-sim-back");
   if (btnSimBack) {
     btnSimBack.addEventListener("click", function () {
-      if (typeof sendAsyncMessage === "function") {
-        sendAsyncMessage("aurobore:back", {});
-      }
+      sendNativeMessage("aurobore:back", "");
     });
   }
 
@@ -324,14 +335,13 @@
   }
 
   function maybeA2Ok() {
-    if (a2Checks.chrome && a2Checks.viewport) {
-      console.log(
-        "[aurobore-container] A2 OK: Runtime+ deep links, scopes, system chrome verified"
-      );
-      if (typeof sendAsyncMessage === "function") {
-        sendAsyncMessage("aurobore:a2-ok", { ok: true });
-      }
-    }
+    if (a2OkSent || !(a2Checks.chrome && a2Checks.viewport))
+      return;
+    a2OkSent = true;
+    console.log(
+      "[aurobore-container] A2 OK: Runtime+ deep links, scopes, system chrome verified"
+    );
+    sendNativeMessage("aurobore:a2-ok", "ok");
   }
 
   function runA2Checks() {
@@ -348,10 +358,34 @@
       console.log("[aurobore-container] A2 chrome OK: viewport-fit=cover");
     }
 
+    var keyboardInput = document.getElementById("a2-keyboard-test");
+    var innerHeightBeforeKeyboard = 0;
+    if (keyboardInput) {
+      keyboardInput.addEventListener("focus", function () {
+        innerHeightBeforeKeyboard = window.innerHeight;
+        setStatus("A2: focus input — ожидаем keyboard inset");
+      });
+    }
+
     Aurobore.on("systemChrome:insetsChanged", function (insets) {
       if (insets && insets.top > 0) {
         a2Checks.chrome = true;
         console.log("[aurobore-container] A2 chrome OK: insetsChanged", insets);
+      }
+      if (insets && insets.bottom > 0) {
+        a2Checks.keyboard = true;
+        console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + insets.bottom);
+        if (innerHeightBeforeKeyboard > 0) {
+          var delta = Math.abs(window.innerHeight - innerHeightBeforeKeyboard);
+          if (delta === 0) {
+            console.log("[aurobore-container] A2 keyboard OK: innerHeight stable (" + window.innerHeight + ")");
+          } else {
+            console.warn(
+              "[aurobore-container] A2 keyboard WARN: innerHeight changed by " + delta +
+                " (" + innerHeightBeforeKeyboard + " → " + window.innerHeight + ")"
+            );
+          }
+        }
       }
       maybeA2Ok();
     });
@@ -363,10 +397,11 @@
     navigate("/", true);
 
     setTimeout(function () {
-      if (typeof sendAsyncMessage === "function") {
-        sendAsyncMessage("aurobore:ready", { ok: true });
+      if (!readySent) {
+        readySent = true;
+        sendNativeMessage("aurobore:ready", "ok");
       } else {
-        console.log("[aurobore-web] sendAsyncMessage unavailable");
+        console.log("[aurobore-web] aurobore:ready already sent");
       }
       console.log(
         "[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works" +

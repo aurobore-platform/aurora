@@ -57,15 +57,28 @@ export { sfdkBuild, findRpm } from "./aurora/sdk.js";
 export { ensureEmulator } from "./aurora/emulator.js";
 export { deployRpm, runOnEmulator, generateRunScript } from "./aurora/deploy.js";
 export {
+  CEF_DEBUG_DOC_REL,
   DEFAULT_CEF_DEBUG_PORT,
   resolveCefDebugPort,
   startCefDebugTunnel,
+  printCefDebugJournalHeader,
+  printCefDebugSetupInstructions,
+  printCefDebugManualTunnel,
   printCefDebugBanner,
   fetchCefDebugTargets,
+  pickPreferredCefTarget,
+  printCefInspectUrl,
+  resolveAndPrintCefInspectUrl,
+  tryResolveAndPrintCefInspectUrl,
   printInspectableTargets,
   waitAndPrintInspectableTargets,
 } from "./aurora/cefDebug.js";
-export type { CefDebugTunnel, StartCefDebugTunnelOptions, CefDebugTarget } from "./aurora/cefDebug.js";
+export type {
+  CefDebugTunnel,
+  StartCefDebugTunnelOptions,
+  CefDebugTarget,
+  PickCefTargetOptions,
+} from "./aurora/cefDebug.js";
 
 export { buildApp, runApp } from "./pipeline/buildApp.js";
 export type { BuildAppOptions, BuildResult, BuildReport, RunAppOptions } from "./pipeline/buildApp.js";

@@ -6,7 +6,7 @@ Runtime всегда работает в единственном режиме (
 
 1. WebView **на весь экран** — якоря `top`/`left`/`right` и фиксированная высота `screenAxisHeight()` (`Screen.height` / `Screen.width` по ориентации, включая перевёрнутые). WebView **не** `anchors.fill`: при открытии клавиатуры Silica сжимает `Page`, но CEF остаётся полноэкранным.
 2. `ApplicationWindow`: `displayMode: "FillScreen"`, `statusbarForceVisible: true`.
-3. Инъектирует CSS-переменные `--aurobore-safe-area-*` (и алиасы `--safe-area-inset-*`) из `SafeZoneRect` / status bar.
+3. Инъектирует CSS-переменные `--aurobore-safe-area-*` (и алиасы `--safe-area-inset-*`) из `SafeZoneRect` / status bar. Native QML-значения калибруются в **CSS px** WebView: `webCssScale = innerHeight / screenAxisHeight()` (fallback `1 / devicePixelRatio` до загрузки страницы). Событие `systemChrome:insetsChanged` и CSS vars используют те же CSS px.
 4. Подключает `aurobore-chrome.css` — padding на `html` из этих переменных.
 5. Нормализует `viewport-fit=cover` в meta viewport (в т.ч. при dev-сервере).
 6. Клавиатура **overlay** (Chromium WebView):

@@ -4,14 +4,13 @@ import {
   buildApp,
   loadAuroraEnv,
   loadConfig,
-  printCefDebugBanner,
   printDevBanner,
+  resolveAndPrintCefInspectUrl,
   resolveCefDebugPort,
   resolveDevWebRoot,
   runApp,
   startCefDebugTunnel,
   startDevBackend,
-  waitAndPrintInspectableTargets,
   type CefDebugTunnel,
   type DevBackendResult,
 } from "@aurobore/build";
@@ -89,13 +88,12 @@ Options:
 
       if (cefDebugPort != null) {
         tunnel = await startCefDebugTunnel(auroraEnv, cefDebugPort);
-        printCefDebugBanner(tunnel.localPort);
       }
 
       await runApp({ projectRoot: cwd, cefDebugPort: cefDebugPort ?? undefined });
 
       if (cefDebugPort != null && tunnel) {
-        await waitAndPrintInspectableTargets(tunnel.localPort);
+        await resolveAndPrintCefInspectUrl(tunnel.localPort);
       }
     } else if (cefDebugPort != null) {
       console.log(

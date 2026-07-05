@@ -53,6 +53,18 @@ function screenAxisHeight(orientation, screenWidth, screenHeight) {
     return screenHeight
 }
 
+function computeWebCssScale(qmlAxisHeight, webInnerHeight, devicePixelRatio) {
+    if (qmlAxisHeight > 0 && webInnerHeight > 0)
+        return webInnerHeight / qmlAxisHeight
+    if (devicePixelRatio > 0)
+        return 1 / devicePixelRatio
+    return 1
+}
+
+function qmlPxToWebCss(qmlPx, scale) {
+    return Math.round(qmlPx * scale)
+}
+
 function injectChromeStylesheet(webView, href) {
     if (!webView)
         return
@@ -79,7 +91,7 @@ function injectKeyboardViewportListener(webView) {
         "function apply(){ if(!window.visualViewport) return;" +
         "var v=window.visualViewport;" +
         "var bottom=Math.max(0, Math.round(window.innerHeight-v.height-v.offsetTop));" +
-        "if(typeof sendAsyncMessage==='function') sendAsyncMessage('aurobore:keyboard-inset',{bottom:bottom});" +
+        "if(typeof sendAsyncMessage==='function') sendAsyncMessage('aurobore:keyboard-inset',bottom);" +
         "}" +
         "if(window.visualViewport){" +
         "window.visualViewport.addEventListener('resize',apply);" +
@@ -94,7 +106,8 @@ function injectViewportMeta(webView) {
     if (!webView)
         return
     webView.runJavaScript(
-        "(function(){ var m=document.querySelector('meta[name=viewport]');" +
+        "(function(){ if(navigator.virtualKeyboard) navigator.virtualKeyboard.overlaysContent=true;" +
+        "var m=document.querySelector('meta[name=viewport]');" +
         "if(!m){ m=document.createElement('meta'); m.name='viewport'; document.head.appendChild(m); }" +
         "var content=m.getAttribute('content')||'';" +
         "if(content.indexOf('viewport-fit=cover')<0){" +

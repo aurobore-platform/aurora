@@ -17,6 +17,8 @@ Page {
     property bool splashVisible: true
     property bool webReady: false
     property real keyboardInset: 0
+    property real baselineInnerHeight: 0
+    property real webCssScale: WebChrome.computeWebCssScale(0, 0, Screen.devicePixelRatio)
     property var webView: webViewLoader.item
 
     function statusBarHeightPx() {
@@ -31,10 +33,19 @@ Page {
         return Qt.inputMethod.visible ? Qt.inputMethod.keyboardRectangle.height : 0
     }
 
-    function applyKeyboardInset(bottom) {
+    function captureBaselineInnerHeight() {
+        if (!webView)
+            return
+        webView.runJavaScript(
+            "window.innerHeight",
+            function (h) { page.baselineInnerHeight = h || 0 },
+            function (err) { console.log("[aurobore-container] baseline innerHeight error:", err) }
+        )
+    }
+
+    function commitKeyboardInset(bottom, wasClosed) {
         if (bottom === keyboardInset)
             return
-        var wasClosed = keyboardInset === 0
         keyboardInset = bottom
         injectInsets()
         if (wasClosed && bottom > 0 && webView) {
@@ -49,8 +60,73 @@ Page {
             console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + bottom)
     }
 
+    function applyKeyboardInset(bottom) {
+        if (bottom === keyboardInset)
+            return
+        var wasClosed = keyboardInset === 0
+        if (bottom <= 0) {
+            commitKeyboardInset(0, wasClosed)
+            captureBaselineInnerHeight()
+            return
+        }
+        if (!webView) {
+            commitKeyboardInset(bottom, wasClosed)
+            return
+        }
+        webView.runJavaScript(
+            "window.innerHeight",
+            function (innerHeight) {
+                var current = innerHeight || 0
+                var baseline = page.baselineInnerHeight
+                var effective = bottom
+                if (baseline > 0 && current > 0 && current < baseline - 1) {
+                    console.log("[aurobore-container] A2 keyboard WARN: viewport shrunk, skip CSS inset")
+                    effective = 0
+                }
+                page.commitKeyboardInset(effective, wasClosed)
+            },
+            function (err) {
+                console.log("[aurobore-container] keyboard innerHeight check error:", err)
+                page.commitKeyboardInset(bottom, wasClosed)
+            }
+        )
+    }
+
     function updateKeyboardInset() {
-        applyKeyboardInset(nativeKeyboardInsetPx())
+        var nativePx = nativeKeyboardInsetPx()
+        if (nativePx <= 0) {
+            applyKeyboardInset(0)
+            return
+        }
+        applyKeyboardInset(WebChrome.qmlPxToWebCss(nativePx, webCssScale))
+    }
+
+    function calibrateWebCssScale() {
+        if (!webView) {
+            injectInsets()
+            updateKeyboardInset()
+            return
+        }
+        var axis = screenAxisHeight()
+        var dpr = Screen.devicePixelRatio
+        webView.runJavaScript(
+            "window.innerHeight",
+            function (innerHeight) {
+                var scale = WebChrome.computeWebCssScale(axis, innerHeight || 0, dpr)
+                if (Math.abs(scale - page.webCssScale) > 0.001) {
+                    page.webCssScale = scale
+                    console.log("[aurobore-container] webCssScale=" + scale +
+                        " (qmlAxis=" + axis + ", innerHeight=" + (innerHeight || 0) + ")")
+                }
+                page.injectInsets()
+                page.updateKeyboardInset()
+            },
+            function (err) {
+                console.log("[aurobore-container] webCssScale calibrate error:", err)
+                page.injectInsets()
+                page.updateKeyboardInset()
+            }
+        )
     }
 
     function chromeStylesheetHref() {
@@ -76,12 +152,15 @@ Page {
             return
         var safeZone = typeof SafeZoneRect !== "undefined" ? SafeZoneRect : null
         var cutout = WebChrome.computeCutoutInsets(page.orientation, safeZone, statusBarHeightPx())
-        WebChrome.injectInsets(webView, cutout.top, cutout.right, keyboardInset, cutout.left)
+        var top = WebChrome.qmlPxToWebCss(cutout.top, webCssScale)
+        var right = WebChrome.qmlPxToWebCss(cutout.right, webCssScale)
+        var left = WebChrome.qmlPxToWebCss(cutout.left, webCssScale)
+        WebChrome.injectInsets(webView, top, right, keyboardInset, left)
         bridgeRouter.emitEvent("systemChrome:insetsChanged", {
-            top: cutout.top,
-            right: cutout.right,
+            top: top,
+            right: right,
             bottom: keyboardInset,
-            left: cutout.left
+            left: left
         })
     }
 
@@ -181,12 +260,9 @@ Page {
         }
     }
 
-    onOrientationChanged: {
-        injectInsets()
-        updateKeyboardInset()
-    }
-    onWidthChanged: injectInsets()
-    onHeightChanged: injectInsets()
+    onOrientationChanged: calibrateWebCssScale()
+    onWidthChanged: calibrateWebCssScale()
+    onHeightChanged: calibrateWebCssScale()
 
     Component.onCompleted: {
         bridgeRouter.trustedOrigin = assetServerOrigin && assetServerOrigin.length > 0
@@ -289,10 +365,10 @@ Page {
         interval: 1200
         repeat: false
         onTriggered: {
-            if (!page.webView)
+            if (!page.webView || page.webReady)
                 return
             page.webView.runJavaScript(
-                "(function(){ if (typeof sendAsyncMessage === 'function') { sendAsyncMessage('aurobore:ready', {ok:true, probe:true}); return true; } return false; })()",
+                "(function(){ if (typeof sendAsyncMessage === 'function') { sendAsyncMessage('aurobore:ready', 'probe'); return true; } return false; })()",
                 function (ok) {
                     if (ok)
                         console.log("[aurobore-container] ready probe sent from native")
@@ -350,12 +426,13 @@ Page {
             page.injectChromeStylesheet()
             page.injectViewportMeta()
             page.injectKeyboardViewportListener()
-            page.injectInsets()
+            page.calibrateWebCssScale()
         }
         onBundledLoadComplete: {
             page.injectViewportMeta()
             page.injectKeyboardViewportListener()
-            page.injectInsets()
+            page.calibrateWebCssScale()
+            page.captureBaselineInnerHeight()
         }
         onReadyProbeNeeded: pageLoadProbeTimer.start()
         onRecvAsyncMessage: BridgeMessages.handleRecvAsyncMessage(

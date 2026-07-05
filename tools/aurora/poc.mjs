@@ -178,25 +178,29 @@ async function main() {
     });
 
     if (project === "container") {
+      const cefDocAbs = path.join(REPO_ROOT, build.CEF_DEBUG_DOC_REL ?? "docs/dev/web-debugging.md");
       const cefPort = build.resolveCefDebugPort({ envPort: env.AUROBORE_CEF_DEBUG_PORT });
       if (cefPort != null) {
         try {
           const tunnel = await build.startCefDebugTunnel(env, cefPort, { detached: true });
-          build.printCefDebugBanner(tunnel.localPort);
-          await build.waitAndPrintInspectableTargets(tunnel.localPort);
           log(
             `cef-debug: SSH tunnel running in background (pid ${tunnel.pid ?? "?"}) — stop when done`,
           );
+          await build.resolveAndPrintCefInspectUrl(tunnel.localPort);
         } catch (err) {
           log(
-            `cef-debug: tunnel failed (${err instanceof Error ? err.message : String(err)}); see docs/dev/web-debugging.md`,
+            `cef-debug: tunnel failed (${err instanceof Error ? err.message : String(err)})`,
           );
+          build.printCefDebugManualTunnel(env, cefPort);
+          const picked = await build.tryResolveAndPrintCefInspectUrl(cefPort, { timeoutMs: 8000 });
+          if (!picked) {
+            console.log("[cef-debug] После ручного SSH-туннеля перезапустите resolve или откройте json/list");
+          }
         }
       } else {
-        log(
-          "cef-debug: set AUROBORE_CEF_DEBUG_PORT=9222 in tools/aurora/local.env for chrome://inspect",
-        );
+        build.printCefDebugSetupInstructions();
       }
+      log(`cef-debug: ${cefDocAbs}`);
     }
   }
 

@@ -85,11 +85,22 @@ else
   max_wait="${POC_RUN_WAIT_SEC:-90}"
 fi
 
+print_cef_debug_journal_header() {
+  if [ -n "${AUROBORE_CEF_DEBUG_PORT:-}" ]; then
+    echo "=== CEF DEBUG (WebView / Chrome DevTools) ==="
+    echo "Device listens: 127.0.0.1:${AUROBORE_CEF_DEBUG_PORT}"
+    echo "Inspect URL: printed after container:run (fetch json/list on PC)"
+    echo "Full guide: docs/dev/web-debugging.md"
+    echo "============================================="
+  fi
+}
+
 elapsed=0
 while [ "$elapsed" -lt "$max_wait" ]; do
   if journalctl --no-pager -n 200 2>/dev/null | grep -q "$success_pattern"; then
     echo "=== LOG (tail) ==="
     tail -n 40 /tmp/container.log 2>/dev/null || true
+    print_cef_debug_journal_header
     echo "=== JOURNAL (container) ==="
     journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-bridge|aurobore-plugin" || true
     echo "=== RESULT: ${success_pattern} ==="
@@ -102,6 +113,7 @@ done
 echo "=== LOG START ==="
 cat /tmp/container.log 2>/dev/null || true
 echo "=== LOG END ==="
+print_cef_debug_journal_header
 echo "=== JOURNAL (container) ==="
 journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-plugin" || true
 echo "=== RESULT: ${success_pattern} not found in journal within ${max_wait}s ==="

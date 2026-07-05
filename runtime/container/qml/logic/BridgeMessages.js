@@ -28,8 +28,13 @@ function handleRecvAsyncMessage(name, data, page, router, deepLinks, notificatio
         console.log("[aurobore-container] A2 OK: Runtime+ deep links, scopes, system chrome verified")
     } else if (name === "aurobore:keyboard-inset") {
         var inset = parseBridgeData(data)
-        var bottom = (inset && inset.bottom) ? inset.bottom : 0
-        if (page.nativeKeyboardInsetPx() === 0 && bottom > 0)
-            page.applyKeyboardInset(bottom)
+        var bottom = typeof inset === "number" ? inset
+            : ((inset && inset.bottom) ? inset.bottom : 0)
+        if (page.nativeKeyboardInsetPx() === 0) {
+            if (bottom > 0)
+                page.applyKeyboardInset(bottom)
+            else
+                page.applyKeyboardInset(0)
+        }
     }
 }
