@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { formatRpmChangelogDate, generateDesktop, generateDefaultsJson, generateSpec } from "./generate.js";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  copyDirFiltered,
+  formatRpmChangelogDate,
+  generateDesktop,
+  generateDefaultsJson,
+  generateSpec,
+  SYNC_EXCLUDE,
+} from "./generate.js";
 import { parseConfig } from "../config/parse.js";
 import { resolveEffectiveConfig } from "../config/merge.js";
 import type { PluginManifest } from "../manifest/types.js";
@@ -81,5 +91,19 @@ describe("native generate templates", () => {
     const spec = generateSpec("ru.example.demo", resolveEffectiveConfig(config, [manifest]));
     expect(spec).toMatch(/\* \w{3} \w{3}\s+\d{1,2} \d{4} Aurobore <aurobore@local> - 1\.0\.0-1/);
     expect(spec).not.toContain("GMT");
+  });
+
+  it("исключает qml/verification при sync container → native", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "aurobore-gen-"));
+    const src = path.join(tmp, "src");
+    fs.mkdirSync(path.join(src, "qml", "verification"), { recursive: true });
+    fs.writeFileSync(path.join(src, "qml", "verification", "Harness.qml"), "");
+    fs.mkdirSync(path.join(src, "qml", "pages"), { recursive: true });
+    fs.writeFileSync(path.join(src, "qml", "pages", "Page.qml"), "");
+    const dst = path.join(tmp, "dst");
+    copyDirFiltered(src, dst, SYNC_EXCLUDE);
+    expect(fs.existsSync(path.join(dst, "qml", "verification"))).toBe(false);
+    expect(fs.existsSync(path.join(dst, "qml", "pages", "Page.qml"))).toBe(true);
+    fs.rmSync(tmp, { recursive: true, force: true });
   });
 });

@@ -23,7 +23,8 @@
   var m2Checks = { ping: false, stream: false, event: false };
   var a1Checks = { fastStream: false, resource: false };
   var m3Checks = { device: false, storage: false, plugins: false };
-  var a2Checks = { deeplink: false, chrome: false, keyboard: false, viewport: false };
+  var m3Display = { device: null, storage: null };
+  var a2Checks = { deeplink: false, chrome: false, viewport: false };
 
   function handleDeepLink(data) {
     if (!data || !data.url) return;
@@ -88,11 +89,19 @@
     }
   }
 
+  function updateM3Display() {
+    var deviceEl = document.getElementById("m3-device");
+    var storageEl = document.getElementById("m3-storage");
+    if (deviceEl && m3Display.device) deviceEl.textContent = m3Display.device;
+    if (storageEl && m3Display.storage) storageEl.textContent = m3Display.storage;
+  }
+
   function renderRoute(path) {
     var route = routes[path] || routes["/"];
     if (viewEl) {
       viewEl.innerHTML = "<h2>" + route.title + "</h2>" + route.html;
     }
+    if (path === "/") updateM3Display();
     setStatus("Маршрут: " + path + " | origin: " + location.origin);
   }
 
@@ -286,8 +295,8 @@
       Aurobore.Device.getInfo()
         .then(function (info) {
           m3Checks.device = true;
-          var el = document.getElementById("m3-device");
-          if (el) el.textContent = "Device: " + JSON.stringify(info);
+          m3Display.device = "Device: " + JSON.stringify(info);
+          updateM3Display();
           maybeM3Ok();
         })
         .catch(function (err) {
@@ -303,8 +312,8 @@
         .then(function (result) {
           if (result && result.value === "m3") {
             m3Checks.storage = true;
-            var el = document.getElementById("m3-storage");
-            if (el) el.textContent = "Storage: " + JSON.stringify(result);
+            m3Display.storage = "Storage: " + JSON.stringify(result);
+            updateM3Display();
             maybeM3Ok();
           }
         })
@@ -339,34 +348,10 @@
       console.log("[aurobore-container] A2 chrome OK: viewport-fit=cover");
     }
 
-    var keyboardInput = document.getElementById("a2-keyboard-test");
-    var innerHeightBeforeKeyboard = 0;
-    if (keyboardInput) {
-      keyboardInput.addEventListener("focus", function () {
-        innerHeightBeforeKeyboard = window.innerHeight;
-        setStatus("A2: focus input — ожидаем keyboard inset");
-      });
-    }
-
     Aurobore.on("systemChrome:insetsChanged", function (insets) {
       if (insets && insets.top > 0) {
         a2Checks.chrome = true;
         console.log("[aurobore-container] A2 chrome OK: insetsChanged", insets);
-      }
-      if (insets && insets.bottom > 0) {
-        a2Checks.keyboard = true;
-        console.log("[aurobore-container] A2 keyboard OK: bottom inset=" + insets.bottom);
-        if (innerHeightBeforeKeyboard > 0) {
-          var delta = Math.abs(window.innerHeight - innerHeightBeforeKeyboard);
-          if (delta === 0) {
-            console.log("[aurobore-container] A2 keyboard OK: innerHeight stable (" + window.innerHeight + ")");
-          } else {
-            console.warn(
-              "[aurobore-container] A2 keyboard WARN: innerHeight changed by " + delta +
-                " (" + innerHeightBeforeKeyboard + " → " + window.innerHeight + ")"
-            );
-          }
-        }
       }
       maybeA2Ok();
     });

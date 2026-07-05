@@ -119,25 +119,22 @@ int main(int argc, char *argv[])
         qWarning("[aurobore-container] AssetSchemeServer failed; fallback entry %s",
                  qPrintable(entryUrl));
     }
+    QVariantList webViewHarnessModes;
     if (qgetenv("AUROBORE_W3_EXTERNAL") == QByteArray("1")) {
-        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
-        entryUrl += separator + QStringLiteral("w3External=1");
-        qInfo("[aurobore-container] W3 external test: entry URL augmented (see web.allowedOrigins)");
+        webViewHarnessModes.append(QStringLiteral("w3"));
+        qInfo("[aurobore-container] W3 external test enabled (see web.allowedOrigins)");
     }
     if (qgetenv("AUROBORE_W4_AUTH") == QByteArray("1")) {
-        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
-        entryUrl += separator + QStringLiteral("w4Auth=1");
-        qInfo("[aurobore-container] W4 auth test: entry URL augmented (see web.allowedOrigins)");
+        webViewHarnessModes.append(QStringLiteral("w4"));
+        qInfo("[aurobore-container] W4 auth test enabled (see web.allowedOrigins)");
     }
     if (qgetenv("AUROBORE_W5_COOKIES") == QByteArray("1")) {
-        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
-        entryUrl += separator + QStringLiteral("w5Cookies=1");
-        qInfo("[aurobore-container] W5 cookie test: entry URL augmented (see web.allowedOrigins)");
+        webViewHarnessModes.append(QStringLiteral("w5"));
+        qInfo("[aurobore-container] W5 cookie test enabled (see web.allowedOrigins)");
     }
     if (qgetenv("AUROBORE_W6_DISPOSE") == QByteArray("1")) {
-        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
-        entryUrl += separator + QStringLiteral("w6Dispose=1");
-        qInfo("[aurobore-container] W6 dispose test: entry URL augmented");
+        webViewHarnessModes.append(QStringLiteral("w6"));
+        qInfo("[aurobore-container] W6 dispose test enabled");
     }
 
     LifecycleBridge lifecycleBridge;
@@ -224,6 +221,7 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("notificationsBridge"), &notificationsBridge);
     rootContext->setContextProperty(QStringLiteral("shareBridge"), &shareBridge);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
+    rootContext->setContextProperty(QStringLiteral("webViewHarnessModes"), webViewHarnessModes);
     rootContext->setContextProperty(QStringLiteral("allowedOrigins"), allowedOriginsList);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());

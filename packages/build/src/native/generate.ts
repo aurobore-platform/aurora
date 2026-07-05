@@ -17,6 +17,9 @@ import {
 } from "./runtimePaths.js";
 
 const SYNC_EXCLUDE = new Set(["RPMS", "CMakeFiles", ".sfdk", "generated"]);
+const SYNC_EXCLUDE_PATHS = new Set(["qml/verification"]);
+
+export { copyDirFiltered, SYNC_EXCLUDE, SYNC_EXCLUDE_PATHS };
 
 export type { ResolveRuntimeRootOptions };
 export { resolveRuntimeRoot, resolveBundledRuntimeRoot, resolvePluginNativeDir } from "./runtimePaths.js";
@@ -36,14 +39,22 @@ export interface GenerateNativeProjectResult {
   manifests: PluginManifest[];
 }
 
-function copyDirFiltered(src: string, dst: string, excludeDirs: Set<string>): void {
+function copyDirFiltered(
+  src: string,
+  dst: string,
+  excludeDirs: Set<string>,
+  excludePaths: Set<string> = SYNC_EXCLUDE_PATHS,
+  relativePath = "",
+): void {
   fs.mkdirSync(dst, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     if (excludeDirs.has(entry.name)) continue;
+    const childRelative = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    if (excludePaths.has(childRelative)) continue;
     const srcPath = path.join(src, entry.name);
     const dstPath = path.join(dst, entry.name);
     if (entry.isDirectory()) {
-      copyDirFiltered(srcPath, dstPath, excludeDirs);
+      copyDirFiltered(srcPath, dstPath, excludeDirs, excludePaths, childRelative);
     } else {
       fs.copyFileSync(srcPath, dstPath);
     }

@@ -87,7 +87,7 @@ fi
 
 elapsed=0
 while [ "$elapsed" -lt "$max_wait" ]; do
-  if journalctl --no-pager -n 200 --since "2 min ago" 2>/dev/null | grep -q "$success_pattern"; then
+  if journalctl --no-pager -n 200 2>/dev/null | grep -q "$success_pattern"; then
     echo "=== LOG (tail) ==="
     tail -n 40 /tmp/container.log 2>/dev/null || true
     echo "=== JOURNAL (container) ==="
