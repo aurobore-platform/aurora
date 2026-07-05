@@ -53,6 +53,15 @@ export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void
   const w3External =
     process.env.AUROBORE_W3_EXTERNAL?.trim() || env.AUROBORE_W3_EXTERNAL?.trim();
   if (w3External) exports.push(`AUROBORE_W3_EXTERNAL=${w3External}`);
+  const w4Auth =
+    process.env.AUROBORE_W4_AUTH?.trim() || env.AUROBORE_W4_AUTH?.trim();
+  if (w4Auth) exports.push(`AUROBORE_W4_AUTH=${w4Auth}`);
+  const w5Cookies =
+    process.env.AUROBORE_W5_COOKIES?.trim() || env.AUROBORE_W5_COOKIES?.trim();
+  if (w5Cookies) exports.push(`AUROBORE_W5_COOKIES=${w5Cookies}`);
+  const w6Dispose =
+    process.env.AUROBORE_W6_DISPOSE?.trim() || env.AUROBORE_W6_DISPOSE?.trim();
+  if (w6Dispose) exports.push(`AUROBORE_W6_DISPOSE=${w6Dispose}`);
   const exportPrefix =
     exports.length > 0 ? `${exports.map((e) => `export ${e}`).join("; ")}; ` : "";
   const remoteCmd =

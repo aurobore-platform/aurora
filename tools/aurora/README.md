@@ -165,6 +165,9 @@ AUROBORE_CEF_DEBUG_PORT=9222
 | `AUROBORE_CEF_DEBUG_PORT` | — | CEF remote debugging для `container:run` (см. web-debugging.md) |
 | `AUROBORE_QT_LOGGING_RULES` | — | Qt logging rules при `container:run` (см. native-debugging.md) |
 | `AUROBORE_W3_EXTERNAL` | — | W3: navigate на первый `web.allowedOrigins` после loopback load |
+| `AUROBORE_W4_AUTH` | — | W4: navigate на Basic Auth test URL после loopback load (см. webview.md §6.2) |
+| `AUROBORE_W5_COOKIES` | — | W5: setCookie/clearCookies test на httpbin.org после loopback load (см. webview.md §6.3) |
+| `AUROBORE_W6_DISPOSE` | — | W6: 10 циклов dispose/recreate WebView после M3 OK (см. webview.md §6.4) |
 | `VALGRIND_OPTS` | см. valgrind-container.sh | Доп. флаги для `container:valgrind` |
 
 ## Файлы

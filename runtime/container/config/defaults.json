@@ -14,7 +14,12 @@
   "web": {
     "root": "html",
     "entry": "index.html",
-    "entryUrl": "aurobore-app://localhost/index.html"
+    "entryUrl": "aurobore-app://localhost/index.html",
+    "allowedOrigins": [
+      "https://testpages.eviltester.com",
+      "https://example.com",
+      "https://httpbin.org"
+    ]
   },
   "permissions": ["Internet", "Camera", "Location", "Notifications"],
   "build": {

@@ -26,6 +26,9 @@
 #include "LifecycleBridge.h"
 #include "DeepLinkHandler.h"
 #include "BridgeRouter.h"
+#include "WebViewAuthBridge.h"
+#include "WebViewCookieBridge.h"
+#include "WebViewPlugin.h"
 #include "LoopbackTlsCredentials.h"
 #include "CoverBridge.h"
 #include "CoverPlugin.h"
@@ -121,9 +124,26 @@ int main(int argc, char *argv[])
         entryUrl += separator + QStringLiteral("w3External=1");
         qInfo("[aurobore-container] W3 external test: entry URL augmented (see web.allowedOrigins)");
     }
+    if (qgetenv("AUROBORE_W4_AUTH") == QByteArray("1")) {
+        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
+        entryUrl += separator + QStringLiteral("w4Auth=1");
+        qInfo("[aurobore-container] W4 auth test: entry URL augmented (see web.allowedOrigins)");
+    }
+    if (qgetenv("AUROBORE_W5_COOKIES") == QByteArray("1")) {
+        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
+        entryUrl += separator + QStringLiteral("w5Cookies=1");
+        qInfo("[aurobore-container] W5 cookie test: entry URL augmented (see web.allowedOrigins)");
+    }
+    if (qgetenv("AUROBORE_W6_DISPOSE") == QByteArray("1")) {
+        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
+        entryUrl += separator + QStringLiteral("w6Dispose=1");
+        qInfo("[aurobore-container] W6 dispose test: entry URL augmented");
+    }
 
     LifecycleBridge lifecycleBridge;
     BridgeRouter bridgeRouter;
+    WebViewAuthBridge webViewAuthBridge(&bridgeRouter);
+    WebViewCookieBridge webViewCookieBridge(&bridgeRouter);
     CoverBridge coverBridge(&bridgeRouter);
     CameraBridge cameraBridge;
     NotificationsBridge notificationsBridge;
@@ -157,6 +177,11 @@ int main(int argc, char *argv[])
     CoverPlugin *coverPlugin =
         new CoverPlugin(&bridgeRouter, &coverBridge);
     bridgeRouter.registerBuiltInPlugin(CoverPlugin::descriptor(), coverPlugin);
+    webViewAuthBridge.setAllowedOrigins(Aurobore::AppConfig::allowedOrigins());
+    webViewCookieBridge.setAllowedOrigins(Aurobore::AppConfig::allowedOrigins());
+    WebViewPlugin *webViewPlugin =
+        new WebViewPlugin(&bridgeRouter, &webViewAuthBridge, &webViewCookieBridge);
+    bridgeRouter.registerBuiltInPlugin(WebViewPlugin::descriptor(), webViewPlugin);
     QObject::connect(
         application.data(), &QGuiApplication::applicationStateChanged,
         &lifecycleBridge, &LifecycleBridge::onApplicationStateChanged);
@@ -192,6 +217,8 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("lifecycleBridge"), &lifecycleBridge);
     rootContext->setContextProperty(QStringLiteral("deepLinkHandler"), &deepLinkHandler);
     rootContext->setContextProperty(QStringLiteral("bridgeRouter"), &bridgeRouter);
+    rootContext->setContextProperty(QStringLiteral("webViewAuthBridge"), &webViewAuthBridge);
+    rootContext->setContextProperty(QStringLiteral("webViewCookieBridge"), &webViewCookieBridge);
     rootContext->setContextProperty(QStringLiteral("coverBridge"), &coverBridge);
     rootContext->setContextProperty(QStringLiteral("cameraBridge"), &cameraBridge);
     rootContext->setContextProperty(QStringLiteral("notificationsBridge"), &notificationsBridge);
@@ -201,7 +228,20 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());
 
+    static bool cefShutdownDone = false;
+    QObject::connect(application.data(), &QGuiApplication::aboutToQuit, [&]() {
+        bridgeRouter.emitEvent(QStringLiteral("destroy"), QVariantMap());
+        assetServer.stop();
+        if (!cefShutdownDone) {
+            Aurora::WebView::WebEngineContext::Shutdown();
+            cefShutdownDone = true;
+            qInfo("[aurobore-container] WebEngineContext::Shutdown complete");
+        }
+    });
+
     view->setSource(Aurora::Application::pathToMainQml());
+    webViewAuthBridge.initialize(view->engine());
+    webViewCookieBridge.initialize(view->engine());
     view->show();
     return application->exec();
 }

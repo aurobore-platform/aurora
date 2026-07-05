@@ -21,6 +21,9 @@ Flutter-плагин — **не замена архитектуры**, а кар
 | URL policy | [`LoadRequestExtension`](../../runtime/container/qml/pages/WebAppPage.qml) |
 | System chrome / keyboard (A2) | insets, `KeyboardInput`, `visualViewport` fallback |
 | CEF debug | `AUROBORE_CEF_DEBUG_PORT` в `main.cpp` |
+| HTTP Basic Auth (W4) | [`WebViewAuthBridge`](../../runtime/container/src/WebViewAuthBridge.cpp), plugin `webview` |
+| Cookies (W5) | [`WebViewCookieBridge`](../../runtime/container/src/WebViewCookieBridge.cpp), plugin `webview` |
+| WebView dispose / recreate (W6) | `Loader` + `teardownWebView` / `recreateWebView` в [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml); `WebEngineContext::Shutdown()` в [`main.cpp`](../../runtime/container/src/main.cpp) |
 
 ### Что у Flutter есть, у нас пока нет
 
@@ -28,9 +31,7 @@ Flutter-плагин — **не замена архитектуры**, а кар
 |---|---|
 | RPM: `webview-subprocess` + `cryptopro-checker` | example `aurora/rpm/*.spec`, README §Configuration |
 | InitQCA (QtCrypto) | `WebviewFlutterAuroraPluginInitQCA()` в [`webview_flutter_aurora_plugin.cpp`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_flutter_aurora_plugin.cpp) |
-| HTTP Basic Auth | [`http_auth_handler.cpp`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/http_auth_handler.cpp) → `AW::AuthHandler::httpAuthRequested` |
-| Cookies | `AW::CookieManager` в `webview_flutter_aurora_plugin.cpp` |
-| WebView dispose | [`WebviewController::Dispose`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_controller.cpp) |
+| WebView dispose | [`WebviewController::Dispose`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_controller.cpp) — **реализовано W6** (Loader-recreate) |
 
 ### Явно не переносим
 
@@ -113,7 +114,7 @@ void WebviewFlutterAuroraPluginInitQCA() {
 
 ---
 
-## W4 — HTTP Basic Auth и HTTP/resource errors (приоритет: средний)
+## W4 — HTTP Basic Auth и HTTP/resource errors (приоритет: средний) ✅
 
 **Цель:** приложения с whitelist external URL могут пройти Basic Auth и получать события об ошибках загрузки.
 
@@ -143,7 +144,7 @@ void WebviewFlutterAuroraPluginInitQCA() {
 
 ---
 
-## W5 — Cookie manager (приоритет: средний)
+## W5 — Cookie manager (приоритет: средний) ✅
 
 **Цель:** session cookies на внешних origin (SSO, API) для гибридных приложений.
 
@@ -164,37 +165,35 @@ void WebviewFlutterAuroraPluginInitQCA() {
 
 ---
 
-## W6 — WebView dispose / пересоздание (приоритет: низкий)
+## W6 — WebView dispose / пересоздание (приоритет: низкий) ✅
 
 **Цель:** корректный teardown при dev reload или смене entry URL без zombie CEF-процессов.
 
 **Референс:** [`WebviewController::Dispose`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_controller.cpp) — `DisconnectAll`, `deleteLater`, `DeferredDelete`; CHANGELOG fix после `Dispose()`.
 
-**Целевые файлы:** lifecycle в container QML/C++; возможно `aurobore dev` hot reload.
+**Реализовано:**
 
-**Шаги:**
+- `Loader` + `Component` в [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml): `teardownWebView`, `recreateWebView`, lifecycle `destroy`.
+- `aboutToQuit` в [`main.cpp`](../../runtime/container/src/main.cpp): `AssetSchemeServer::stop()`, `WebEngineContext::Shutdown()`.
+- Harness: `AUROBORE_W6_DISPOSE=1` — 10 циклов после M3 OK; journal `W6 OK: 10 dispose cycles complete`.
 
-1. Проверить: повторный `webView.url = …` / пересоздание PageStack без утечек (`pnpm container:valgrind` — опционально).
-2. При необходимости — явный destroy/recreate WebView по паттерну Flutter.
-
-**Критерий:** 10 циклов reload без роста процессов `webview-subprocess` в `ps` на эмуляторе.
+**Критерий:** 10 циклов reload без роста процессов `webview-subprocess` в `ps` на эмуляторе. См. [webview.md](../aurora/webview.md) §6.4.
 
 ---
 
-## W7 — Реестр verification-status (приоритет: низкий)
+## W7 — Реестр verification-status (приоритет: низкий) ✅
 
 **Цель:** зафиксировать открытые пункты WebView post-M1 в [verification-status.md](../aurora/verification-status.md).
 
-Предлагаемые строки §2:
+Строки §2 (актуальный статус):
 
 | # | Вопрос | Статус |
 |---|---|---|
-| V-webview-subprocess | Bundling `webview-subprocess` + `cryptopro-checker` в app RPM (W2) | ⏳ |
-| V-webview-qca | Нужен ли `QCA::Initializer` для prod TLS (W3) | ✅ |
-| V-webview-auth | HTTP Basic Auth для whitelist URL (W4) | ⏳ |
-| V-webview-cookies | Programmatic cookie API (W5) | ⏳ |
-
-Обновлять по мере закрытия W2–W5.
+| V-webview-subprocess | Bundling `webview-subprocess` + `cryptopro-checker` в app RPM (W2) | 🟡 |
+| V-webview-qca | Нужен ли `QCA::Initializer` для prod TLS (W3) | 🟢 |
+| V-webview-auth | HTTP Basic Auth для whitelist URL (W4) | 🟢 |
+| V-webview-cookies | Programmatic cookie API (W5) | 🟡 |
+| V-webview-dispose | WebView dispose/recreate без zombie subprocess (W6) | 🟡 |
 
 ---
 
@@ -218,7 +217,7 @@ void WebviewFlutterAuroraPluginInitQCA() {
 ## Порядок работ
 
 ```
-W1 (infra) ✅ → W2 (M4 packaging) → W3 (QCA spike) → W4 (auth/errors) → W5 (cookies) → W6 (dispose) → W7 (registry)
+W1 (infra) ✅ → W2 (M4 packaging) ✅ → W3 (QCA spike) ✅ → W4 (auth/errors) ✅ → W5 (cookies) ✅ → W6 (dispose) ✅ → W7 (registry) ✅
 ```
 
 W2 блокирует prod-ready `aurobore build`; W3–W5 — по запросу гибридных приложений с external URL.

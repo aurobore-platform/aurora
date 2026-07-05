@@ -22,3 +22,12 @@ export type LifecycleEvent =
   | "orientationchange"
   | "deeplink"
   | "destroy";
+
+/** События WebView-навигации (whitelist external URL, см. docs/aurora/webview.md §6.2). */
+export type WebViewEvent =
+  | "webview:httpAuth"
+  | "webview:httpError"
+  | "webview:loadError";
+
+/** Все bridge-события, доступные приложению через aurobore.on(...). */
+export type BridgeEvent = LifecycleEvent | WebViewEvent;

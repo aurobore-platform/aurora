@@ -20,6 +20,24 @@ if [ -n "${AUROBORE_W3_EXTERNAL:-}" ]; then
 "
 fi
 
+w4_auth_export=""
+if [ -n "${AUROBORE_W4_AUTH:-}" ]; then
+  w4_auth_export="export AUROBORE_W4_AUTH=${AUROBORE_W4_AUTH}
+"
+fi
+
+w5_cookies_export=""
+if [ -n "${AUROBORE_W5_COOKIES:-}" ]; then
+  w5_cookies_export="export AUROBORE_W5_COOKIES=${AUROBORE_W5_COOKIES}
+"
+fi
+
+w6_dispose_export=""
+if [ -n "${AUROBORE_W6_DISPOSE:-}" ]; then
+  w6_dispose_export="export AUROBORE_W6_DISPOSE=${AUROBORE_W6_DISPOSE}
+"
+fi
+
 pkill -f ru.auroraos.aurobore-container 2>/dev/null || true
 sleep 1
 rm -f /tmp/container.log
@@ -44,7 +62,7 @@ su "${POC_RUN_USER:-defaultuser}" -s /bin/sh -c "
   export WAYLAND_DISPLAY=/run/display/wayland-0
   export QT_QPA_PLATFORM=wayland
   export LD_LIBRARY_PATH=/usr/lib/cef:\${LD_LIBRARY_PATH:-}
-  ${cef_debug_export}${qt_logging_export}${w3_external_export}  nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
+  ${cef_debug_export}${qt_logging_export}${w3_external_export}${w4_auth_export}${w5_cookies_export}${w6_dispose_export}  nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
 "
 
 sleep 2
@@ -59,15 +77,22 @@ fi
 # Дождаться загрузки WebView, M2- и M3-проверок (stream ~1.2s после ready).
 sleep 10
 
-max_wait="${POC_RUN_WAIT_SEC:-90}"
+if [ -n "${AUROBORE_W6_DISPOSE:-}" ]; then
+  success_pattern="W6 OK: 10 dispose cycles complete"
+  max_wait="${POC_RUN_WAIT_SEC:-120}"
+else
+  success_pattern="M3 OK: plugins registered"
+  max_wait="${POC_RUN_WAIT_SEC:-90}"
+fi
+
 elapsed=0
 while [ "$elapsed" -lt "$max_wait" ]; do
-  if journalctl --no-pager -n 100 --since "1 min ago" 2>/dev/null | grep -q "M3 OK: plugins registered"; then
+  if journalctl --no-pager -n 200 --since "2 min ago" 2>/dev/null | grep -q "$success_pattern"; then
     echo "=== LOG (tail) ==="
     tail -n 40 /tmp/container.log 2>/dev/null || true
     echo "=== JOURNAL (container) ==="
     journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-bridge|aurobore-plugin" || true
-    echo "=== RESULT: M3 OK ==="
+    echo "=== RESULT: ${success_pattern} ==="
     exit 0
   fi
   sleep 3
@@ -79,5 +104,5 @@ cat /tmp/container.log 2>/dev/null || true
 echo "=== LOG END ==="
 echo "=== JOURNAL (container) ==="
 journalctl --no-pager -n 120 2>/dev/null | grep -E "aurobore-container|aurobore-web|aurobore-plugin" || true
-echo "=== RESULT: M3 OK not found in journal within ${max_wait}s ==="
+echo "=== RESULT: ${success_pattern} not found in journal within ${max_wait}s ==="
 exit 1

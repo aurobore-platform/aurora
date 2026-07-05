@@ -26,6 +26,12 @@ export interface AuroraEnv {
   AUROBORE_QT_LOGGING_RULES?: string;
   /** W3 spike: navigate to first web.allowedOrigins after loopback load (optional). */
   AUROBORE_W3_EXTERNAL?: string;
+  /** W4 spike: navigate to Basic Auth test URL after loopback load (optional). */
+  AUROBORE_W4_AUTH?: string;
+  /** W5 spike: setCookie/clearCookies test on httpbin.org after loopback load (optional). */
+  AUROBORE_W5_COOKIES?: string;
+  /** W6 spike: 10 WebView dispose/recreate cycles after loopback load (optional). */
+  AUROBORE_W6_DISPOSE?: string;
   /** Extra Valgrind flags for container:valgrind (optional). */
   VALGRIND_OPTS?: string;
 }

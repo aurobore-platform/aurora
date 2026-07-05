@@ -46,6 +46,7 @@ add_compile_definitions(
 include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_INCLUDES ${AuroraWebView_INCLUDE_DIRS})
 set(CMAKE_REQUIRED_LIBRARIES ${AuroraWebView_LINK_LIBRARIES})
+set(CMAKE_REQUIRED_FLAGS "-fPIC")
 check_cxx_source_compiles([=[
 #include <aurorawebview/webenginecontext.h>
 int main(int argc, char **argv) {
@@ -58,6 +59,29 @@ if(AUROBORE_WEBVIEW_HAS_START_SUBPROCESS)
 else()
     message(STATUS "WebView: StartSubprocess unavailable (SDK 5.2.x) — RPM bundles subprocess, runtime uses system CEF helper")
 endif()
+
+find_path(AUROBORE_WEBVIEW_HTTP_AUTH_INCLUDE aurorawebview/httpauthrequest.h
+    PATHS ${AuroraWebView_INCLUDE_DIRS} /usr/include)
+if(AUROBORE_WEBVIEW_HTTP_AUTH_INCLUDE)
+    add_compile_definitions(AUROBORE_WEBVIEW_HAS_HTTP_AUTH)
+    message(STATUS "WebView: HTTP auth API available (AuthHandler/HttpAuthRequest)")
+else()
+    message(STATUS "WebView: HTTP auth API unavailable — WebViewAuthBridge will be no-op")
+endif()
+
+find_path(AUROBORE_WEBVIEW_COOKIE_INCLUDE aurorawebview/cookies/cookiemanager.h
+    PATHS ${AuroraWebView_INCLUDE_DIRS} /usr/include)
+if(NOT AUROBORE_WEBVIEW_COOKIE_INCLUDE)
+    find_path(AUROBORE_WEBVIEW_COOKIE_INCLUDE cookies/cookiemanager.h
+        PATHS ${AuroraWebView_INCLUDE_DIRS} /usr/include)
+endif()
+if(AUROBORE_WEBVIEW_COOKIE_INCLUDE)
+    add_compile_definitions(AUROBORE_WEBVIEW_HAS_COOKIE_MANAGER)
+    message(STATUS "WebView: CookieManager API available (aurorawebview/cookies/cookiemanager.h)")
+else()
+    message(STATUS "WebView: CookieManager API unavailable — WebViewCookieBridge will be no-op")
+endif()
+unset(CMAKE_REQUIRED_FLAGS)
 
 file(GLOB TsFiles "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 qt5_add_translation(QmFiles ${TsFiles})
@@ -74,6 +98,9 @@ add_executable(${PROJECT_NAME}
     src/LoopbackTlsCredentials.cpp
     src/LifecycleBridge.cpp
     src/DeepLinkHandler.cpp
+    src/WebViewAuthBridge.cpp
+    src/WebViewCookieBridge.cpp
+    src/WebViewPlugin.cpp
     src/CoverBridge.cpp
     src/CoverPlugin.cpp
     generated/PluginRegistry.cpp

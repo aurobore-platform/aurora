@@ -9,7 +9,9 @@ export {
   BRIDGE_PROTOCOL_VERSION,
   createBridgeError,
   type BridgeError,
+  type BridgeEvent,
   type LifecycleEvent,
+  type WebViewEvent,
 } from "./types.js";
 
 export {

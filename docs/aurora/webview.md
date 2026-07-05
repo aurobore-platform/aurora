@@ -238,6 +238,115 @@ OMP [`webview_flutter_aurora`](https://hub.mos.ru/auroraos/flutter/flutter-commu
 
 QCA остаётся в шаблоне M4 для parity с OMP и потенциальных гибридных приложений с external origin.
 
+## 6.2. HTTP Basic Auth и ошибки навигации (W4)
+
+Для приложений с **whitelist external URL** (`web.allowedOrigins`) runtime-контейнер прокидывает:
+
+| Событие bridge | Когда | Payload |
+|---|---|---|
+| `webview:httpAuth` | CEF запросил HTTP Basic Auth для host из whitelist | `{ requestId, host, realm }` |
+| `webview:httpError` | Main-frame load завершился с HTTP 4xx/5xx | `{ url, statusCode }` |
+| `webview:loadError` | Сетевая/ресурсная ошибка загрузки | `{ url, errorCode, isForMainFrame }` |
+
+**Auth UX:** по умолчанию открывается native Silica dialog (username/password). Параллельно приложение
+может ответить через bridge invoke:
+
+```js
+await bridge.invoke("webview", "respondAuth", {
+  requestId,
+  username: "admin",
+  password: "password",
+});
+// или
+await bridge.invoke("webview", "cancelAuth", { requestId });
+```
+
+Built-in plugin `webview` (без manifest): методы `respondAuth`, `cancelAuth`.
+
+**Ограничения:** auth и error events только для URL из `web.allowedOrigins` (не loopback asset origin).
+`onSslAuthError` / `onNavigationRequest` на Aurora **не поддерживаются** (OMP README).
+
+**Проверка на эмуляторе:**
+
+1. В config добавить `"allowedOrigins": ["https://testpages.eviltester.com"]` в секцию `web`.
+2. `AUROBORE_W4_AUTH=1 pnpm container:run` — после loopback load переход на
+   `https://testpages.eviltester.com/pages/auth/basic-auth/` (credentials: `admin` / `password`).
+3. Journal: `W4 auth OK: loaded …` после успешной авторизации.
+
+Реализация: `WebViewAuthBridge` (`AuthHandler::GetInstance` из `aurorawebview/authhandler.h`), QML `onLoadFinished` /
+`onLoadError` в [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml).
+
+## 6.3. Cookie manager (W5)
+
+Для гибридных приложений с **whitelist external URL** (`web.allowedOrigins`) runtime-контейнер
+прокидывает programmatic cookies через CEF `CookieManager` (parity с OMP Flutter).
+
+**Bridge invoke** (built-in plugin `webview`):
+
+```js
+await bridge.invoke("webview", "setCookie", {
+  domain: "httpbin.org",
+  path: "/",
+  name: "session",
+  value: "abc123",
+});
+
+await bridge.invoke("webview", "clearCookies", {});
+```
+
+| Метод | Ответ | Примечание |
+|---|---|---|
+| `setCookie` | `{ ok: true, success: bool }` (async) | `domain`, `path`, `name` обязательны; `value` может быть пустым |
+| `clearCookies` | `{ ok: true, success: bool }` | Сбрасывает **все** cookies всех WebView (как OMP) |
+
+**Ограничения:**
+
+- `setCookie` только для host из `web.allowedOrigins` (не loopback asset origin).
+- На SDK 5.2.1 public `CookieManager` **не содержит** `setCookie` (в отличие от internal API OMP Flutter).
+  Runtime устанавливает cookie через `document.cookie` после краткой навигации на `https://<domain>/`
+  (QML orchestration). Подходит для session cookies перед переходом на external origin; **не** HttpOnly.
+- `clearCookies` использует native `CookieManager::deleteCookies("", "")` (global, OMP parity).
+- Требуется permission `Internet` и whitelist entry для target domain.
+
+**Проверка на эмуляторе:**
+
+1. В config добавить `"https://httpbin.org"` в `web.allowedOrigins`.
+2. `AUROBORE_W5_COOKIES=1 pnpm container:run` — после loopback load: `setCookie` →
+   `https://httpbin.org/anything` → verify Cookie header → `clearCookies` → reload.
+3. Journal: `W5 cookie test: setCookie OK`, `W5 cookie OK: Cookie header verified`, `W5 cookie OK: cleared`.
+
+Реализация: `WebViewCookieBridge` (`CookieManager::GetInstance` из `aurorawebview/cookies/cookiemanager.h`),
+методы в [`WebViewPlugin`](../../runtime/container/src/WebViewPlugin.cpp).
+
+**W5 harness на эмуляторе:** cookie устанавливается через `https://httpbin.org/cookies/set/foo/bar`
+(redirect Set-Cookie), затем проверка на `/anything` и `clearCookies`. Bridge `setCookie` тестируется
+отдельно через invoke из приложения.
+
+## 6.4. WebView dispose / recreate (W6)
+
+Runtime-контейнер уничтожает и пересоздаёт QML `WebView` через `Loader` (parity с OMP Flutter
+`WebviewController::Dispose` — отключение связей и destroy объекта, не только смена URL).
+
+**Teardown (`recreateWebView` / выход приложения):**
+
+- Остановка таймеров загрузки и pending auth/cookie state.
+- Событие lifecycle `destroy` → JS (`bridgeRouter.emitEvent("destroy", …)`).
+- Очистка `globalThis.__auroboreBridgeReceive`, навигация на `about:blank`.
+- `Loader.active = false` → destroy QML WebView → `active = true` → повторная регистрация listeners.
+
+**Graceful shutdown процесса** ([`main.cpp`](../../runtime/container/src/main.cpp)):
+
+- `aboutToQuit` → `destroy` event → `AssetSchemeServer::stop()` → `WebEngineContext::Shutdown()`.
+
+**Проверка на эмуляторе:**
+
+1. `AUROBORE_W6_DISPOSE=1 pnpm container:run` — после M3 OK: 10 циклов dispose/recreate loopback entry.
+2. Journal: `W6 dispose cycle N/10`, финал `W6 OK: 10 dispose cycles complete`.
+3. На эмуляторе: `ps | grep webview-subprocess` — число процессов не растёт за 10 циклов.
+
+Реализация: [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml) (`teardownWebView`,
+`recreateWebView`, `Loader` + `Component`).
+
 ## 7. Связь с архитектурой Aurobore
 
 - [architecture/runtime.md](../architecture/runtime.md) — контейнер, lifecycle, asset loader.
