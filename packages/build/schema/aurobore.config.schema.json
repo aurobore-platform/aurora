@@ -49,6 +49,14 @@
             "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
             "host": { "type": "string" }
           }
+        },
+        "allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://[^/]+"
+          },
+          "uniqueItems": true
         }
       }
     },

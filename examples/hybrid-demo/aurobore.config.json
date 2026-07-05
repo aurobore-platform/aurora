@@ -1,0 +1,15 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.hybrid",
+    "name": "Hybrid Demo",
+    "version": "0.1.0",
+    "orientation": "portrait"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "allowedOrigins": ["https://example.com"]
+  },
+  "permissions": ["Internet"]
+}

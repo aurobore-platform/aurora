@@ -128,6 +128,9 @@ void WebViewCookieBridge::finishSetCookie(const QString &invokeId, bool success)
     emit cookieSet(success);
 }
 
+// W+3 interim (SDK <=5.2.x): public CookieManager has no setCookie; delegate to QML orchestration
+// via setCookieRequested. Bridge invoke contract is stable; migrate to native in W+3b.
+// See docs/aurora/webview.md section 6.3 Interim.
 bool WebViewCookieBridge::requestSetCookie(const QString &domain, const QString &path,
                                            const QString &name, const QString &value,
                                            const QString &invokeId)

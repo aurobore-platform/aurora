@@ -71,6 +71,74 @@ describe("config parse", () => {
     });
     expect(errors.some((e) => e.path === "cover.actions")).toBe(true);
   });
+
+  it("принимает web.allowedOrigins с Internet", () => {
+    const errors = validateConfig({
+      ...validConfig,
+      web: {
+        ...validConfig.web,
+        allowedOrigins: ["https://example.com"],
+      },
+    });
+    expect(errors).toEqual([]);
+    const parsed = parseConfig({
+      ...validConfig,
+      web: {
+        ...validConfig.web,
+        allowedOrigins: ["https://example.com"],
+      },
+    });
+    expect(parsed.web.allowedOrigins).toEqual(["https://example.com"]);
+  });
+
+  it("отклоняет http:// в allowedOrigins", () => {
+    const errors = validateConfig({
+      ...validConfig,
+      web: {
+        ...validConfig.web,
+        allowedOrigins: ["http://example.com"],
+      },
+    });
+    expect(errors.some((e) => e.path === "web.allowedOrigins[0]")).toBe(true);
+  });
+
+  it("отклоняет path в allowedOrigins", () => {
+    const errors = validateConfig({
+      ...validConfig,
+      web: {
+        ...validConfig.web,
+        allowedOrigins: ["https://example.com/foo"],
+      },
+    });
+    expect(errors.some((e) => e.path === "web.allowedOrigins[0]")).toBe(true);
+  });
+
+  it("отклоняет дубликаты в allowedOrigins", () => {
+    const errors = validateConfig({
+      ...validConfig,
+      web: {
+        ...validConfig.web,
+        allowedOrigins: ["https://example.com", "https://example.com"],
+      },
+    });
+    expect(errors.some((e) => e.path === "web.allowedOrigins[1]")).toBe(true);
+  });
+
+  it("отклоняет непустой allowedOrigins без Internet", () => {
+    const errors = validateConfig({
+      ...validConfig,
+      permissions: [],
+      web: {
+        ...validConfig.web,
+        allowedOrigins: ["https://example.com"],
+      },
+    });
+    expect(errors.some((e) => e.path === "web.allowedOrigins")).toBe(true);
+  });
+
+  it("принимает отсутствие allowedOrigins (bundled-only)", () => {
+    expect(validateConfig(validConfig)).toEqual([]);
+  });
 });
 
 describe("config merge", () => {

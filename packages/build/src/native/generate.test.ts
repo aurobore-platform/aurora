@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -7,6 +7,7 @@ import {
   formatRpmChangelogDate,
   generateDesktop,
   generateDefaultsJson,
+  generateNativeProject,
   generateSpec,
   SYNC_EXCLUDE,
 } from "./generate.js";
@@ -31,6 +32,37 @@ const manifest: PluginManifest = {
   permissions: ["DeviceInfo"],
   methods: { getInfo: { args: {}, result: "void" } },
 };
+
+const tempDirs: string[] = [];
+
+function makeTempProject(): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "aurobore-gen-project-"));
+  tempDirs.push(dir);
+  fs.writeFileSync(
+    path.join(dir, "aurobore.config.json"),
+    `${JSON.stringify(
+      {
+        configVersion: 1,
+        app: { id: "ru.example.demo", name: "Demo App", version: "1.0.0" },
+        web: { root: "dist", entry: "index.html" },
+        permissions: ["Internet"],
+        plugins: ["@aurobore/echo"],
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  fs.mkdirSync(path.join(dir, "dist"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "dist", "index.html"), "<!doctype html><title>demo</title>", "utf8");
+  return dir;
+}
+
+afterEach(() => {
+  for (const dir of tempDirs.splice(0)) {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 describe("native generate templates", () => {
   it("генерирует .spec с app id и версией", () => {
@@ -85,6 +117,28 @@ describe("native generate templates", () => {
     });
   });
 
+  it("генерирует defaults.json с web.allowedOrigins", () => {
+    const withOrigins = parseConfig({
+      configVersion: 1,
+      app: { id: "ru.example.demo", name: "Demo", version: "1.0.0" },
+      web: {
+        root: "dist",
+        entry: "index.html",
+        allowedOrigins: ["https://example.com"],
+      },
+      permissions: ["Internet"],
+    });
+    const effective = resolveEffectiveConfig(withOrigins, [manifest]);
+    const json = JSON.parse(generateDefaultsJson(effective, "prod"));
+    expect(json.web.allowedOrigins).toEqual(["https://example.com"]);
+  });
+
+  it("генерирует пустой allowedOrigins без поля в конфиге", () => {
+    const effective = resolveEffectiveConfig(config, [manifest]);
+    const json = JSON.parse(generateDefaultsJson(effective, "prod"));
+    expect(json.web.allowedOrigins).toEqual([]);
+  });
+
   it("formatRpmChangelogDate в формате rpm", () => {
     const date = formatRpmChangelogDate(new Date(Date.UTC(2026, 5, 28, 12, 0, 0)));
     expect(date).toBe("Sun Jun 28 2026");
@@ -105,5 +159,16 @@ describe("native generate templates", () => {
     expect(fs.existsSync(path.join(dst, "qml", "verification"))).toBe(false);
     expect(fs.existsSync(path.join(dst, "qml", "pages", "Page.qml"))).toBe(true);
     fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("generateNativeProject исключает qml/verification из .aurobore/native", async () => {
+    const projectRoot = makeTempProject();
+    const { nativeDir } = await generateNativeProject({
+      projectRoot,
+      config: parseConfig(JSON.parse(fs.readFileSync(path.join(projectRoot, "aurobore.config.json"), "utf8"))),
+      mode: "prod",
+    });
+    expect(fs.existsSync(path.join(nativeDir, "qml", "verification"))).toBe(false);
+    expect(fs.existsSync(path.join(nativeDir, "qml", "pages", "WebAppPage.qml"))).toBe(true);
   });
 });

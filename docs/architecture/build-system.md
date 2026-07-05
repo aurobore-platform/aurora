@@ -39,6 +39,9 @@ aurobore build
   `BuildRequires`/`Requires` в `.spec` и зависимости CMake.
 - **Поиск библиотек** через `find_package`/pkgconfig с приоритетом точных RPM-имён (а не «угадывания»),
   с учётом известных проблем RPATH/зависимостей WebView. (Заметка из исследования сборки на Аврора.)
+- При генерации `.aurobore/native` (`generateNativeProject`) из `runtime/container` исключается
+  `qml/verification/` — harness W3–W6 для dev-toolkit, не для user RPM. Harness доступен только через
+  `pnpm container:*` (sync из repo root без exclude); см. [runtime/container/README.md](../../runtime/container/README.md).
 
 ## 4. Движок WebView
 
@@ -47,6 +50,10 @@ aurobore build
   `ru.auroraos.webview-devel`, `Requires: ru.auroraos.webview`) — точные имена верифицируются на SDK.
 - Транспорт моста — единственная реализация на WebView async API (`WebViewTransport`; см. [bridge.md](bridge.md#транспорт)).
 - `build.minOs` задаёт минимальную версию ОС (Chromium-линейка, ориентир 5.1.5/5.1.6+).
+- **Гибридные приложения** (bundled SPA + external HTTPS): в `aurobore.config.json` задают
+  `web.allowedOrigins` — массив origin-only URL (`https://host`, без path). Поле проецируется в
+  `config/defaults.json` при `aurobore build`; runtime применяет whitelist в URL policy, HTTP auth и cookies.
+  Непустой whitelist требует permission `Internet`. Пример: [`examples/hybrid-demo/`](../../examples/hybrid-demo/).
 
 ## 5. Требования к окружению
 

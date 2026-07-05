@@ -75,6 +75,7 @@ Staging по умолчанию: `%USERPROFILE%\aurobore-spike\aurobore-containe
 | `../native-sdk/` | IPlugin, PluginManager |
 | `../plugins/` | Нативные реализации плагинов |
 | `qml/pages/WebAppPage.qml` | WebView, splash, URL filtering, `trustedOrigin` |
+| `qml/verification/` | Harness W3–W6 (WebView verification); **только dev-toolkit** (`pnpm container:*`); в user RPM через `aurobore build` **не копируется** |
 | `html/` | Demo SPA + `aurobore-bridge.js` + `aurobore-plugins.js` |
 
 ## Источники паттернов

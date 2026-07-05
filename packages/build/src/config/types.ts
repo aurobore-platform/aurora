@@ -26,6 +26,8 @@ export interface WebConfig {
   entry: string;
   entryUrl?: string;
   devServer?: DevServerConfig;
+  /** Whitelist external HTTPS origins (origin only, no path). */
+  allowedOrigins?: string[];
 }
 
 export type WebViewEngine = "chromium";

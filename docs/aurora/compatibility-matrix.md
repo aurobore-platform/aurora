@@ -26,7 +26,7 @@
 Команды прогона на текущем SDK:
 
 ```powershell
-pnpm demos:verify          # 10 examples: web + RPM (~30–60 мин)
+pnpm demos:verify          # 11 examples: web + RPM (~30–60 мин)
 pnpm compat:verify         # container:all на эмуляторе (без повторного demos)
 ```
 
@@ -41,7 +41,7 @@ pnpm compat:verify -- --run-demo hello-world
 | Сценарий | 5.2.1.200 | 5.1.x |
 |---|---|---|
 | `pnpm container:all` (M1/M2/M3 journal) | OK (2026-07-01, re-verify): M1/M2/M3 OK | pending |
-| `pnpm demos:verify` (10 examples, RPM) | OK (2026-07-03): 10/10 (включая `camera-demo`, `geo-demo`, `sensors-demo`, `notifications-demo`, `share-demo`) | pending |
+| `pnpm demos:verify` (11 examples, RPM) | OK (2026-07-03): 10/10 (включая `camera-demo`, `geo-demo`, `sensors-demo`, `notifications-demo`, `share-demo`); + `hybrid-demo` после W+2 | pending |
 | `aurobore run` — `hello-world` | manual (кнопка Benchmark → journal) | pending |
 | `aurobore run` — `camera-demo` | manual: pick/capture на устройстве; эмулятор — `getPhoto` UNAVAILABLE | pending |
 | `aurobore run` — `geo-demo` | manual: GPS на устройстве; эмулятор — `GEOLOCATION_UNAVAILABLE` | pending |

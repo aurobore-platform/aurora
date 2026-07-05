@@ -1,3 +1,6 @@
+// W+3 interim (SDK <=5.2.x): setCookie via navigate to https://<domain>/ then document.cookie.
+// Brief navigation flash on invoke; no HttpOnly. Native CookieManager::setCookie in W+3b.
+// See docs/aurora/webview.md section 6.3 Interim.
 import QtQuick 2.6
 
 Item {

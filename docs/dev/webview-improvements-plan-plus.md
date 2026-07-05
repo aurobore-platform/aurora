@@ -77,10 +77,10 @@ runtime/container/qml/
    - `shouldEmitWebViewError`, `maybeApplyPendingCookie`, auth dialog — **остаются** (это не harness).
    - W3 navigate / W4 auto-navigate eviltester / W5 httpbin redirect test / W6 10 cycles — **только** в verification/.
 
-### W+1.4 — Sync в generated apps
+### W+1.4 — Sync в generated apps ✅
 
-[`generateNativeProject`](../../packages/build/src/native/generate.ts) копирует весь `runtime/container`.
-Варианты (выбрать при реализации):
+[`generateNativeProject`](../../packages/build/src/native/generate.ts) копирует `runtime/container` в `.aurobore/native`,
+исключая `qml/verification/` через `SYNC_EXCLUDE_PATHS` (вариант **B** из таблицы ниже).
 
 | Вариант | Плюс | Минус |
 |---|---|---|
@@ -88,8 +88,7 @@ runtime/container/qml/
 | **B.** `SYNC_EXCLUDE` для `qml/verification/` | чистый prod tree | harness только в repo container |
 | **C.** `#ifdef AUROBORE_CONTAINER_HARNESS` + условная сборка | zero dead code | сложнее CMake |
 
-**Рекомендация:** **B** — harness нужен только для `pnpm container:*`; user RPM не включает `verification/`.
-Добавить `qml/verification` в `SYNC_EXCLUDE` в `generate.ts` + отдельный путь для container dev-toolkit (staging из repo, не из generated).
+**Реализовано (B):** `SYNC_EXCLUDE_PATHS` в `generate.ts`; container dev-toolkit sync из repo (`pnpm container:sync`) — без exclude.
 
 ### Критерий готовности
 
@@ -155,7 +154,7 @@ runtime/container/qml/
 
 ---
 
-## W+3 — W5 interim: документация и API contract (приоритет: средний)
+## W+3 — W5 interim: документация и API contract (приоритет: средний) ✅
 
 **Цель:** явно зафиксировать, что `setCookie` — **временная** реализация до public native API на SDK.
 
@@ -273,9 +272,9 @@ WebAppPage подписывается на signals для bridge events (`webvie
 
 | # | Вопрос | Статус |
 |---|---|---|
-| V-webview-harness-split | Harness W3–W6 вынесен из WebAppPage (W+1) | ⏳ |
+| V-webview-harness-split | Harness W3–W6 вынесен из WebAppPage (W+1) | 🟢 |
 | V-webview-allowedOrigins-config | `web.allowedOrigins` в aurobore.config → defaults.json (W+2) | ⏳ |
-| V-webview-setcookie-interim | W5 setCookie documented as interim (W+3) | ⏳ |
+| V-webview-setcookie-interim | W5 setCookie documented as interim (W+3) | 🟢 |
 | V-webview-qml-decompose | WebAppPage ≤350 строк, AuroboreWebView component (W+4) | ⏳ |
 
 ---

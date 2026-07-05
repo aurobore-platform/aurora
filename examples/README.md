@@ -4,6 +4,7 @@
 |---|---|
 | `hello-world/` | Полный walkthrough: Echo, lifecycle, Device, SDK-импорты (vanilla) |
 | `hello-world-stub/` | M4 фикстура для `aurobore build` / `aurobore run` (минимальный HTML) |
+| `hybrid-demo/` | Гибридное приложение: bundled SPA + whitelist external HTTPS (`web.allowedOrigins`) |
 | `react-demo/` | React + Vite + `@aurobore/react` — шаблон `create --template react` |
 | `vue-demo/` | Vue 3 + Vite + `@aurobore/vue` |
 | `svelte-demo/` | Svelte 5 + Vite + `@aurobore/svelte` |

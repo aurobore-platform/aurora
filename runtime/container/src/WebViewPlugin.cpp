@@ -74,6 +74,7 @@ QVariant WebViewPlugin::invoke(const QString &method, const QVariant &args,
         return ok;
     }
 
+    // Bridge invoke contract stable; setCookie impl is interim (W+3, docs/aurora/webview.md §6.3).
     if (method == QStringLiteral("setCookie")) {
         if (!m_cookieBridge) {
             return makeError(QStringLiteral("WEBVIEW_COOKIE_UNAVAILABLE"),

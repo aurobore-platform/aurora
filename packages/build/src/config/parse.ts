@@ -17,7 +17,7 @@ const TOP_KEYS = new Set([
 ]);
 
 const APP_KEYS = new Set(["id", "name", "version", "orientation", "icon", "splash"]);
-const WEB_KEYS = new Set(["root", "entry", "entryUrl", "devServer"]);
+const WEB_KEYS = new Set(["root", "entry", "entryUrl", "devServer", "allowedOrigins"]);
 const SPLASH_KEYS = new Set(["image", "background", "timeoutMs"]);
 const DEV_SERVER_KEYS = new Set(["port", "host"]);
 const BUILD_KEYS = new Set(["engine", "minOs", "targets"]);
@@ -31,6 +31,7 @@ const ENGINES = new Set(["chromium"]);
 const APP_ID_RE = /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/;
 const SEMVER_RE = /^\d+\.\d+\.\d+(-[\w.-]+)?(\+[\w.-]+)?$/;
 const COVER_ACTION_ID_RE = /^[a-z][a-z0-9_-]*$/i;
+const ALLOWED_ORIGIN_RE = /^https:\/\/[^/]+/;
 const MAX_COVER_ACTIONS = 4;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -66,6 +67,53 @@ function validateStringArray(
     return undefined;
   }
   return value;
+}
+
+function validateAllowedOrigins(
+  errors: ConfigValidationError[],
+  value: unknown,
+): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) {
+    push(errors, "web.allowedOrigins", "must be an array of strings");
+    return undefined;
+  }
+  const seen = new Set<string>();
+  const origins: string[] = [];
+  value.forEach((item, index) => {
+    const path = `web.allowedOrigins[${index}]`;
+    if (typeof item !== "string") {
+      push(errors, path, "must be a string");
+      return;
+    }
+    if (!ALLOWED_ORIGIN_RE.test(item)) {
+      push(errors, path, "must be an HTTPS origin without path (e.g. https://example.com)");
+      return;
+    }
+    if (seen.has(item)) {
+      push(errors, path, `duplicate origin: ${item}`);
+      return;
+    }
+    seen.add(item);
+    origins.push(item);
+  });
+  return origins;
+}
+
+function validateInternetForAllowedOrigins(
+  errors: ConfigValidationError[],
+  allowedOrigins: string[] | undefined,
+  permissions: unknown,
+): void {
+  if (!allowedOrigins || allowedOrigins.length === 0) return;
+  const perms = Array.isArray(permissions) ? permissions : [];
+  if (!perms.includes("Internet")) {
+    push(
+      errors,
+      "web.allowedOrigins",
+      "non-empty allowedOrigins requires Internet in permissions",
+    );
+  }
 }
 
 /** Валидирует сырой JSON конфига; возвращает список ошибок (пустой = ok). */
@@ -158,6 +206,8 @@ export function validateConfig(raw: unknown): ConfigValidationError[] {
         }
       }
     }
+    const allowedOrigins = validateAllowedOrigins(errors, raw.web.allowedOrigins);
+    validateInternetForAllowedOrigins(errors, allowedOrigins, raw.permissions);
   }
 
   validateStringArray(errors, raw.permissions, "permissions");

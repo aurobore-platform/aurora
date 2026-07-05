@@ -19,6 +19,7 @@ const DEMOS = [
   { name: "vue-demo", web: { filter: "@aurobore/example-vue-demo", script: "build" } },
   { name: "svelte-demo", web: { filter: "@aurobore/example-svelte-demo", script: "build" } },
   { name: "hello-world-stub" },
+  { name: "hybrid-demo" },
   { name: "camera-demo", web: { filter: "@aurobore/example-camera-demo", script: "build:web" } },
   { name: "geo-demo", web: { filter: "@aurobore/example-geo-demo", script: "build:web" } },
   { name: "sensors-demo", web: { filter: "@aurobore/example-sensors-demo", script: "build:web" } },

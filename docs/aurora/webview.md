@@ -268,7 +268,7 @@ Built-in plugin `webview` (без manifest): методы `respondAuth`, `cancel
 
 **Проверка на эмуляторе:**
 
-1. В config добавить `"allowedOrigins": ["https://testpages.eviltester.com"]` в секцию `web`.
+1. В `aurobore.config.json` добавить `"allowedOrigins": ["https://testpages.eviltester.com"]` в секцию `web` (и `Internet` в `permissions`). При `aurobore build` поле попадает в `config/defaults.json`.
 2. `AUROBORE_W4_AUTH=1 pnpm container:run` — после loopback load переход на
    `https://testpages.eviltester.com/pages/auth/basic-auth/` (credentials: `admin` / `password`).
 3. Journal: `W4 auth OK: loaded …` после успешной авторизации.
@@ -299,18 +299,35 @@ await bridge.invoke("webview", "clearCookies", {});
 | `setCookie` | `{ ok: true, success: bool }` (async) | `domain`, `path`, `name` обязательны; `value` может быть пустым |
 | `clearCookies` | `{ ok: true, success: bool }` | Сбрасывает **все** cookies всех WebView (как OMP) |
 
+### Interim implementation (SDK ≤5.2.x)
+
+На SDK 5.2.1 public `CookieManager` (`aurorawebview/cookies/cookiemanager.h`) **не содержит**
+`setCookie` — в отличие от internal API OMP Flutter
+([`webview_flutter_aurora_plugin.cpp`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_flutter_aurora_plugin.cpp),
+`manager->setCookie`). До появления public native API Aurobore использует **interim** QML orchestration.
+
+| Аспект | Interim (сейчас) | Target (когда SDK/OMP даст API) |
+|---|---|---|
+| `setCookie` | Navigate на `https://<domain>/` + `document.cookie` в QML ([`WebViewCookieOrchestrator.qml`](../../runtime/container/qml/components/WebViewCookieOrchestrator.qml)) | `CookieManager::setCookie` native |
+| HttpOnly | не поддерживается | да (если API поддержит) |
+| UX | краткий flash navigation при invoke | без navigation |
+| `clearCookies` | native `deleteCookies("", "")` | без изменений |
+
+**Bridge API contract:** сигнатура invoke (`domain`, `path`, `name`, `value`) и ответ `{ ok, success }`
+**стабильны** — при миграции на native (W+3b) меняется только внутренняя реализация, не JS API.
+
+Follow-up **W+3b:** при обновлении SDK — spike `CookieManager::setCookie` в devel headers; если есть —
+заменить QML orchestration, сохранить bridge API.
+
 **Ограничения:**
 
 - `setCookie` только для host из `web.allowedOrigins` (не loopback asset origin).
-- На SDK 5.2.1 public `CookieManager` **не содержит** `setCookie` (в отличие от internal API OMP Flutter).
-  Runtime устанавливает cookie через `document.cookie` после краткой навигации на `https://<domain>/`
-  (QML orchestration). Подходит для session cookies перед переходом на external origin; **не** HttpOnly.
-- `clearCookies` использует native `CookieManager::deleteCookies("", "")` (global, OMP parity).
 - Требуется permission `Internet` и whitelist entry для target domain.
+- Подробности interim-реализации — таблица выше; подходит для session cookies перед переходом на external origin.
 
 **Проверка на эмуляторе:**
 
-1. В config добавить `"https://httpbin.org"` в `web.allowedOrigins`.
+1. В `aurobore.config.json` добавить `"https://httpbin.org"` в `web.allowedOrigins` (и `Internet` в `permissions`).
 2. `AUROBORE_W5_COOKIES=1 pnpm container:run` — после loopback load: `setCookie` →
    `https://httpbin.org/anything` → verify Cookie header → `clearCookies` → reload.
 3. Journal: `W5 cookie test: setCookie OK`, `W5 cookie OK: Cookie header verified`, `W5 cookie OK: cleared`.

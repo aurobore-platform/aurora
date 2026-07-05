@@ -328,6 +328,7 @@ export function generateDefaultsJson(effective: EffectiveConfig, mode: "prod" | 
       root: "html",
       entry,
       entryUrl,
+      allowedOrigins: effective.web.allowedOrigins ?? [],
     },
     permissions: effective.effectivePermissions,
     build: effective.build,

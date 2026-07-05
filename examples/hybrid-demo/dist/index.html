@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hybrid Demo</title>
+  <style>
+    body { font-family: system-ui; margin: 2rem; background: #1a1a2e; color: #eee; }
+    a, button {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: #4a9eff;
+      color: #fff;
+      text-decoration: none;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .hint { color: #aaa; font-size: 0.9rem; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Hybrid Demo</h1>
+  <p>Bundled SPA with whitelist external origin (<code>https://example.com</code>).</p>
+  <p class="hint">Requires <code>web.allowedOrigins</code> and <code>Internet</code> permission.</p>
+  <a id="open-external" href="https://example.com">Open example.com</a>
+  <script>
+    document.getElementById("open-external").addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "https://example.com";
+    });
+    document.dispatchEvent(new CustomEvent("aurobore:ready"));
+  </script>
+</body>
+</html>
