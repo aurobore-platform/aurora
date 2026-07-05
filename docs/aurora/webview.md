@@ -222,6 +222,22 @@ btn.addEventListener('click', function () {
 > Примечание: демо собраны через **qmake** (`*.pro`), тогда как Aurobore генерирует **CMake**
 > ([ADR-007](../adr/ADR-007-packaging-build.md)) — оба пути официально поддерживаются, это не противоречие.
 
+## 6.1. InitQCA (Qt Cryptographic Architecture)
+
+OMP [`webview_flutter_aurora`](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins/webview-flutter) вызывает
+`QCA::Initializer` до инициализации CEF. Aurobore повторяет этот паттерн в `runtime/container/src/main.cpp`
+(`#include <QtCrypto>`, `pkgconfig(qca2-qt5)`).
+
+**W3 spike (SDK 5.2.1.200, см. [verification-status.md](verification-status.md) V-webview-qca):**
+
+| Сценарий | Нужен ли QCA |
+|---|---|
+| Bundled SPA через loopback `AssetSchemeServer` | **Нет** — trust через SPKI fingerprint в `InitBrowser` (V-13) |
+| External public HTTPS (whitelist, напр. `https://example.com`) | **Нет** — работало и до QCA; с QCA поведение то же |
+| GOST / корпоративные сертификаты | **Не верифицировано** на spike; для prod — `cryptopro-checker-path` (W2) + QCA по референсу OMP |
+
+QCA остаётся в шаблоне M4 для parity с OMP и потенциальных гибридных приложений с external origin.
+
 ## 7. Связь с архитектурой Aurobore
 
 - [architecture/runtime.md](../architecture/runtime.md) — контейнер, lifecycle, asset loader.

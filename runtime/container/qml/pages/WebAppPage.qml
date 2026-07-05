@@ -15,6 +15,9 @@ Page {
     property bool splashVisible: true
     property bool webReady: false
     property real keyboardInset: 0
+    property bool w3ExternalTriggered: false
+
+    readonly property bool w3ExternalTest: entryUrl && entryUrl.indexOf("w3External=1") >= 0
 
     function statusBarHeightPx() {
         var h = Theme.statusBarHeight || 0
@@ -219,7 +222,28 @@ Page {
         if (urlString.indexOf("aurobore-app://") === 0) {
             return assetResolver.isAllowedUrl(urlString)
         }
+        if (typeof allowedOrigins !== "undefined" && allowedOrigins) {
+            for (var i = 0; i < allowedOrigins.length; i++) {
+                var origin = allowedOrigins[i]
+                if (origin && origin.length > 0 && urlString.indexOf(origin) === 0)
+                    return true
+            }
+        }
         return false
+    }
+
+    function maybeRunW3ExternalTest() {
+        if (!w3ExternalTest || w3ExternalTriggered)
+            return
+        if (typeof allowedOrigins === "undefined" || !allowedOrigins || allowedOrigins.length === 0) {
+            console.log("[aurobore-container] W3 external test: skipped (web.allowedOrigins empty)")
+            return
+        }
+        w3ExternalTriggered = true
+        var origin = allowedOrigins[0]
+        var target = origin.charAt(origin.length - 1) === "/" ? origin : origin + "/"
+        console.log("[aurobore-container] W3 external test: navigating to", target)
+        webView.url = target
     }
 
     Keys.onReleased: {
@@ -363,6 +387,12 @@ Page {
                 page.injectKeyboardViewportListener()
                 page.injectInsets()
                 pageLoadProbeTimer.start()
+                page.maybeRunW3ExternalTest()
+            }
+            if (!loading && w3ExternalTest && typeof allowedOrigins !== "undefined"
+                    && allowedOrigins.length > 0
+                    && webView.url.indexOf(allowedOrigins[0]) === 0) {
+                console.log("[aurobore-container] W3 external test OK: loaded", allowedOrigins[0])
             }
         }
 

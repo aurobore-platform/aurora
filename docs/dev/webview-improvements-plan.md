@@ -55,7 +55,7 @@ Flutter-плагин — **не замена архитектуры**, а кар
 
 ---
 
-## W2 — Упаковка: webview-subprocess + cryptopro-checker (приоритет: высокий, M4)
+## W2 — Упаковка: webview-subprocess + cryptopro-checker (приоритет: высокий, M4) ✅
 
 **Цель:** сгенерированный RPM пользовательского приложения повторяет паттерн OMP 4.13.1+ (subprocess и checker в `%files`).
 
@@ -83,9 +83,11 @@ Flutter-плагин — **не замена архитектуры**, а кар
 
 ---
 
-## W3 — Spike InitQCA / QtCrypto (приоритет: средний)
+## W3 — Spike InitQCA / QtCrypto (приоритет: средний) ✅
 
 **Цель:** понять, нужен ли Aurobore вызов QCA до `InitBrowser` для TLS/cookies на корпоративных сертификатах.
+
+**Итог (V-webview-qca):** для **bundled SPA** QCA не обязателен (loopback trust через SPKI). Для **public external HTTPS** на SDK 5.2.1 — без изменений vs baseline. **QCA включён** в runtime и M4-шаблон для **parity с OMP** + потенциальные GOST-сценарии (GOST на spike не проверялся). См. [verification-status.md](../aurora/verification-status.md) V-webview-qca.
 
 **Референс:**
 
@@ -188,7 +190,7 @@ void WebviewFlutterAuroraPluginInitQCA() {
 | # | Вопрос | Статус |
 |---|---|---|
 | V-webview-subprocess | Bundling `webview-subprocess` + `cryptopro-checker` в app RPM (W2) | ⏳ |
-| V-webview-qca | Нужен ли `QCA::Initializer` для prod TLS (W3) | ⏳ |
+| V-webview-qca | Нужен ли `QCA::Initializer` для prod TLS (W3) | ✅ |
 | V-webview-auth | HTTP Basic Auth для whitelist URL (W4) | ⏳ |
 | V-webview-cookies | Programmatic cookie API (W5) | ⏳ |
 

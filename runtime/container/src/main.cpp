@@ -9,9 +9,13 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QDebug>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QMap>
+#include <QtCore/QVariant>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickView>
+
+#include <QtCrypto>
 
 #include <auroraapp/auroraapp.h>
 #include <aurorawebview/webenginecontext.h>
@@ -39,6 +43,9 @@ int main(int argc, char *argv[])
     QScopedPointer<QGuiApplication> application(Aurora::Application::application(argc, argv));
     QScopedPointer<QQuickView> view(Aurora::Application::createView());
     view->setResizeMode(QQuickView::SizeRootObjectToView);
+
+    static QCA::Initializer qcaInitializer;
+    qInfo("[aurobore-container] InitQCA: QCA::Initializer ready");
 
     AssetResolver assetResolver;
     const QUrl htmlRootUrl = Aurora::Application::pathTo(QStringLiteral("html"));
@@ -85,7 +92,20 @@ int main(int argc, char *argv[])
         }
     }
 
-    Aurora::WebView::WebEngineContext::InitBrowser(argc, argv, browserArgs);
+#ifdef AUROBORE_WEBVIEW_HAS_START_SUBPROCESS
+    browserArgs.push_back(
+        std::string("--browser-subprocess-path=" WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH));
+    qInfo("[aurobore-container] InitBrowser: subprocess %s",
+          WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH);
+#endif
+
+    QMap<QString, QString> webViewParams;
+#ifdef WEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH
+    webViewParams.insert(QStringLiteral("cryptopro-checker-path"),
+                         QStringLiteral(WEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH));
+#endif
+
+    Aurora::WebView::WebEngineContext::InitBrowser(argc, argv, browserArgs, webViewParams);
 
     AssetSchemeServer assetServer;
     QString entryUrl;
@@ -95,6 +115,11 @@ int main(int argc, char *argv[])
         entryUrl = QString::fromLatin1(Aurobore::AppConfig::kEntryUrl);
         qWarning("[aurobore-container] AssetSchemeServer failed; fallback entry %s",
                  qPrintable(entryUrl));
+    }
+    if (qgetenv("AUROBORE_W3_EXTERNAL") == QByteArray("1")) {
+        const QChar separator = entryUrl.contains(QLatin1Char('?')) ? QLatin1Char('&') : QLatin1Char('?');
+        entryUrl += separator + QStringLiteral("w3External=1");
+        qInfo("[aurobore-container] W3 external test: entry URL augmented (see web.allowedOrigins)");
     }
 
     LifecycleBridge lifecycleBridge;
@@ -155,6 +180,11 @@ int main(int argc, char *argv[])
                 deepLinkHandler.captureFromArguments(application->arguments());
         });
 
+    const QStringList allowedOrigins = Aurobore::AppConfig::allowedOrigins();
+    QVariantList allowedOriginsList;
+    for (const QString &origin : allowedOrigins)
+        allowedOriginsList.append(origin);
+
     auto *rootContext = view->rootContext();
     rootContext->setContextProperty(QStringLiteral("htmlRootPath"), htmlRoot);
     rootContext->setContextProperty(QStringLiteral("assetResolver"), &assetResolver);
@@ -167,6 +197,7 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("notificationsBridge"), &notificationsBridge);
     rootContext->setContextProperty(QStringLiteral("shareBridge"), &shareBridge);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
+    rootContext->setContextProperty(QStringLiteral("allowedOrigins"), allowedOriginsList);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());
 

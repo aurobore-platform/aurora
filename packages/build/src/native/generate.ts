@@ -102,6 +102,88 @@ export function formatRpmChangelogDate(date: Date = new Date()): string {
   return `${day} ${month} ${dom} ${year}`;
 }
 
+/** RPM globals and install steps for webview-subprocess + cryptopro-checker (W2). */
+export const WEBVIEW_RPM_GLOBALS = `%global webview_launcher %{_libexecdir}/%{name}/%{name}.webview-subprocess
+%global cryptopro_checker %{_libexecdir}/%{name}/ru.auroraos.webview-cryptopro-checker`;
+
+export const WEBVIEW_RPM_BUILD = `%cmake -DWEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH=%{webview_launcher} \\
+       -DWEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH=%{cryptopro_checker}`;
+
+export const WEBVIEW_RPM_INSTALL = `%make_install
+mkdir -p %{buildroot}/%{_libexecdir}/%{name} && \\
+  mv %{buildroot}%{_bindir}/%{name}.webview-subprocess %{buildroot}/%{webview_launcher} && \\
+  chmod +x %{buildroot}/%{webview_launcher} && \\
+  if test -f %{buildroot}%{_libexecdir}/ru.auroraos.webview-cryptopro-checker; then \\
+    mv %{buildroot}%{_libexecdir}/ru.auroraos.webview-cryptopro-checker %{buildroot}/%{cryptopro_checker}; \\
+  else \\
+    cp -a %{_libexecdir}/ru.auroraos.webview-cryptopro-checker %{buildroot}/%{cryptopro_checker}; \\
+  fi && \\
+  chmod +x %{buildroot}/%{cryptopro_checker}`;
+
+export const WEBVIEW_RPM_FILES = `%{webview_launcher}
+%{cryptopro_checker}`;
+
+/** QCA init for WebView TLS (W3) — pkg-config name on SDK 5.2.1: qca2-qt5. */
+export const RPM_BUILDREQUIRES_QCA = "pkgconfig(qca2-qt5)";
+
+export const CMAKE_QCA_BLOCK = `pkg_check_modules(qca2-qt5 REQUIRED IMPORTED_TARGET qca2-qt5)`;
+
+/** Shared CMake blocks for webview subprocess packaging (W2). */
+export const CMAKE_WEBVIEW_SUBPROCESS_BLOCK = `find_package(aurora_libaurorawebview QUIET)
+
+if(aurora_libaurorawebview_FOUND)
+    get_property(CEF_LIBS_PATH GLOBAL PROPERTY aurora_libcef_PROPERTY_LIBS_PATH)
+    get_property(WEBVIEW_LIBS_PATH GLOBAL PROPERTY aurora_libaurorawebview_PROPERTY_LIBS_PATH)
+    set_property(GLOBAL PROPERTY CEF_LINK_PROPERTY
+        "-L\${WEBVIEW_LIBS_PATH}" "-laurorawebview" "-Wl,--no-as-needed"
+        \${CEF_LIBS_PATH}/libcef.so "-Wl,--as-needed")
+    set(AUROBORE_WEBVIEW_TARGET aurora_libaurorawebview::aurora_libaurorawebview)
+else()
+    message(STATUS "aurora_libaurorawebview not found; using pkgconfig(aurorawebview)")
+    set(AUROBORE_WEBVIEW_TARGET PkgConfig::AuroraWebView)
+endif()
+
+pkg_check_modules(AuroraWebView aurorawebview REQUIRED IMPORTED_TARGET)
+
+if(NOT WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH)
+    message(FATAL_ERROR "WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH is required")
+endif()
+if(NOT WEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH)
+    message(FATAL_ERROR "WEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH is required")
+endif()
+add_compile_definitions(
+    WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH="\${WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH}"
+    WEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH="\${WEBVIEW_CRYPTOPRO_CHECKER_INSTALL_PATH}")
+
+include(CheckCXXSourceCompiles)
+set(CMAKE_REQUIRED_INCLUDES \${AuroraWebView_INCLUDE_DIRS})
+set(CMAKE_REQUIRED_LIBRARIES \${AuroraWebView_LINK_LIBRARIES})
+check_cxx_source_compiles([=[
+#include <aurorawebview/webenginecontext.h>
+int main(int argc, char **argv) {
+  return Aurora::WebView::WebEngineContext::StartSubprocess(argc, argv);
+}
+]=] AUROBORE_WEBVIEW_HAS_START_SUBPROCESS)
+if(AUROBORE_WEBVIEW_HAS_START_SUBPROCESS)
+    add_compile_definitions(AUROBORE_WEBVIEW_HAS_START_SUBPROCESS)
+endif()`;
+
+export const CMAKE_WEBVIEW_SUBPROCESS_TARGET = `get_property(CEF_LINK_PROPERTY GLOBAL PROPERTY CEF_LINK_PROPERTY)
+if(CEF_LINK_PROPERTY)
+    target_link_options(\${PROJECT_NAME} PRIVATE \${CEF_LINK_PROPERTY})
+endif()
+
+set(SUBPROCESS_NAME \${PROJECT_NAME}.webview-subprocess)
+add_executable(\${SUBPROCESS_NAME} src/webview_subprocess_main.cpp)
+target_link_options(\${SUBPROCESS_NAME} PRIVATE "-Wl,--no-as-needed")
+target_link_libraries(\${SUBPROCESS_NAME} PRIVATE
+    \${AUROBORE_WEBVIEW_TARGET}
+    Qt5::Core
+)
+set_target_properties(\${SUBPROCESS_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/../../lib/cef")
+
+install(TARGETS \${SUBPROCESS_NAME} RUNTIME DESTINATION bin)`;
+
 export function generateSpec(appId: string, effective: EffectiveConfig): string {
   const version = effective.app.version;
   const buildRequires = new Set([
@@ -113,6 +195,7 @@ export function generateSpec(appId: string, effective: EffectiveConfig): string 
     "pkgconfig(Qt5Quick)",
     "pkgconfig(aurorawebview)",
     "ru.auroraos.webview-devel",
+    RPM_BUILDREQUIRES_QCA,
   ]);
   const requires = new Set(["ru.auroraos.webview"]);
 
@@ -139,6 +222,8 @@ ${buildRequiresLines}
 
 ${requiresLines}
 
+${WEBVIEW_RPM_GLOBALS}
+
 %description
 ${effective.app.name} — Aurobore application.
 
@@ -146,15 +231,16 @@ ${effective.app.name} — Aurobore application.
 %setup -q
 
 %build
-%cmake
+${WEBVIEW_RPM_BUILD}
 %make_build
 
 %install
-%make_install
+${WEBVIEW_RPM_INSTALL}
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
+${WEBVIEW_RPM_FILES}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/86x86/apps/%{name}.png
@@ -399,8 +485,11 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 find_package(Qt5 COMPONENTS ${qtFindPackage} REQUIRED)
 find_package(PkgConfig REQUIRED)
 
+${CMAKE_WEBVIEW_SUBPROCESS_BLOCK}
+
+${CMAKE_QCA_BLOCK}
+
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
-pkg_check_modules(AuroraWebView aurorawebview REQUIRED IMPORTED_TARGET)
 ${pkgConfigBlock}
 ${CMAKE_TRANSLATIONS_BLOCK}
 
@@ -436,8 +525,11 @@ target_link_libraries(\${PROJECT_NAME}
     PRIVATE
 ${qtLinkLines}
         PkgConfig::Auroraapp
-        PkgConfig::AuroraWebView
+        \${AUROBORE_WEBVIEW_TARGET}
+        PkgConfig::qca2-qt5
 ${pkgConfigLinks ? pkgConfigLinks + "\n" : ""})
+
+${CMAKE_WEBVIEW_SUBPROCESS_TARGET}
 
 install(TARGETS \${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(DIRECTORY html DESTINATION share/\${PROJECT_NAME})

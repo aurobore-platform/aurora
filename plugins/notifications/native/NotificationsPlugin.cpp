@@ -6,6 +6,7 @@
 #include <notification.h>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QTimer>
 #include <QtCore/QUuid>
 #include <QtCore/QVariantMap>
 
@@ -62,7 +63,7 @@ QString NotificationsPlugin::resolveNotificationId(const QVariantMap &args) cons
     const QString requested = stringArg(args, "id");
     if (!requested.isEmpty())
         return requested;
-    return QUuid::createUuid().toString(QUuid::WithoutBraces);
+    return QUuid::createUuid().toString().remove(QLatin1Char('{')).remove(QLatin1Char('}'));
 }
 
 QVariant NotificationsPlugin::invoke(const QString &method, const QVariant &args,

@@ -24,6 +24,8 @@ export interface AuroraEnv {
   AUROBORE_CEF_DEBUG_PORT?: string;
   /** Qt logging rules passed to container on emulator (optional). */
   AUROBORE_QT_LOGGING_RULES?: string;
+  /** W3 spike: navigate to first web.allowedOrigins after loopback load (optional). */
+  AUROBORE_W3_EXTERNAL?: string;
   /** Extra Valgrind flags for container:valgrind (optional). */
   VALGRIND_OPTS?: string;
 }

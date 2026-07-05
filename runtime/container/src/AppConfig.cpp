@@ -119,6 +119,15 @@ QString AppConfig::appId()
     return id.isString() ? id.toString() : QString();
 }
 
+QStringList AppConfig::allowedOrigins()
+{
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue webValue = root.value(QStringLiteral("web"));
+    if (!webValue.isObject())
+        return QStringList();
+    return readStringArray(webValue.toObject(), QStringLiteral("allowedOrigins"));
+}
+
 CoverConfig AppConfig::cover()
 {
     CoverConfig config;

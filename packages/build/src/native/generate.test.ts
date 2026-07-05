@@ -29,6 +29,13 @@ describe("native generate templates", () => {
     expect(spec).toContain("Name:       ru.example.demo");
     expect(spec).toContain("Version:    1.0.0");
     expect(spec).toContain("pkgconfig(aurorawebview)");
+    expect(spec).toContain("%global webview_launcher");
+    expect(spec).toContain("%global cryptopro_checker");
+    expect(spec).toContain("-DWEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH=%{webview_launcher}");
+    expect(spec).toContain(".webview-subprocess");
+    expect(spec).toContain("ru.auroraos.webview-cryptopro-checker");
+    expect(spec).toContain("cp -a %{_libexecdir}/ru.auroraos.webview-cryptopro-checker");
+    expect(spec).toContain("pkgconfig(qca2-qt5)");
   });
 
   it("генерирует .desktop с permissions", () => {

@@ -25,6 +25,7 @@ struct AppConfig {
     static QString appId();
     static QStringList grantedPermissions();
     static QStringList deepLinkSchemes();
+    static QStringList allowedOrigins();
     static CoverConfig cover();
 };
 

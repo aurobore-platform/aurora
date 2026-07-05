@@ -51,6 +51,24 @@ describe("generateCMakeLists native-sdk parity", () => {
     }
     expect(containerSources).toEqual([...NATIVE_SDK_SOURCES].sort());
   });
+
+  it("generateCMakeLists включает webview subprocess (W2)", () => {
+    const cmake = generateCMakeLists("ru.example.app", "1.0.0", []);
+    expect(cmake).toContain("find_package(aurora_libaurorawebview QUIET)");
+    expect(cmake).toContain("pkgconfig(aurorawebview)");
+    expect(cmake).toContain("WEBVIEW_SUBPROCESS_LAUNCHER_INSTALL_PATH");
+    expect(cmake).toContain("webview_subprocess_main.cpp");
+    expect(cmake).toContain("${AUROBORE_WEBVIEW_TARGET}");
+    expect(cmake).toContain("CEF_LINK_PROPERTY");
+    expect(cmake).toContain('INSTALL_RPATH "$ORIGIN/../../lib/cef"');
+    expect(cmake).toContain(".webview-subprocess");
+  });
+
+  it("generateCMakeLists включает QCA (W3)", () => {
+    const cmake = generateCMakeLists("ru.example.app", "1.0.0", []);
+    expect(cmake).toContain("pkg_check_modules(qca2-qt5 REQUIRED IMPORTED_TARGET qca2-qt5)");
+    expect(cmake).toContain("PkgConfig::qca2-qt5");
+  });
 });
 
 describe("generateCMakeLists nativeDeps.qt", () => {

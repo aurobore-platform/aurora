@@ -6,13 +6,15 @@
 
 #include <QtCore/QDebug>
 #include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusConnectionInterface>
 #include <QtCore/QVariantMap>
 
 namespace {
 
 QString dbusPathFromAppId(const QString &appId)
 {
-    return QStringLiteral("/") + appId.replace(QLatin1Char('.'), QLatin1Char('/'));
+    QString path = appId;
+    return QStringLiteral("/") + path.replace(QLatin1Char('.'), QLatin1Char('/'));
 }
 
 } // namespace

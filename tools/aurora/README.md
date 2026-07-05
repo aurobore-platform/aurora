@@ -164,6 +164,7 @@ AUROBORE_CEF_DEBUG_PORT=9222
 | `POC_RUN_WAIT_SEC` | `90` | Секунд опроса journal на M3 OK |
 | `AUROBORE_CEF_DEBUG_PORT` | — | CEF remote debugging для `container:run` (см. web-debugging.md) |
 | `AUROBORE_QT_LOGGING_RULES` | — | Qt logging rules при `container:run` (см. native-debugging.md) |
+| `AUROBORE_W3_EXTERNAL` | — | W3: navigate на первый `web.allowedOrigins` после loopback load |
 | `VALGRIND_OPTS` | см. valgrind-container.sh | Доп. флаги для `container:valgrind` |
 
 ## Файлы

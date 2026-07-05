@@ -50,6 +50,9 @@ export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void
     const escaped = qtRules.replace(/'/g, "'\\''");
     exports.push(`AUROBORE_QT_LOGGING_RULES='${escaped}'`);
   }
+  const w3External =
+    process.env.AUROBORE_W3_EXTERNAL?.trim() || env.AUROBORE_W3_EXTERNAL?.trim();
+  if (w3External) exports.push(`AUROBORE_W3_EXTERNAL=${w3External}`);
   const exportPrefix =
     exports.length > 0 ? `${exports.map((e) => `export ${e}`).join("; ")}; ` : "";
   const remoteCmd =

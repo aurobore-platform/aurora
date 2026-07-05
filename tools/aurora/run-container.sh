@@ -14,6 +14,12 @@ if [ -n "${AUROBORE_QT_LOGGING_RULES:-}" ]; then
 "
 fi
 
+w3_external_export=""
+if [ -n "${AUROBORE_W3_EXTERNAL:-}" ]; then
+  w3_external_export="export AUROBORE_W3_EXTERNAL=${AUROBORE_W3_EXTERNAL}
+"
+fi
+
 pkill -f ru.auroraos.aurobore-container 2>/dev/null || true
 sleep 1
 rm -f /tmp/container.log
@@ -38,7 +44,7 @@ su "${POC_RUN_USER:-defaultuser}" -s /bin/sh -c "
   export WAYLAND_DISPLAY=/run/display/wayland-0
   export QT_QPA_PLATFORM=wayland
   export LD_LIBRARY_PATH=/usr/lib/cef:\${LD_LIBRARY_PATH:-}
-  ${cef_debug_export}${qt_logging_export}  nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
+  ${cef_debug_export}${qt_logging_export}${w3_external_export}  nohup /usr/bin/ru.auroraos.aurobore-container >/tmp/container.log 2>&1 &
 "
 
 sleep 2
