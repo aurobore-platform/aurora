@@ -2,6 +2,8 @@
 
 Пошаговое руководство: от нуля до приложения на эмуляторе Аврора.
 
+> Онлайн-версия: [aurobore-platform.github.io/aurora/tutorials/quick-start](https://aurobore-platform.github.io/aurora/tutorials/quick-start)
+
 > Пример в репозитории: [`examples/hello-world/`](../../examples/hello-world/).
 > Гибридное приложение (bundled SPA + external HTTPS): [`examples/hybrid-demo/`](../../examples/hybrid-demo/).
 

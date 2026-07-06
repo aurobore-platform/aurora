@@ -11,6 +11,8 @@
 
 ## Для разработчиков приложений
 
+**Сайт документации:** [aurobore-platform.github.io/aurora](https://aurobore-platform.github.io/aurora/)
+
 | Документ | Назначение |
 |---|---|
 | [tutorials/quick-start.md](tutorials/quick-start.md) | Установка CLI, create, build, run |

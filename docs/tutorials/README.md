@@ -2,6 +2,8 @@
 
 Пошаговые практические руководства для разработчиков приложений Aurobore.
 
+> **Онлайн:** [aurobore-platform.github.io/aurora/tutorials/](https://aurobore-platform.github.io/aurora/tutorials/)
+
 ## MVP + Alpha (готово)
 
 | Туториал | Результат |

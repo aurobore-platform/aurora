@@ -2,6 +2,7 @@
   "name": "@aurobore/cli",
   "version": "0.0.3",
   "description": "CLI Aurobore: create/dev/build/run/plugin/doctor.",
+  "homepage": "https://aurobore-platform.github.io/aurora/",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

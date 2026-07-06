@@ -14,8 +14,11 @@
 | `@aurobore/filesystem` | FileSystem |
 | `@aurobore/clipboard` | Clipboard |
 | `@aurobore/network` | Network |
-| `@aurobore/camera` | Camera (A3) |
-| `@aurobore/geolocation` | Geolocation (A3) |
+| `@aurobore/camera` | Camera |
+| `@aurobore/geolocation` | Geolocation |
+| `@aurobore/notifications` | Notifications |
+| `@aurobore/share` | Share |
+| `@aurobore/sensors` | Sensors |
 
 Плагины перечисляются в `aurobore.config.json`:
 
@@ -98,30 +101,23 @@ try {
 }
 ```
 
-## Встроенные плагины MVP
+## Встроенные плагины
 
-| Пакет | Плагин | Назначение |
-|---|---|---|
-| `@aurobore/echo` | Echo | Conformance-stub, тест моста |
-| `@aurobore/device` | Device | Информация об устройстве |
-| `@aurobore/storage` | Storage | Key-value хранилище |
-| `@aurobore/filesystem` | FileSystem | Файловая система |
-| `@aurobore/clipboard` | Clipboard | Буфер обмена |
-| `@aurobore/network` | Network | Сетевой статус |
+| Пакет | Плагин | Назначение | Демо |
+|---|---|---|---|
+| `@aurobore/echo` | Echo | Conformance-stub, тест моста | [hello-world](../../examples/hello-world/) |
+| `@aurobore/device` | Device | Информация об устройстве | hello-world |
+| `@aurobore/storage` | Storage | Key-value хранилище | — |
+| `@aurobore/filesystem` | FileSystem | Файловая система (scope `appData`) | — |
+| `@aurobore/clipboard` | Clipboard | Буфер обмена | — |
+| `@aurobore/network` | Network | Сетевой статус | — |
+| `@aurobore/camera` | Camera | Фото / галерея → URL ресурса | [camera-demo](../../examples/camera-demo/) |
+| `@aurobore/geolocation` | Geolocation | Позиция и `watch` | [geo-demo](../../examples/geo-demo/) |
+| `@aurobore/notifications` | Notifications | Локальные уведомления | [notifications-demo](../../examples/notifications-demo/) |
+| `@aurobore/share` | Share | Системный шаринг | [share-demo](../../examples/share-demo/) |
+| `@aurobore/sensors` | Sensors | Акселерометр / гироскоп (стримы) | [sensors-demo](../../examples/sensors-demo/) |
 
 Подробнее по каждому: [plugins/README.md](../plugins/README.md).
-
-## Плагины post-A3 (P1–P5)
-
-| Пакет | Плагин | Demo | Статус native |
-|---|---|---|---|
-| `@aurobore/camera` | Camera | [camera-demo](../../examples/camera-demo/) | **P1** — pick/capture → `Photo` URL; sign-off на устройстве pending |
-| `@aurobore/geolocation` | Geolocation | [geo-demo](../../examples/geo-demo/) | **P2** — GPS watch + getCurrentPosition; sign-off на устройстве pending |
-| `@aurobore/sensors` | Sensors | [sensors-demo](../../examples/sensors-demo/) | **P3** — accel/gyro streams; sign-off на устройстве pending |
-| `@aurobore/notifications` | Notifications | [notifications-demo](../../examples/notifications-demo/) | **P4** — notify/schedule/cancel + `notification:tap`; sign-off tap на устройстве pending |
-| `@aurobore/share` | Share | — | [share-demo](../../examples/share-demo/) (P5) |
-
-См. [plugins/camera.md](../plugins/camera.md), [plugins/geolocation.md](../plugins/geolocation.md), [plugins/sensors.md](../plugins/sensors.md), [plugins/notifications.md](../plugins/notifications.md).
 
 ## Написание своего плагина
 

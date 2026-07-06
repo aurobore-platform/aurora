@@ -13,6 +13,11 @@ const pluginItems: SidebarItem[] = [
   { text: "FileSystem", link: "/plugins/filesystem" },
   { text: "Clipboard", link: "/plugins/clipboard" },
   { text: "Network", link: "/plugins/network" },
+  { text: "Camera", link: "/plugins/camera" },
+  { text: "Geolocation", link: "/plugins/geolocation" },
+  { text: "Notifications", link: "/plugins/notifications" },
+  { text: "Share", link: "/plugins/share" },
+  { text: "Sensors", link: "/plugins/sensors" },
 ];
 
 const generatedPluginItems: SidebarItem[] = [

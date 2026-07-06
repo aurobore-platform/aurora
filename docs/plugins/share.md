@@ -5,7 +5,7 @@
 **Пакет:** `@aurobore/share`  
 **Разрешения:** нет
 
-Native-реализация (P5): `Sailfish.Share` `ShareAction` (`sailfish-components-share-qt5`) + async invoke через `ShareBridge` / `ShareSheetPage.qml`.
+Native: `Sailfish.Share` `ShareAction` (`sailfish-components-share-qt5`) + async invoke через `ShareBridge` / `ShareSheetPage.qml`.
 
 ## Методы
 

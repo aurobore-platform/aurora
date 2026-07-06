@@ -2,10 +2,10 @@
 
 > Открытая платформа для создания **WebView-приложений под ОС Аврора** на стандартном вебе
 > (HTML/CSS/JS/TS) с доступом к нативным возможностям через типизированный мост и систему плагинов.
-> Аналог Cordova / Capacitor / Tauri, спроектированный с учётом особенностей Аврора (Qt/QML + C++).
 
-**Статус: MVP (M0–M5).** Платформа включает runtime, мост, плагины, CLI, SDK и шаблоны.
-Документация — в [`docs/`](docs/README.md).
+**Документация:** [aurobore-platform.github.io/aurora](https://aurobore-platform.github.io/aurora/)  
+**Статус: MVP (M0–M5).** Платформа включает runtime, мост, плагины, CLI, SDK и шаблоны.  
+Исходники и полная проектная документация — в [`docs/`](docs/README.md) (VitePress: `pnpm docs:dev:full`).
 
 ## Быстрый старт
 
@@ -19,7 +19,7 @@ cd MyApp && pnpm install && pnpm build:web
 aurobore build && aurobore run
 ```
 
-Подробнее: [docs/tutorials/quick-start.md](docs/tutorials/quick-start.md).
+Подробнее: [Быстрый старт на сайте документации](https://aurobore-platform.github.io/aurora/tutorials/quick-start) · [docs/tutorials/quick-start.md](docs/tutorials/quick-start.md) (в репозитории).
 Пример: [`examples/hello-world/`](examples/hello-world/).
 
 ## С чего начать

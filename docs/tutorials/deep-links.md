@@ -23,7 +23,7 @@
 
 ## Событие в JavaScript
 
-Runtime доставляет URI как событие **`deeplink`** (алиас **`appurlopen`** для совместимости с Cordova):
+Runtime доставляет URI как событие **`deeplink`** (алиас **`appurlopen`** — то же событие, другое имя):
 
 ```javascript
 Aurobore.on("deeplink", ({ url }) => {

@@ -51,6 +51,7 @@
     "version:bump": "node scripts/bump-version.mjs",
     "publish": "node scripts/check-npm-publish.mjs && pnpm build && pnpm changeset publish"
   },
+  "homepage": "https://aurobore-platform.github.io/aurora/",
   "repository": {
     "type": "git",
     "url": "https://github.com/aurobore-platform/aurora.git"

@@ -1,4 +1,4 @@
-# API Reference (MVP)
+# API Reference
 
 Краткий справочник публичного SDK `@aurobore/core` и пакетов плагинов.
 
@@ -76,9 +76,13 @@ interface StreamSubscription {
 ```typescript
 import { Device } from "@aurobore/device";
 import { Echo } from "@aurobore/echo";
+import { Camera } from "@aurobore/camera";
 ```
 
-**Справочник:** [plugins/README.md](../plugins/README.md) — методы, типы, события, коды ошибок (`FILESYSTEM_*`, `STORAGE_*`, …).
+**Пакеты:** `@aurobore/echo`, `device`, `storage`, `filesystem`, `clipboard`, `network`,
+`camera`, `geolocation`, `notifications`, `share`, `sensors`.
+
+**Справочник:** [plugins/README.md](../plugins/README.md) — методы, типы, события, коды ошибок.
 
 Каталог: [standard-plugins.md](../plugins/standard-plugins.md).
 Контракт плагина: [plugin-api.md](../plugins/plugin-api.md).
@@ -88,7 +92,7 @@ import { Echo } from "@aurobore/echo";
 | Команда | Описание |
 |---|---|
 | `aurobore create` | Новый проект из шаблона |
-| `aurobore dev` | Dev server + эмулятор |
+| `aurobore dev` | Dev server + эмулятор; `--web` — только браузер с mock-плагинами |
 | `aurobore build` | Web + native RPM |
 | `aurobore run` | Деплой и запуск |
 | `aurobore plugin add/list/remove` | Управление плагинами |

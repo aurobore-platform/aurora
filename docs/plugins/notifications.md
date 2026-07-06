@@ -5,7 +5,7 @@
 **Пакет:** `@aurobore/notifications`  
 **Разрешения:** `Notifications`
 
-Native-реализация (P4): Nemo `Notification` API (`nemonotifications-qt5`) + D-Bus `remoteAction` для tap из шторки.
+Native: Nemo `Notification` API (`nemonotifications-qt5`) + D-Bus `remoteAction` для tap из шторки.
 
 ## Методы
 

@@ -120,5 +120,9 @@ export default defineConfig({
     outline: {
       label: "На этой странице",
     },
+
+    socialLinks: [
+      { icon: "github", link: "https://github.com/aurobore-platform/aurora" },
+    ],
   },
 });
