@@ -51,4 +51,15 @@ describe("materializeDevAssets", () => {
     expect(fs.existsSync(path.join(assets.jsDir, "aurobore-plugins.js"))).toBe(true);
     expect(fs.existsSync(path.join(assets.cssDir, "aurobore-chrome.css"))).toBe(true);
   });
+
+  it("webMode writes browser bridge bundles and fixtures", () => {
+    const repoRoot = path.resolve(import.meta.dirname, "../../../..");
+    const stubRoot = path.join(repoRoot, "examples", "hello-world-stub");
+    if (!fs.existsSync(path.join(stubRoot, "aurobore.config.json"))) return;
+
+    const assets = materializeDevAssets(stubRoot, { webMode: true });
+    expect(fs.existsSync(path.join(assets.jsDir, "aurobore-bridge-web.js"))).toBe(true);
+    expect(fs.existsSync(path.join(assets.jsDir, "aurobore-web-shim.js"))).toBe(true);
+    expect(fs.existsSync(path.join(assets.appDataDir, "fixtures", "photo.jpg"))).toBe(true);
+  });
 });

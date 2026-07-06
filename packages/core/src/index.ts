@@ -85,3 +85,23 @@ export {
   type CoverActionEvent,
   type CoverState,
 } from "./cover.js";
+
+export {
+  MOCK_CLIPBOARD_TEXT,
+  MOCK_DEVICE_INFO,
+  MOCK_GEO_POSITION,
+  MOCK_NETWORK_STATUS,
+  MOCK_NOTIFICATION_ID,
+  MOCK_PHOTO_FIXTURE,
+  MOCK_SAFE_AREA_INSETS,
+  MOCK_SENSOR_READING,
+  MockFilesystemState,
+  MockStorageState,
+  createMockPluginState,
+  dispatchMockEvent,
+  dispatchMockInvoke,
+  type MockBridgeError,
+  type MockDispatchResult,
+  type MockPluginState,
+  type MockStreamSpec,
+} from "./mocks/index.js";

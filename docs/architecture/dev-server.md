@@ -55,7 +55,26 @@
 - Dev-режим явно отделён от prod: дополнительные источники (Dev Server) разрешены только в dev-сборке.
 - Понятная диагностика типичных проблем: устройство не видит хост, неверный порт, файрвол.
 
-## 7. Связи
+## 7. Browser mock mode (`dev --web`, FR-C12)
+
+Альтернатива эмуляторному циклу для **веб-разработки без SDK**:
+
+```
+Desktop browser                    Dev Server (127.0.0.1)
+┌─────────────────────────┐        ┌──────────────────────────┐
+│ Web app + HMR           │◀──────▶│ Vite / esbuild / static  │
+│ aurobore-bridge-web.js  │        │ + injected bridge/plugins │
+│ loopback + mock plugins │        │ + /app-data/fixtures      │
+└─────────────────────────┘        └──────────────────────────┘
+```
+
+- Запуск: `aurobore dev --web` — **без** сборки/деплоя dev-контейнера.
+- Транспорт: `LoopbackTransport` (`@aurobore/bridge-js`) вместо `WebViewTransport`.
+- Mock native: `packages/core/src/mocks/` — все 11 встроенных плагинов.
+- HTML: автоматическая инъекция bridge-скриптов (в т.ч. для React/Vue SPA без тегов в шаблоне).
+- Подробнее: [web-mock-mode.md](../dev/web-mock-mode.md).
+
+## 8. Связи
 
 - ↔ [Runtime](runtime.md) — dev-контейнер грузит веб с Dev Server.
 - ↔ [Build System](build-system.md) — dev-сборка контейнера.

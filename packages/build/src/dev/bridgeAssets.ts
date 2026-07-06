@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { findMonorepoRoot } from "../codegen/project.js";
 import { generatePluginBundle } from "../codegen/generate.js";
 import { resolvePluginManifests } from "../codegen/project.js";
 import { loadConfig } from "../config/parse.js";
@@ -13,8 +14,10 @@ export const DEV_ASSETS_DIR = ".aurobore/dev-assets";
 /** URL-пути bridge-ассетов → относительный путь внутри DEV_ASSETS_DIR. */
 export const BRIDGE_ASSET_ROUTES: Record<string, string> = {
   "/js/aurobore-bridge.js": "js/aurobore-bridge.js",
+  "/js/aurobore-bridge-web.js": "js/aurobore-bridge-web.js",
   "/js/aurobore-bootstrap.js": "js/aurobore-bootstrap.js",
   "/js/aurobore-plugins.js": "js/aurobore-plugins.js",
+  "/js/aurobore-web-shim.js": "js/aurobore-web-shim.js",
   "/css/aurobore-chrome.css": "css/aurobore-chrome.css",
 };
 
@@ -22,6 +25,11 @@ export interface DevAssetsPaths {
   root: string;
   jsDir: string;
   cssDir: string;
+  appDataDir: string;
+}
+
+export interface MaterializeDevAssetsOptions {
+  webMode?: boolean;
 }
 
 /** Абсолютный путь к каталогу dev-ассетов проекта. */
@@ -32,6 +40,8 @@ export function devAssetsDir(projectRoot: string): string {
 /** Пути runtime bridge-скриптов в @aurobore/runtime. */
 export function resolveBridgeAssetSources(projectRoot: string): {
   bridgeJs: string;
+  bridgeWebJs: string;
+  webShimJs: string;
   bootstrapJs: string;
   chromeCss: string;
 } {
@@ -39,9 +49,19 @@ export function resolveBridgeAssetSources(projectRoot: string): {
   const containerHtml = path.join(runtimeRoot, "container", "html");
   return {
     bridgeJs: path.join(containerHtml, "js", "aurobore-bridge.js"),
+    bridgeWebJs: path.join(containerHtml, "js", "aurobore-bridge-web.js"),
+    webShimJs: path.join(containerHtml, "js", "aurobore-web-shim.js"),
     bootstrapJs: path.join(containerHtml, "js", "aurobore-bootstrap.js"),
     chromeCss: path.join(containerHtml, "css", "aurobore-chrome.css"),
   };
+}
+
+function resolveWebFixturesRoot(projectRoot: string): string {
+  const monorepo = findMonorepoRoot(projectRoot);
+  if (monorepo) {
+    return path.join(monorepo, "packages", "bridge-js", "fixtures");
+  }
+  return path.join(projectRoot, "node_modules", "@aurobore", "bridge-js", "fixtures");
 }
 
 function copyFileIfExists(src: string, dest: string): void {
@@ -62,11 +82,30 @@ export function generateDevPluginsBundle(projectRoot: string, outPath: string): 
   fs.writeFileSync(outPath, generatePluginBundle(manifests), "utf8");
 }
 
+function materializeWebFixtures(appDataDir: string, projectRoot: string): void {
+  const fixturesRoot = resolveWebFixturesRoot(projectRoot);
+  const photoSrc = path.join(fixturesRoot, "photo.jpg");
+  if (fs.existsSync(photoSrc)) {
+    copyFileIfExists(photoSrc, path.join(appDataDir, "fixtures", "photo.jpg"));
+  }
+
+  const echoDir = path.join(appDataDir, "echo");
+  fs.mkdirSync(echoDir, { recursive: true });
+  const samplePath = path.join(echoDir, "sample.txt");
+  if (!fs.existsSync(samplePath)) {
+    fs.writeFileSync(samplePath, "aurobore echo sample fixture\n", "utf8");
+  }
+}
+
 /** Копирует bridge/bootstrap/chrome + plugins bundle в .aurobore/dev-assets/. */
-export function materializeDevAssets(projectRoot: string): DevAssetsPaths {
+export function materializeDevAssets(
+  projectRoot: string,
+  options?: MaterializeDevAssetsOptions,
+): DevAssetsPaths {
   const root = devAssetsDir(projectRoot);
   const jsDir = path.join(root, "js");
   const cssDir = path.join(root, "css");
+  const appDataDir = path.join(root, "app-data");
   const sources = resolveBridgeAssetSources(projectRoot);
 
   copyFileIfExists(sources.bridgeJs, path.join(jsDir, "aurobore-bridge.js"));
@@ -74,7 +113,13 @@ export function materializeDevAssets(projectRoot: string): DevAssetsPaths {
   copyFileIfExists(sources.chromeCss, path.join(cssDir, "aurobore-chrome.css"));
   generateDevPluginsBundle(projectRoot, path.join(jsDir, "aurobore-plugins.js"));
 
-  return { root, jsDir, cssDir };
+  if (options?.webMode) {
+    copyFileIfExists(sources.bridgeWebJs, path.join(jsDir, "aurobore-bridge-web.js"));
+    copyFileIfExists(sources.webShimJs, path.join(jsDir, "aurobore-web-shim.js"));
+    materializeWebFixtures(appDataDir, projectRoot);
+  }
+
+  return { root, jsDir, cssDir, appDataDir };
 }
 
 /** Пытается отдать bridge-ассет; возвращает true если ответ отправлен. */

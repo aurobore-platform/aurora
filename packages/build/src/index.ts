@@ -100,7 +100,9 @@ export {
   BRIDGE_ASSET_ROUTES,
   bridgeAssetsMiddleware,
 } from "./dev/bridgeAssets.js";
-export type { DevAssetsPaths } from "./dev/bridgeAssets.js";
+export type { DevAssetsPaths, MaterializeDevAssetsOptions } from "./dev/bridgeAssets.js";
+export { injectAuroboreWebMode, WEB_MODE_MARKER } from "./dev/webInject.js";
+export { appDataMiddleware, tryServeAppDataAsset, APP_DATA_URL_PREFIX } from "./dev/appDataMiddleware.js";
 export {
   detectDevBackend,
   isViteProject,

@@ -4,19 +4,26 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const outFile = join(here, "../../../runtime/container/html/js/aurobore-bridge.js");
+const outDir = join(here, "../../../runtime/container/html/js");
 
-mkdirSync(dirname(outFile), { recursive: true });
+mkdirSync(outDir, { recursive: true });
 
-await esbuild.build({
-  entryPoints: [join(here, "../src/bundle.ts")],
-  bundle: true,
-  format: "iife",
-  platform: "browser",
-  target: "es2020",
-  outfile: outFile,
-  minify: false,
-  sourcemap: false,
-});
+const bundles = [
+  { entry: join(here, "../src/bundle.ts"), outfile: join(outDir, "aurobore-bridge.js") },
+  { entry: join(here, "../src/bundle-web.ts"), outfile: join(outDir, "aurobore-bridge-web.js") },
+  { entry: join(here, "../src/web-shim.ts"), outfile: join(outDir, "aurobore-web-shim.js") },
+];
 
-console.log(`[bridge-js] bundle → ${outFile}`);
+for (const { entry, outfile } of bundles) {
+  await esbuild.build({
+    entryPoints: [entry],
+    bundle: true,
+    format: "iife",
+    platform: "browser",
+    target: "es2020",
+    outfile,
+    minify: false,
+    sourcemap: false,
+  });
+  console.log(`[bridge-js] bundle → ${outfile}`);
+}

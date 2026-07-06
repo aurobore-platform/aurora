@@ -1,5 +1,5 @@
 import type { BridgeInbound, BridgeMessage, BridgeOutbound } from "@aurobore/core";
-import { APP_DATA_URL_PREFIX } from "@aurobore/core";
+import { MockNativeHost } from "../mock-host.js";
 import type { LoopbackTransportLike } from "./types.js";
 
 type Handler = (msg: BridgeInbound) => void;
@@ -50,126 +50,9 @@ export class LoopbackTransport implements LoopbackTransportLike {
   }
 }
 
-/** Симуляция native-стороны в loopback-тестах. */
+/** Симуляция native-стороны в loopback-тестах (делегирует в MockNativeHost). */
 export class LoopbackNativeStub {
-  private activeStreamId: string | null = null;
-  private streamTimeoutId: ReturnType<typeof setTimeout> | null = null;
-
-  constructor(private readonly transport: LoopbackTransport) {
-    transport.onReceiveRaw((msg) => {
-      if (msg.type === "cancel") {
-        if (this.activeStreamId === msg.id) {
-          if (this.streamTimeoutId !== null) {
-            clearTimeout(this.streamTimeoutId);
-            this.streamTimeoutId = null;
-          }
-          this.activeStreamId = null;
-        }
-        return;
-      }
-      if (msg.type === "invoke") {
-        const { id, plugin, method, args } = msg;
-        if (plugin === "Echo" && method === "ping") {
-          this.reply(id, true, { pong: true });
-        } else if (plugin === "Echo" && method === "echo") {
-          this.reply(id, true, args);
-        } else if (plugin === "Echo" && method === "fail") {
-          this.reply(id, false, {
-            code: "ECHO_TEST_ERROR",
-            message: "demo error",
-            data: { code: 42 },
-          });
-        } else if (plugin === "Echo" && method === "watchTicks") {
-          this.streamTicks(id);
-        } else if (plugin === "Echo" && method === "watchFastTicks") {
-          this.streamFastTicks(id);
-        } else if (plugin === "Echo" && method === "getSampleResource") {
-          this.reply(id, true, {
-            kind: "resource",
-            url: `${APP_DATA_URL_PREFIX}echo/sample.txt`,
-            mimeType: "text/plain",
-            size: 28,
-          });
-        } else if (plugin === "Cover" && method === "setState") {
-          this.reply(id, true, { ok: true });
-        } else if (plugin === "Cover" && method === "setActions") {
-          this.reply(id, true, { ok: true });
-        } else if (plugin === "Cover" && method === "reset") {
-          this.reply(id, true, { ok: true });
-        } else {
-          this.reply(id, false, {
-            code: "BRIDGE_METHOD_NOT_FOUND",
-            message: `Unknown method ${method}`,
-          });
-        }
-      } else if (msg.type === "event" && msg.name === "app:demo") {
-        this.transport.sendRaw({
-          type: "event",
-          name: "app:echo",
-          data: msg.data,
-        });
-      }
-    });
-  }
-
-  private reply(id: string, ok: boolean, payload: unknown): void {
-    if (ok) {
-      this.transport.sendRaw({ type: "response", id, ok: true, result: payload });
-    } else {
-      this.transport.sendRaw({
-        type: "response",
-        id,
-        ok: false,
-        error: payload as { code: string; message: string; data?: unknown },
-      });
-    }
-  }
-
-  private streamTicks(subscriptionId: string): void {
-    this.activeStreamId = subscriptionId;
-    let tick = 0;
-    const send = (): void => {
-      tick += 1;
-      if (tick <= 5) {
-        this.transport.sendRaw({
-          type: "stream",
-          subscriptionId,
-          phase: "data",
-          payload: { tick },
-        });
-        this.streamTimeoutId = setTimeout(send, 10);
-      } else {
-        this.streamTimeoutId = null;
-        this.activeStreamId = null;
-        this.transport.sendRaw({
-          type: "stream",
-          subscriptionId,
-          phase: "complete",
-        });
-      }
-    };
-    send();
-  }
-
-  /** Burst в одном microtask — проверка JS coalescing (latest-wins за кадр). */
-  private streamFastTicks(subscriptionId: string): void {
-    this.activeStreamId = subscriptionId;
-    const limit = 100;
-    queueMicrotask(() => {
-      for (let tick = 1; tick <= limit; tick += 1) {
-        this.transport.sendRaw({
-          type: "stream",
-          subscriptionId,
-          phase: "data",
-          payload: { tick },
-        });
-      }
-      this.activeStreamId = null;
-      this.transport.sendRaw({
-        type: "stream",
-        subscriptionId,
-        phase: "complete",
-      });
-    });
+  constructor(transport: LoopbackTransport) {
+    new MockNativeHost(transport);
   }
 }

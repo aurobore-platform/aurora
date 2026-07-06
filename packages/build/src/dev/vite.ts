@@ -1,12 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
-import { bridgeAssetsMiddleware, resolveProjectModuleUrl } from "./bridgeAssets.js";
+import { pathToFileURL } from "node:url";
+import { appDataMiddleware } from "./appDataMiddleware.js";
+import { bridgeAssetsMiddleware } from "./bridgeAssets.js";
+import { injectAuroboreWebMode } from "./webInject.js";
 import { resolveDevHost } from "./server.js";
 
 export interface ViteDevServerOptions {
   projectRoot: string;
   port: number;
   assetsDir: string;
+  webMode?: boolean;
 }
 
 export interface ViteDevServerResult {
@@ -31,56 +35,7 @@ async function loadVite(projectRoot: string): Promise<ViteModule> {
   if (!fs.existsSync(viteEntry)) {
     throw new Error("vite not found in project; run npm install / pnpm install");
   }
-  return import(resolveProjectModuleUrl(projectRoot, "vite/dist/node/index.js")) as Promise<ViteModule>;
-}
-
-function auroboreDevAssetsPlugin(assetsDir: string): Record<string, unknown> {
-  return {
-    name: "aurobore-dev-assets",
-    configureServer(server: { middlewares: { use: (fn: ReturnType<typeof bridgeAssetsMiddleware>) => void } }) {
-      server.middlewares.use(bridgeAssetsMiddleware(assetsDir));
-    },
-  };
-}
-
-/** Vite dev server с HMR для WebView на эмуляторе. */
-export async function startViteDevServer(options: ViteDevServerOptions): Promise<ViteDevServerResult> {
-  const { projectRoot, port, assetsDir } = options;
-  const lanHost = resolveDevHost();
-  const vite = await loadVite(projectRoot);
-
-  const inlineConfig: Record<string, unknown> = {
-    root: projectRoot,
-    configFile: findViteConfig(projectRoot),
-    server: {
-      host: true,
-      port,
-      strictPort: true,
-      hmr: {
-        host: lanHost,
-        port,
-      },
-    },
-    plugins: [auroboreDevAssetsPlugin(assetsDir)],
-  };
-
-  const server = await vite.createServer(inlineConfig);
-  await server.listen();
-
-  const resolvedPort = server.config.server.port ?? port;
-  const entryUrl = `http://${lanHost}:${resolvedPort}/`;
-
-  console.log(`[dev] Vite HMR http://0.0.0.0:${resolvedPort}/`);
-  console.log(`[dev] emulator entry: ${entryUrl}`);
-
-  return {
-    port: resolvedPort,
-    host: lanHost,
-    url: entryUrl,
-    stop: async () => {
-      await server.close();
-    },
-  };
+  return import(pathToFileURL(viteEntry).href) as Promise<ViteModule>;
 }
 
 function findViteConfig(projectRoot: string): string | undefined {
@@ -89,4 +44,71 @@ function findViteConfig(projectRoot: string): string | undefined {
     if (fs.existsSync(p)) return p;
   }
   return undefined;
+}
+
+function auroboreDevAssetsPlugin(assetsDir: string, webMode?: boolean): Record<string, unknown> {
+  const plugin: Record<string, unknown> = {
+    name: "aurobore-dev-assets",
+    configureServer(server: { middlewares: { use: (fn: ReturnType<typeof bridgeAssetsMiddleware>) => void } }) {
+      server.middlewares.use(bridgeAssetsMiddleware(assetsDir));
+      server.middlewares.use(appDataMiddleware(assetsDir));
+    },
+  };
+
+  if (webMode) {
+    plugin.transformIndexHtml = {
+      order: "pre",
+      handler(html: string) {
+        return injectAuroboreWebMode(html);
+      },
+    };
+  }
+
+  return plugin;
+}
+
+/** Vite dev server с HMR для WebView на эмуляторе или browser mock mode. */
+export async function startViteDevServer(options: ViteDevServerOptions): Promise<ViteDevServerResult> {
+  const { projectRoot, port, assetsDir, webMode } = options;
+  const entryHost = webMode ? "127.0.0.1" : resolveDevHost();
+  const vite = await loadVite(projectRoot);
+
+  const inlineConfig: Record<string, unknown> = {
+    root: projectRoot,
+    configFile: findViteConfig(projectRoot),
+    server: {
+      host: webMode ? "127.0.0.1" : true,
+      port,
+      strictPort: true,
+      hmr: webMode
+        ? { host: "127.0.0.1", port }
+        : {
+            host: entryHost,
+            port,
+          },
+    },
+    plugins: [auroboreDevAssetsPlugin(assetsDir, webMode)],
+  };
+
+  const server = await vite.createServer(inlineConfig);
+  await server.listen();
+
+  const resolvedPort = server.config.server.port ?? port;
+  const entryUrl = `http://${entryHost}:${resolvedPort}/`;
+
+  if (webMode) {
+    console.log(`[dev] Vite HMR (browser mock) http://127.0.0.1:${resolvedPort}/`);
+  } else {
+    console.log(`[dev] Vite HMR http://0.0.0.0:${resolvedPort}/`);
+    console.log(`[dev] emulator entry: ${entryUrl}`);
+  }
+
+  return {
+    port: resolvedPort,
+    host: entryHost,
+    url: entryUrl,
+    stop: async () => {
+      await server.close();
+    },
+  };
 }

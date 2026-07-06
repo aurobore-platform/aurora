@@ -12,6 +12,7 @@ export interface EsbuildDevServerOptions {
   port: number;
   host?: string;
   entry?: string;
+  webMode?: boolean;
 }
 
 export interface EsbuildDevServerResult {
@@ -70,9 +71,9 @@ function liveReloadPlugin(notifyReload: () => void): esbuild.Plugin {
 export async function startEsbuildDevServer(
   options: EsbuildDevServerOptions,
 ): Promise<EsbuildDevServerResult> {
-  const { projectRoot, port } = options;
-  const bindHost = options.host ?? "0.0.0.0";
-  const lanHost = resolveDevHost();
+  const { projectRoot, port, webMode } = options;
+  const bindHost = options.host ?? (webMode ? "127.0.0.1" : "0.0.0.0");
+  const lanHost = webMode ? "127.0.0.1" : resolveDevHost();
   const entryPoint = options.entry ?? path.join(projectRoot, "src", "ts", "app.ts");
   const serveDir = prepareServeDir(projectRoot);
   const outJs = path.join(serveDir, "js", "app.js");
@@ -83,6 +84,7 @@ export async function startEsbuildDevServer(
     port,
     host: bindHost,
     assetsDir: assetsRoot,
+    webMode,
   });
 
   const ctx = await esbuildLib.context({
@@ -107,8 +109,12 @@ export async function startEsbuildDevServer(
 
   const entryUrl = `http://${lanHost}:${port}/index.html`;
 
-  console.log(`[dev] esbuild server http://${bindHost}:${port}/ → ${serveDir}`);
-  console.log(`[dev] emulator entry: ${entryUrl}`);
+  if (webMode) {
+    console.log(`[dev] esbuild server (browser mock) http://127.0.0.1:${port}/`);
+  } else {
+    console.log(`[dev] esbuild server http://${bindHost}:${port}/ → ${serveDir}`);
+    console.log(`[dev] emulator entry: ${entryUrl}`);
+  }
 
   return {
     port,

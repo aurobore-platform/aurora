@@ -4,6 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import { findMonorepoRoot } from "../codegen/project.js";
 import { tryServeBridgeAsset } from "./bridgeAssets.js";
+import { tryServeAppDataAsset } from "./appDataMiddleware.js";
+import { injectAuroboreWebMode } from "./webInject.js";
 
 export interface DevServerOptions {
   root: string;
@@ -12,6 +14,8 @@ export interface DevServerOptions {
   onReload?: () => void;
   /** Каталог .aurobore/dev-assets с bridge/bootstrap/plugins. */
   assetsDir?: string;
+  /** Browser mock mode: inject bridge scripts into HTML responses. */
+  webMode?: boolean;
 }
 
 const RELOAD_SCRIPT = `
@@ -69,6 +73,10 @@ export function startDevServer(options: DevServerOptions): DevServerHandle {
       return;
     }
 
+    if (options.assetsDir && tryServeAppDataAsset(urlPath, options.assetsDir, res)) {
+      return;
+    }
+
     let filePath = path.join(options.root, urlPath === "/" ? "index.html" : urlPath.replace(/^\//, ""));
 
     if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
@@ -84,8 +92,13 @@ export function startDevServer(options: DevServerOptions): DevServerHandle {
     let body = fs.readFileSync(filePath);
     let type = contentType(filePath);
     if (filePath.endsWith(".html")) {
-      const html = body.toString("utf8");
-      body = Buffer.from(html.includes("</body>") ? html.replace("</body>", `${RELOAD_SCRIPT}</body>`) : html + RELOAD_SCRIPT);
+      let html = body.toString("utf8");
+      if (options.webMode) {
+        html = injectAuroboreWebMode(html);
+      }
+      body = Buffer.from(
+        html.includes("</body>") ? html.replace("</body>", `${RELOAD_SCRIPT}</body>`) : html + RELOAD_SCRIPT,
+      );
     }
 
     res.writeHead(200, { "Content-Type": type });

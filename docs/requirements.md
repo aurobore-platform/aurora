@@ -81,6 +81,8 @@
 - **FR-P6.** Расширенный набор плагинов: **Camera, Geolocation, Notifications (local), Share, Sensors**.
 - **FR-P7.** Установка сторонних плагинов из npm и автоинтеграция их нативной части.
 - **FR-C7.** `dev` с **Hot Reload** (HMR) поверх live reload.
+- **FR-C12.** `dev --web` — browser mock mode: приложение в desktop-браузере с loopback-мостом и
+  детерминированными mock-ответами встроенных плагинов; без эмулятора/SDK. См. [web-mock-mode.md](dev/web-mock-mode.md).
 - **FR-C8.** `plugin create` — генерация скелета нового плагина из манифеста.
 - **FR-C9.** `publish` — публикация приложения/плагина (в стор Аврора / npm).
 - **FR-S4.** Официальные шаблоны для React / Vue / Svelte.

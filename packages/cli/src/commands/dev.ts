@@ -15,12 +15,15 @@ import {
   type DevBackendResult,
 } from "@aurobore/build";
 import { flagBool, flagString, type ParsedArgs } from "../args.js";
+import { openBrowser } from "../openBrowser.js";
 
 export async function runDevCommand(args: ParsedArgs): Promise<number> {
   if (flagBool(args.flags, "help") || flagBool(args.flags, "h")) {
     console.log(`aurobore dev — dev server + HMR/live reload + run на эмуляторе
 
 Options:
+  --web                Browser mock mode (desktop browser, no emulator)
+  --no-open            With --web: do not open the browser automatically
   --port <n>           Dev server port (default from config)
   --no-run             Только dev server, без deploy
   --static             Принудительно static SSE reload (без Vite HMR)
@@ -33,6 +36,7 @@ Options:
   let backend: DevBackendResult | undefined;
   let tunnel: CefDebugTunnel | undefined;
   let shuttingDown = false;
+  const webMode = flagBool(args.flags, "web");
 
   const shutdown = async (code = 0): Promise<void> => {
     if (shuttingDown) return;
@@ -65,24 +69,32 @@ Options:
     }
 
     const auroraEnv = loadAuroraEnv({ projectRoot: cwd, stagingName: config.app.id });
-    const cefDebugPort = resolveCefDebugPort({
-      disabled: flagBool(args.flags, "no-cef-debug"),
-      explicit: flagString(args.flags, "cef-debug-port")
-        ? Number(flagString(args.flags, "cef-debug-port"))
-        : undefined,
-      envPort: auroraEnv.AUROBORE_CEF_DEBUG_PORT ?? process.env.AUROBORE_CEF_DEBUG_PORT,
-      devMode: true,
-    });
+    const cefDebugPort = webMode
+      ? null
+      : resolveCefDebugPort({
+          disabled: flagBool(args.flags, "no-cef-debug"),
+          explicit: flagString(args.flags, "cef-debug-port")
+            ? Number(flagString(args.flags, "cef-debug-port"))
+            : undefined,
+          envPort: auroraEnv.AUROBORE_CEF_DEBUG_PORT ?? process.env.AUROBORE_CEF_DEBUG_PORT,
+          devMode: true,
+        });
 
     backend = await startDevBackend({
       projectRoot: cwd,
       config,
       port,
       forceStatic: flagBool(args.flags, "static"),
+      webMode,
     });
     printDevBanner(backend);
 
-    if (!flagBool(args.flags, "no-run")) {
+    if (webMode) {
+      if (!flagBool(args.flags, "no-open")) {
+        console.log(`[dev] opening browser: ${backend.url}`);
+        await openBrowser(backend.url);
+      }
+    } else if (!flagBool(args.flags, "no-run")) {
       console.log(`[dev] building dev container (entry: ${backend.url})`);
       await buildApp({ mode: "dev", devEntryUrl: backend.url, projectRoot: cwd });
 
