@@ -47,6 +47,8 @@ export interface EventMessage {
 
 export type StreamPhase = "data" | "error" | "complete";
 
+/** Camera frame payloads (FR-B7 / ADR-011): { kind: "frame", format, width, height, timestamp, binaryPayload } */
+
 export interface StreamMessage {
   type: "stream";
   subscriptionId: string;

@@ -1,0 +1,31 @@
+{
+  "name": "@aurobore/polyfills",
+  "version": "0.0.3",
+  "description": "W3C API polyfills over Aurobore plugins (FR-S6).",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aurobore/core": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  },
+  "scripts": {
+    "build": "tsc -b && node scripts/bundle.mjs",
+    "clean": "tsc -b --clean"
+  }
+}

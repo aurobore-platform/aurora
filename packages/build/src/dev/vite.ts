@@ -11,6 +11,7 @@ export interface ViteDevServerOptions {
   port: number;
   assetsDir: string;
   webMode?: boolean;
+  polyfills?: string[] | null;
 }
 
 export interface ViteDevServerResult {
@@ -46,7 +47,7 @@ function findViteConfig(projectRoot: string): string | undefined {
   return undefined;
 }
 
-function auroboreDevAssetsPlugin(assetsDir: string, webMode?: boolean): Record<string, unknown> {
+function auroboreDevAssetsPlugin(assetsDir: string, webMode?: boolean, polyfills?: string[] | null): Record<string, unknown> {
   const plugin: Record<string, unknown> = {
     name: "aurobore-dev-assets",
     configureServer(server: { middlewares: { use: (fn: ReturnType<typeof bridgeAssetsMiddleware>) => void } }) {
@@ -59,7 +60,7 @@ function auroboreDevAssetsPlugin(assetsDir: string, webMode?: boolean): Record<s
     plugin.transformIndexHtml = {
       order: "pre",
       handler(html: string) {
-        return injectAuroboreWebMode(html);
+        return injectAuroboreWebMode(html, { polyfills });
       },
     };
   }
@@ -69,7 +70,7 @@ function auroboreDevAssetsPlugin(assetsDir: string, webMode?: boolean): Record<s
 
 /** Vite dev server с HMR для WebView на эмуляторе или browser mock mode. */
 export async function startViteDevServer(options: ViteDevServerOptions): Promise<ViteDevServerResult> {
-  const { projectRoot, port, assetsDir, webMode } = options;
+  const { projectRoot, port, assetsDir, webMode, polyfills } = options;
   const entryHost = webMode ? "127.0.0.1" : resolveDevHost();
   const vite = await loadVite(projectRoot);
 
@@ -87,7 +88,7 @@ export async function startViteDevServer(options: ViteDevServerOptions): Promise
             port,
           },
     },
-    plugins: [auroboreDevAssetsPlugin(assetsDir, webMode)],
+    plugins: [auroboreDevAssetsPlugin(assetsDir, webMode, polyfills)],
   };
 
   const server = await vite.createServer(inlineConfig);

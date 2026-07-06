@@ -267,6 +267,15 @@ importers:
         specifier: ^2.2.0
         version: 2.2.12(typescript@5.9.3)
 
+  examples/w3c-demo:
+    devDependencies:
+      '@aurobore/build':
+        specifier: workspace:*
+        version: link:../../packages/build
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/bridge-js:
     dependencies:
       '@aurobore/core':
@@ -304,6 +313,16 @@ importers:
   packages/core: {}
 
   packages/create-aurobore: {}
+
+  packages/polyfills:
+    dependencies:
+      '@aurobore/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      esbuild:
+        specifier: ^0.24.2
+        version: 0.24.2
 
   packages/react:
     dependencies:

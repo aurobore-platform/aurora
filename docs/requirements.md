@@ -86,6 +86,10 @@
 - **FR-C8.** `plugin create` — генерация скелета нового плагина из манифеста.
 - **FR-C9.** `publish` — публикация приложения/плагина (в стор Аврора / npm).
 - **FR-S4.** Официальные шаблоны для React / Vue / Svelte.
+- **FR-S6.** Опциональные полифилы W3C API (`@aurobore/polyfills`): `navigator.geolocation`,
+  `navigator.share`, `Notification`, `navigator.clipboard`, `navigator.mediaDevices.getUserMedia`
+  → плагины Aurobore; opt-in через `web.polyfills` в конфиге. См. [w3c-polyfills.md](dev/w3c-polyfills.md),
+  [ADR-010](adr/ADR-010-w3c-polyfills.md).
 - **FR-D3.** DevTools: лог bridge-вызовов, инспекция, базовое профилирование.
 - **FR-T1.** Набор тестов совместимости плагинов (conformance suite).
 

@@ -261,6 +261,12 @@ WebView, снятие результата, ассерты; переисполь
 - **OTA (II.1):** модель доверия к источнику обновлений, подпись бандла, политика отката, границы «что можно
   менять по воздуху» (только веб; не permissions/нативный слой). → ADR.
 - **Полифилы (III.1):** объём соответствия стандарту (полный vs достаточный), поведение при отсутствии железа.
+  - **Резолюция getUserMedia — engine-first, plugin-fallback** ([RFC-001](rfc/RFC-001-w3c-polyfills.md),
+    [ADR-011](adr/ADR-011-camera-frame-channel.md)). `getUserMedia` — API движка WebView, поэтому `mediaDevices`
+    **исключён из дефолтного набора** полифилов (`web.polyfills: true` = 4 лёгких адаптера) и включается только
+    явным opt-in. Camera-fallback (`watchPreview` + бинарные кадры) **заблокирован на device-спайк**
+    `V-webview-getusermedia` ([verification-status](aurora/verification-status.md) §2): на устройстве с камерой
+    проверить нативный getUserMedia и возможность выдать media-permission из натива.
 - **Supply chain (V.2):** модель доверия к сторонним плагинам, формат/место хранения подписей. → ADR.
 - **Aurobore Go (I.2):** безопасность загрузки удалённого кода в dev-режиме, чёткое отделение от релиза.
 

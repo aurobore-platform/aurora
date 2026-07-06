@@ -5,6 +5,7 @@ import { findMonorepoRoot } from "../codegen/project.js";
 import { generatePluginBundle } from "../codegen/generate.js";
 import { resolvePluginManifests } from "../codegen/project.js";
 import { loadConfig } from "../config/parse.js";
+import { isPolyfillsEnabled } from "../polyfills/config.js";
 import { resolvePluginRefs } from "../plugins/catalog.js";
 import { resolveRuntimeRoot } from "../native/runtimePaths.js";
 
@@ -18,6 +19,7 @@ export const BRIDGE_ASSET_ROUTES: Record<string, string> = {
   "/js/aurobore-bootstrap.js": "js/aurobore-bootstrap.js",
   "/js/aurobore-plugins.js": "js/aurobore-plugins.js",
   "/js/aurobore-web-shim.js": "js/aurobore-web-shim.js",
+  "/js/aurobore-polyfills.js": "js/aurobore-polyfills.js",
   "/css/aurobore-chrome.css": "css/aurobore-chrome.css",
 };
 
@@ -42,6 +44,7 @@ export function resolveBridgeAssetSources(projectRoot: string): {
   bridgeJs: string;
   bridgeWebJs: string;
   webShimJs: string;
+  polyfillsJs: string;
   bootstrapJs: string;
   chromeCss: string;
 } {
@@ -51,6 +54,7 @@ export function resolveBridgeAssetSources(projectRoot: string): {
     bridgeJs: path.join(containerHtml, "js", "aurobore-bridge.js"),
     bridgeWebJs: path.join(containerHtml, "js", "aurobore-bridge-web.js"),
     webShimJs: path.join(containerHtml, "js", "aurobore-web-shim.js"),
+    polyfillsJs: path.join(containerHtml, "js", "aurobore-polyfills.js"),
     bootstrapJs: path.join(containerHtml, "js", "aurobore-bootstrap.js"),
     chromeCss: path.join(containerHtml, "css", "aurobore-chrome.css"),
   };
@@ -117,6 +121,11 @@ export function materializeDevAssets(
     copyFileIfExists(sources.bridgeWebJs, path.join(jsDir, "aurobore-bridge-web.js"));
     copyFileIfExists(sources.webShimJs, path.join(jsDir, "aurobore-web-shim.js"));
     materializeWebFixtures(appDataDir, projectRoot);
+  }
+
+  const { config } = loadConfig(projectRoot);
+  if (isPolyfillsEnabled(config)) {
+    copyFileIfExists(sources.polyfillsJs, path.join(jsDir, "aurobore-polyfills.js"));
   }
 
   return { root, jsDir, cssDir, appDataDir };

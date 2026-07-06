@@ -1,4 +1,4 @@
-import path from "node:path";
+import { resolvePolyfillIds } from "../polyfills/config.js";
 import type { AuroboreConfig } from "../config/types.js";
 import { materializeDevAssets } from "./bridgeAssets.js";
 import { detectDevBackend, resolveDevWebRoot, type DevBackendKind } from "./detect.js";
@@ -25,6 +25,7 @@ export interface DevBackendResult {
 /** Поднимает dev backend (vite / esbuild / static) и materialize bridge assets. */
 export async function startDevBackend(options: StartDevBackendOptions): Promise<DevBackendResult> {
   const { projectRoot, config, port, forceStatic, webMode } = options;
+  const polyfills = resolvePolyfillIds(config);
   const assets = materializeDevAssets(projectRoot, { webMode });
   const backend = detectDevBackend(projectRoot, forceStatic);
   const lanHost = webMode ? "127.0.0.1" : resolveDevHost();
@@ -37,6 +38,7 @@ export async function startDevBackend(options: StartDevBackendOptions): Promise<
         port,
         assetsDir: assets.root,
         webMode,
+        polyfills,
       });
       const url = result.url.endsWith("/") ? `${result.url}${entryPath}` : `${result.url}/${entryPath}`;
       return { url, port: result.port, backend, webMode: !!webMode, stop: result.stop };
@@ -51,6 +53,7 @@ export async function startDevBackend(options: StartDevBackendOptions): Promise<
       port,
       webMode,
       host: webMode ? "127.0.0.1" : undefined,
+      polyfills,
     });
     return { url: result.url, port: result.port, backend, webMode: !!webMode, stop: result.stop };
   }
@@ -62,6 +65,7 @@ export async function startDevBackend(options: StartDevBackendOptions): Promise<
     host: webMode ? "127.0.0.1" : "0.0.0.0",
     assetsDir: assets.root,
     webMode,
+    polyfills,
   });
   const url = `http://${lanHost}:${port}/${entryPath}`;
   return { url, port, backend: "static", webMode: !!webMode };

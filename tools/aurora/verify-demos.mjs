@@ -25,6 +25,7 @@ const DEMOS = [
   { name: "sensors-demo", web: { filter: "@aurobore/example-sensors-demo", script: "build:web" } },
   { name: "notifications-demo", web: { filter: "@aurobore/example-notifications-demo", script: "build:web" } },
   { name: "share-demo", web: { filter: "@aurobore/example-share-demo", script: "build:web" } },
+  { name: "w3c-demo", web: { filter: "@aurobore/example-w3c-demo", script: "build:web" } },
 ];
 
 function log(msg) {

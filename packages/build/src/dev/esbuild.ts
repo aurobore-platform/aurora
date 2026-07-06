@@ -13,6 +13,7 @@ export interface EsbuildDevServerOptions {
   host?: string;
   entry?: string;
   webMode?: boolean;
+  polyfills?: string[] | null;
 }
 
 export interface EsbuildDevServerResult {
@@ -71,7 +72,7 @@ function liveReloadPlugin(notifyReload: () => void): esbuild.Plugin {
 export async function startEsbuildDevServer(
   options: EsbuildDevServerOptions,
 ): Promise<EsbuildDevServerResult> {
-  const { projectRoot, port, webMode } = options;
+  const { projectRoot, port, webMode, polyfills } = options;
   const bindHost = options.host ?? (webMode ? "127.0.0.1" : "0.0.0.0");
   const lanHost = webMode ? "127.0.0.1" : resolveDevHost();
   const entryPoint = options.entry ?? path.join(projectRoot, "src", "ts", "app.ts");
@@ -85,6 +86,7 @@ export async function startEsbuildDevServer(
     host: bindHost,
     assetsDir: assetsRoot,
     webMode,
+    polyfills,
   });
 
   const ctx = await esbuildLib.context({

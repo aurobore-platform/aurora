@@ -25,11 +25,18 @@
     },
     "PickPhotoArgs": {
       "allowEditing": "boolean?"
+    },
+    "WatchPreviewArgs": {
+      "facingMode": "string?",
+      "width": "number?",
+      "height": "number?",
+      "maxFps": "number?"
     }
   },
   "methods": {
     "getPhoto": { "args": "GetPhotoArgs", "result": "Photo" },
-    "pickPhoto": { "args": "PickPhotoArgs", "result": "Photo" }
+    "pickPhoto": { "args": "PickPhotoArgs", "result": "Photo" },
+    "watchPreview": { "args": "WatchPreviewArgs", "result": "void", "stream": true }
   },
   "errors": {
     "CAMERA_UNAVAILABLE": {

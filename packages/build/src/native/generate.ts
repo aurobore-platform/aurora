@@ -15,6 +15,8 @@ import {
   resolveRuntimeRoot,
   type ResolveRuntimeRootOptions,
 } from "./runtimePaths.js";
+import { injectPolyfillsScript } from "../dev/webInject.js";
+import { isPolyfillsEnabled, resolvePolyfillIds } from "../polyfills/config.js";
 
 const SYNC_EXCLUDE = new Set(["RPMS", "CMakeFiles", ".sfdk", "generated"]);
 const SYNC_EXCLUDE_PATHS = new Set(["qml/verification"]);
@@ -70,7 +72,7 @@ function copyWebAssets(projectRoot: string, config: AuroboreConfig, htmlDir: str
   copyDirFiltered(webRoot, htmlDir, new Set());
 }
 
-function ensureBridgeScripts(runtimeRoot: string, htmlDir: string): void {
+function ensureBridgeScripts(runtimeRoot: string, htmlDir: string, polyfills?: boolean): void {
   const jsDir = path.join(htmlDir, "js");
   fs.mkdirSync(jsDir, { recursive: true });
   const containerJs = path.join(runtimeRoot, "container", "html", "js");
@@ -78,6 +80,12 @@ function ensureBridgeScripts(runtimeRoot: string, htmlDir: string): void {
     const src = path.join(containerJs, file);
     if (fs.existsSync(src)) {
       fs.copyFileSync(src, path.join(jsDir, file));
+    }
+  }
+  if (polyfills) {
+    const polyfillsSrc = path.join(containerJs, "aurobore-polyfills.js");
+    if (fs.existsSync(polyfillsSrc)) {
+      fs.copyFileSync(polyfillsSrc, path.join(jsDir, "aurobore-polyfills.js"));
     }
   }
   const containerCss = path.join(runtimeRoot, "container", "html", "css", "aurobore-chrome.css");
@@ -605,7 +613,18 @@ export async function generateNativeProject(
     if (fs.existsSync(htmlDir)) fs.rmSync(htmlDir, { recursive: true, force: true });
     copyWebAssets(projectRoot, config, htmlDir);
   }
-  ensureBridgeScripts(runtimeRoot, path.join(nativeDir, "html"));
+  ensureBridgeScripts(runtimeRoot, path.join(nativeDir, "html"), isPolyfillsEnabled(config));
+
+  if (mode === "prod" && isPolyfillsEnabled(config)) {
+    const entryHtml = path.join(nativeDir, "html", config.web.entry.replace(/^\//, ""));
+    if (fs.existsSync(entryHtml)) {
+      const html = fs.readFileSync(entryHtml, "utf8");
+      const patched = injectPolyfillsScript(html, "js/aurobore-polyfills.js", resolvePolyfillIds(config));
+      if (patched !== html) {
+        fs.writeFileSync(entryHtml, patched, "utf8");
+      }
+    }
+  }
 
   const { manifests } = runProjectCodegenFromConfig(projectRoot, pluginsForCodegen);
   const effective = resolveEffectiveConfig(config, manifests);

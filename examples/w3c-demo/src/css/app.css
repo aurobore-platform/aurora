@@ -1,0 +1,42 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 1rem;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+main {
+  max-width: 40rem;
+}
+
+h1, h2 {
+  margin-top: 1.25rem;
+}
+
+.hint {
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.log {
+  background: #1e293b;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+}
+
+button {
+  margin: 0.25rem 0.5rem 0.25rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
+#preview {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 0.5rem;
+  background: #000;
+  border-radius: 0.5rem;
+}

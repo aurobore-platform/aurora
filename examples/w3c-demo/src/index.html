@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>W3C Polyfills Demo</title>
+  <link rel="stylesheet" href="css/aurobore-chrome.css" data-aurobore-chrome="1" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main>
+    <h1>W3C Polyfills (FR-S6)</h1>
+    <p id="status">Loading…</p>
+    <p class="hint">This app uses only standard <code>navigator.*</code> and <code>Notification</code>.</p>
+
+    <section>
+      <h2>Geolocation</h2>
+      <button type="button" id="btn-geo">Get Position</button>
+      <pre id="geo-log" class="log"></pre>
+    </section>
+
+    <section>
+      <h2>Share</h2>
+      <button type="button" id="btn-share">Share text</button>
+    </section>
+
+    <section>
+      <h2>Notification</h2>
+      <button type="button" id="btn-notify">Show notification</button>
+    </section>
+
+    <section>
+      <h2>Clipboard</h2>
+      <button type="button" id="btn-copy">Copy «hello»</button>
+      <button type="button" id="btn-paste">Paste</button>
+      <pre id="clip-log" class="log"></pre>
+    </section>
+
+    <section>
+      <h2>Camera (getUserMedia)</h2>
+      <button type="button" id="btn-camera">Start camera</button>
+      <button type="button" id="btn-stop-camera" disabled>Stop</button>
+      <video id="preview" playsinline autoplay muted></video>
+    </section>
+  </main>
+  <script src="js/aurobore-bridge.js"></script>
+  <script src="js/aurobore-plugins.js"></script>
+  <script src="js/aurobore-polyfills.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

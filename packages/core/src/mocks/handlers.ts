@@ -1,5 +1,6 @@
 import { APP_DATA_URL_PREFIX, createResourceRef } from "../resource.js";
 import {
+  MOCK_CAMERA_FRAME_BASE64,
   MOCK_CLIPBOARD_TEXT,
   MOCK_DEVICE_INFO,
   MOCK_GEO_POSITION,
@@ -214,6 +215,23 @@ export function dispatchMockInvoke(
         height: MOCK_PHOTO_FIXTURE.height,
         format: MOCK_PHOTO_FIXTURE.format,
       });
+    }
+    if (method === "watchPreview") {
+      return {
+        type: "stream",
+        stream: {
+          count: 30,
+          intervalMs: 66,
+          payload: () => ({
+            kind: "frame",
+            format: "jpeg",
+            width: MOCK_PHOTO_FIXTURE.width,
+            height: MOCK_PHOTO_FIXTURE.height,
+            timestamp: Date.now(),
+            binaryPayload: MOCK_CAMERA_FRAME_BASE64,
+          }),
+        },
+      };
     }
     return notFound(method);
   }

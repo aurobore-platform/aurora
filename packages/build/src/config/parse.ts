@@ -17,12 +17,19 @@ const TOP_KEYS = new Set([
 ]);
 
 const APP_KEYS = new Set(["id", "name", "version", "orientation", "icon", "splash"]);
-const WEB_KEYS = new Set(["root", "entry", "entryUrl", "devServer", "allowedOrigins"]);
+const WEB_KEYS = new Set(["root", "entry", "entryUrl", "devServer", "allowedOrigins", "polyfills"]);
 const SPLASH_KEYS = new Set(["image", "background", "timeoutMs"]);
 const DEV_SERVER_KEYS = new Set(["port", "host"]);
 const BUILD_KEYS = new Set(["engine", "minOs", "targets"]);
 const DEEP_LINKS_KEYS = new Set(["schemes"]);
 const COVER_KEYS = new Set(["actions"]);
+const POLYFILL_IDS = new Set([
+  "geolocation",
+  "share",
+  "notification",
+  "clipboard",
+  "mediaDevices",
+]);
 const COVER_ACTION_KEYS = new Set(["id", "label", "icon"]);
 
 const ORIENTATIONS = new Set(["portrait", "landscape", "auto"]);
@@ -208,6 +215,20 @@ export function validateConfig(raw: unknown): ConfigValidationError[] {
     }
     const allowedOrigins = validateAllowedOrigins(errors, raw.web.allowedOrigins);
     validateInternetForAllowedOrigins(errors, allowedOrigins, raw.permissions);
+    if (raw.web.polyfills !== undefined) {
+      if (raw.web.polyfills === true) {
+        // ok
+      } else if (Array.isArray(raw.web.polyfills)) {
+        for (let i = 0; i < raw.web.polyfills.length; i++) {
+          const id = raw.web.polyfills[i];
+          if (typeof id !== "string" || !POLYFILL_IDS.has(id)) {
+            push(errors, `web.polyfills[${i}]`, `unknown polyfill id: ${String(id)}`);
+          }
+        }
+      } else {
+        push(errors, "web.polyfills", "polyfills must be true or an array of polyfill ids");
+      }
+    }
   }
 
   validateStringArray(errors, raw.permissions, "permissions");

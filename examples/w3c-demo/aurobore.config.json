@@ -1,0 +1,30 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.w3cdemo",
+    "name": "W3C Demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "resources/icon.svg"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html",
+    "polyfills": ["geolocation", "share", "notification", "clipboard", "mediaDevices"],
+    "devServer": {
+      "port": 5180
+    }
+  },
+  "permissions": ["Internet", "Location", "Camera", "Notifications"],
+  "plugins": [
+    "@aurobore/geolocation",
+    "@aurobore/camera",
+    "@aurobore/notifications",
+    "@aurobore/share",
+    "@aurobore/clipboard"
+  ],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  }
+}

@@ -4,6 +4,10 @@
 #include "IPlugin.h"
 
 class CameraBridge;
+class QCamera;
+class QCameraImageCapture;
+class QTimer;
+class StreamPublisher;
 
 class CameraPlugin : public IPlugin
 {
@@ -13,6 +17,7 @@ public:
     static void setCameraBridge(CameraBridge *bridge);
 
     explicit CameraPlugin(BridgeRouter *bridgeRouter, QObject *parent = nullptr);
+    ~CameraPlugin() override;
 
     QString displayName() const override;
 
@@ -29,9 +34,23 @@ private:
                                    const QString &mimeHint,
                                    int quality) const;
 
+    void startPreview(const QString &subscriptionId, const QVariantMap &args);
+    void stopPreview();
+    void emitSyntheticFrame();
+    void onImageCaptured(int id, const QImage &preview);
+    QVariantMap framePayloadFromJpeg(const QByteArray &jpeg, int width, int height) const;
+
     QString m_pendingId;
     QString m_pendingMethod;
     int m_pendingQuality = 80;
+
+    StreamPublisher *m_previewPublisher = nullptr;
+    QTimer *m_previewTimer = nullptr;
+    QCamera *m_previewCamera = nullptr;
+    QCameraImageCapture *m_previewCapture = nullptr;
+    QString m_previewId;
+    int m_previewWidth = 640;
+    int m_previewHeight = 480;
 };
 
 #endif

@@ -21,6 +21,15 @@ export interface DevServerConfig {
   host?: string;
 }
 
+export type PolyfillId =
+  | "geolocation"
+  | "share"
+  | "notification"
+  | "clipboard"
+  | "mediaDevices";
+
+export type PolyfillsConfig = boolean | PolyfillId[];
+
 export interface WebConfig {
   root: string;
   entry: string;
@@ -28,6 +37,8 @@ export interface WebConfig {
   devServer?: DevServerConfig;
   /** Whitelist external HTTPS origins (origin only, no path). */
   allowedOrigins?: string[];
+  /** W3C API polyfills (FR-S6). */
+  polyfills?: PolyfillsConfig;
 }
 
 export type WebViewEngine = "chromium";

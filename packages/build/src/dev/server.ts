@@ -5,7 +5,7 @@ import path from "node:path";
 import { findMonorepoRoot } from "../codegen/project.js";
 import { tryServeBridgeAsset } from "./bridgeAssets.js";
 import { tryServeAppDataAsset } from "./appDataMiddleware.js";
-import { injectAuroboreWebMode } from "./webInject.js";
+import { injectAuroboreWebMode, injectPolyfillsScript } from "./webInject.js";
 
 export interface DevServerOptions {
   root: string;
@@ -16,6 +16,8 @@ export interface DevServerOptions {
   assetsDir?: string;
   /** Browser mock mode: inject bridge scripts into HTML responses. */
   webMode?: boolean;
+  /** Resolved W3C polyfill ids (null/empty = disabled). */
+  polyfills?: string[] | null;
 }
 
 const RELOAD_SCRIPT = `
@@ -94,7 +96,9 @@ export function startDevServer(options: DevServerOptions): DevServerHandle {
     if (filePath.endsWith(".html")) {
       let html = body.toString("utf8");
       if (options.webMode) {
-        html = injectAuroboreWebMode(html);
+        html = injectAuroboreWebMode(html, { polyfills: options.polyfills });
+      } else if (options.polyfills && options.polyfills.length > 0) {
+        html = injectPolyfillsScript(html, "/js/aurobore-polyfills.js", options.polyfills);
       }
       body = Buffer.from(
         html.includes("</body>") ? html.replace("</body>", `${RELOAD_SCRIPT}</body>`) : html + RELOAD_SCRIPT,
