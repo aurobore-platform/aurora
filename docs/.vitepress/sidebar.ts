@@ -110,6 +110,10 @@ export const architectureSidebar: SidebarItem[] = [
 
 export const devSidebar: SidebarItem[] = [
   { text: "Обзор", link: "/dev/" },
+  { text: "Browser mock (`dev --web`)", link: "/dev/web-mock-mode" },
+  { text: "W3C polyfills", link: "/dev/w3c-polyfills" },
+  { text: "OTA / Live Updates", link: "/dev/ota-updates" },
+  { text: "E2E device tests", link: "/dev/e2e-testing" },
   { text: "Native plugin guide", link: "/dev/native-plugin-guide" },
   { text: "Native debugging", link: "/dev/native-debugging" },
   { text: "Adding a plugin", link: "/dev/adding-a-plugin" },
@@ -128,11 +132,16 @@ export const adrSidebar: SidebarItem[] = [
   { text: "ADR-007 Packaging", link: "/adr/ADR-007-packaging-build" },
   { text: "ADR-008 Codegen", link: "/adr/ADR-008-typescript-sdk-codegen" },
   { text: "ADR-009 Naming", link: "/adr/ADR-009-naming" },
+  { text: "ADR-010 W3C polyfills", link: "/adr/ADR-010-w3c-polyfills" },
+  { text: "ADR-011 Camera frames", link: "/adr/ADR-011-camera-frame-channel" },
+  { text: "ADR-012 OTA updates", link: "/adr/ADR-012-ota-live-updates" },
   { text: "Шаблон", link: "/adr/ADR-000-template" },
 ];
 
 export const rfcSidebar: SidebarItem[] = [
   { text: "RFC", link: "/rfc/" },
+  { text: "RFC-001 W3C polyfills", link: "/rfc/RFC-001-w3c-polyfills" },
+  { text: "RFC-002 OTA updates", link: "/rfc/RFC-002-ota-live-updates" },
   { text: "Шаблон", link: "/rfc/RFC-000-template" },
 ];
 

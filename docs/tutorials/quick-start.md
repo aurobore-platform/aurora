@@ -104,6 +104,14 @@ aurobore run
 aurobore dev
 ```
 
+**Без эмулятора** (только desktop-браузер, mock-плагины):
+
+```bash
+aurobore dev --web
+```
+
+Подробнее: [web-mock-mode.md](../dev/web-mock-mode.md).
+
 ## 6. Проверка моста
 
 В созданном проекте нажмите **Echo ping** — в статусе должно появиться `pong=true`.
@@ -114,3 +122,5 @@ aurobore dev
 - [Использование плагинов](using-plugins.md)
 - [События и lifecycle](events-and-lifecycle.md)
 - [Справочник API](../api/README.md)
+- Перенос SPA/PWA: [W3C polyfills](../dev/w3c-polyfills.md), пример [`w3c-demo`](../../examples/w3c-demo/)
+- OTA-обновления: [ota-updates.md](../dev/ota-updates.md), пример [`ota-demo`](../../examples/ota-demo/)

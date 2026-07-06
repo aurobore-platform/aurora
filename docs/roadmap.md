@@ -61,11 +61,19 @@
 - **Совместимость:** проверка на линейке Chromium/CEF (5.1.5/5.1.6+, 5.2.x); матрица версий ОС
   (FR-R7, NFR-3, ADR-004). Вторая реализация движка (Gecko) **не входит** в область поддержки.
 - **Deep links + permissions/scopes** (FR-R8, FR-R9).
+- **Улучшения из [improvements-plan.md](improvements-plan.md)** (часть уже в коде):
+  - ✅ `dev --web` — browser mock mode ([web-mock-mode.md](dev/web-mock-mode.md), FR-C12).
+  - ✅ OTA live-updates MVP ([ota-updates.md](dev/ota-updates.md), ADR-012; sign-off crypto — P2).
+  - 🟡 W3C polyfills ([w3c-polyfills.md](dev/w3c-polyfills.md), FR-S6; getUserMedia — device-спайк).
+  - ✅ JSON Schema конфига/манифеста ([configuration.md](architecture/configuration.md) §7, FR-D5).
+  - ✅ E2E harness minimal ([e2e-testing.md](dev/e2e-testing.md), `pnpm e2e:verify`, FR-T2).
 - **Критерий выхода:** реальные демо-приложения работают на нескольких версиях Аврора.
 
 ## Этап 4 — Beta
 - **DevTools:** лог bridge-вызовов, инспекция, профилирование (FR-D3).
-- **Тесты:** conformance-suite для плагинов и моста (FR-T1, NFR-8).
+- **Тесты:** conformance-suite для плагинов и моста (FR-T1, NFR-8); расширение E2E-сценариев.
+- **DX:** bundle analyzer / performance budget ([improvements-plan.md](improvements-plan.md) IV.2, FR-C15).
+- **Перенос PWA:** импорт `webmanifest` → `aurobore.config` (III.2, FR-CF4).
 - **Безопасность:** аудит модели разрешений/областей/источника моста (NFR-2).
 - **Сторонние плагины из npm** + автоинтеграция нативной части (FR-P7).
 - **Документация:** полный справочник API из манифестов, туториалы.

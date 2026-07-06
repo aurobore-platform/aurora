@@ -16,7 +16,15 @@
 | [Immersive UI / system chrome](immersive-ui.md) | Zero-config insets, fullscreen WebView, overlay keyboard (fixed geometry) |
 | [Обложка (cover)](cover.md) | Формальная обложка по умолчанию; opt-in actions и `cover.setState` |
 
-Примеры: [`examples/hello-world/`](../../examples/hello-world/), [`react-demo`](../../examples/react-demo/), [`vue-demo`](../../examples/vue-demo/), [`svelte-demo`](../../examples/svelte-demo/).
+Дополнительно (гайды в `dev/`, для full-документации):
+
+| Тема | Документ |
+|---|---|
+| Browser mock (`dev --web`) | [web-mock-mode.md](../dev/web-mock-mode.md) |
+| W3C polyfills (перенос PWA) | [w3c-polyfills.md](../dev/w3c-polyfills.md) |
+| OTA live-updates | [ota-updates.md](../dev/ota-updates.md) |
+
+Примеры: [`examples/hello-world/`](../../examples/hello-world/), [`react-demo`](../../examples/react-demo/), [`vue-demo`](../../examples/vue-demo/), [`svelte-demo`](../../examples/svelte-demo/), [`w3c-demo`](../../examples/w3c-demo/), [`ota-demo`](../../examples/ota-demo/).
 
 Справочник API: [api/README.md](../api/README.md).
 

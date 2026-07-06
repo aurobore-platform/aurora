@@ -2,6 +2,8 @@
 
 Сквозные сценарии на эмуляторе Aurora: сборка приложения → deploy → assert поведения моста/UI.
 
+Оркестратор: `pnpm e2e:verify` → [`tools/aurora/verify-e2e.mjs`](../../tools/aurora/verify-e2e.mjs).
+
 ## Сценарий: hello-world-stub
 
 | Шаг | Действие |
@@ -11,9 +13,7 @@
 | 3 | Native `runJavaScript` проверяет `#out` === «Echo ping OK» |
 | 4 | Journal-маркер: `[e2e] bridge assert OK` |
 
-Оркестратор: `tools/aurora/verify-e2e.mjs` → `pnpm e2e:verify`.
-
-Документация (VitePress): [docs/dev/e2e-testing.md](../../docs/dev/e2e-testing.md).
+Реализация assert: env-gated код в [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml).
 
 ## Требования
 
@@ -30,4 +30,9 @@ $env:AUROBORE_E2E = "1"
 aurobore run
 ```
 
-См. также [tools/aurora/README.md](../../tools/aurora/README.md).
+## Связанные документы
+
+- Исходный README сценария: [`tests/e2e/README.md`](../../tests/e2e/README.md)
+- Dev-toolkit: [tools/aurora/README.md](../../tools/aurora/README.md)
+- Требование: [requirements.md](../requirements.md) (FR-T2)
+- План: [improvements-plan.md](../improvements-plan.md) (IV.3)

@@ -90,7 +90,7 @@
 ## 9. Чек-лист тестирования
 - [ ] Модульные тесты в каждом пакете.
 - [x] Тесты моста на loopback-транспорте → [`packages/bridge-js/src/bridge.test.ts`](../packages/bridge-js/src/bridge.test.ts).
-- [ ] e2e: create→build→run→проверка вызова/события/стрима.
+- [x] e2e: create→build→run→проверка вызова/события/стрима. → `pnpm e2e:verify`, [dev/e2e-testing.md](dev/e2e-testing.md).
 - [ ] Conformance-suite для плагинов (FR-T1).
 - [x] Матрица версий Аврора/движков (NFR-3). → [aurora/compatibility-matrix.md](aurora/compatibility-matrix.md); прогон `pnpm compat:verify`.
 - [ ] Тесты безопасности (отказ разрешений, посторонний источник).

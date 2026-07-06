@@ -44,6 +44,10 @@
 | Документ | Назначение |
 |---|---|
 | [dev/README.md](dev/README.md) | Индекс операционных гайдов |
+| [dev/web-mock-mode.md](dev/web-mock-mode.md) | Browser mock mode: `aurobore dev --web` (FR-C12) |
+| [dev/w3c-polyfills.md](dev/w3c-polyfills.md) | W3C API polyfills для переноса SPA/PWA (FR-S6) |
+| [dev/ota-updates.md](dev/ota-updates.md) | OTA / Live Updates веб-бандла (FR-R13, FR-C14) |
+| [dev/e2e-testing.md](dev/e2e-testing.md) | E2E harness на эмуляторе: `pnpm e2e:verify` (FR-T2) |
 | [dev/native-plugin-guide.md](dev/native-plugin-guide.md) | Workflow M3: codegen, staging, сборка, Qt-подводные камни |
 | [dev/adding-a-plugin.md](dev/adding-a-plugin.md) | Чеклист добавления нового плагина |
 
@@ -57,7 +61,7 @@
 | [roadmap.md](roadmap.md) | Этапы: Research → Design → MVP → Alpha → Beta → RC → 1.0 |
 | [mvp-plan.md](mvp-plan.md) | Детальный план этапа MVP (майлстоуны M0…M5, первый шаг — PoC моста) |
 | [alpha-plan.md](alpha-plan.md) | Детальный план этапа Alpha (майлстоуны A1…A6, первый шаг — Bridge+) |
-| [improvements-plan.md](improvements-plan.md) | План улучшений — идеи развития инструмента (черновик, кандидаты в requirements) |
+| [improvements-plan.md](improvements-plan.md) | План улучшений — живой реестр идей развития (статусы, очередь P1–P2) |
 | [checklists.md](checklists.md) | Чек-листы: архитектура, инфраструктура, Runtime, Bridge, CLI, SDK, тесты, релиз |
 
 ### Архитектура (`architecture/`)

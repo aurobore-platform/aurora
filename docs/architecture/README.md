@@ -118,3 +118,6 @@ Runtime при загрузке плагина проверяет совмест
 - [ADR-006](../adr/ADR-006-configuration-format.md) — формат конфигурации.
 - [ADR-007](../adr/ADR-007-packaging-build.md) — упаковка и сборка (CMake/RPM).
 - [ADR-008](../adr/ADR-008-typescript-sdk-codegen.md) — кодогенерация SDK.
+- [ADR-010](../adr/ADR-010-w3c-polyfills.md) — опциональные W3C API polyfills.
+- [ADR-011](../adr/ADR-011-camera-frame-channel.md) — getUserMedia fallback через Camera.
+- [ADR-012](../adr/ADR-012-ota-live-updates.md) — OTA live-updates веб-бандла.

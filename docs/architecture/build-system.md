@@ -80,7 +80,13 @@ aurobore build
 - Артефакт: `.rpm` (и метаданные).
 - Отчёт сборки: использованные плагины и версии, разрешения, движок, размер пакета, предупреждения.
 
-## 9. Связи
+## 9. OTA-артефакты (FR-C14)
+
+Команда `aurobore update publish` формирует **подписанный OTA-бандл** (tar.gz + `manifest.json` +
+`manifest.sig`) для канала (`stable`/`beta`). Runtime применяет его через UpdateManager (см. [runtime.md](runtime.md) §13).
+Локальная проверка: `examples/ota-demo`, `pnpm ota:serve`. Подробнее — [dev/ota-updates.md](../dev/ota-updates.md).
+
+## 10. Связи
 
 - ↔ [Configuration](configuration.md) — главный вход.
 - ↔ [Plugin System](plugin-system.md)/[Loader](plugin-loader.md) — реестр плагинов и нативные зависимости.

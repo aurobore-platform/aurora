@@ -94,7 +94,7 @@
 - **FR-D5.** JSON Schema для `aurobore.config` и `plugin.manifest` в `@aurobore/build`; шаблоны с `$schema`
   для автодополнения в редакторе. См. [configuration.md](architecture/configuration.md) §7.
 - **FR-T1.** Набор тестов совместимости плагинов (conformance suite).
-- **FR-T2.** E2E device harness: сквозной сценарий на эмуляторе (`pnpm e2e:verify`). См. [tests/e2e/README.md](../tests/e2e/README.md).
+- **FR-T2.** E2E device harness: сквозной сценарий на эмуляторе (`pnpm e2e:verify`). См. [e2e-testing.md](dev/e2e-testing.md).
 
 ## 3. Дополнительные идеи (COULD)
 

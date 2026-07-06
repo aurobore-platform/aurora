@@ -24,6 +24,7 @@ web:
   root: "dist"                  // каталог собранного веба
   entry: "index.html"
   devServer: { port: 5173 }
+  polyfills: true               // опционально; @aurobore/polyfills (FR-S6) — см. dev/w3c-polyfills.md
   allowedOrigins:             // опционально; whitelist external HTTPS (origin only)
     - "https://example.com"
 permissions: ["Internet", "camera", "location"]
@@ -31,6 +32,12 @@ plugins:
   - "@aurobore/device"
   - "@aurobore/storage"
   - "@aurobore/camera"
+updates:                        // опционально; OTA live-updates (FR-R13) — см. dev/ota-updates.md
+  enabled: true
+  url: "https://updates.example/ota"
+  channel: "stable"
+  publicKey: "<base64 Ed25519>"
+  checkOnResume: true
 build:
   engine: "chromium"           // целевой движок WebView (CEF/Chromium); Gecko вне поддержки — см. ADR-004
   minOs: "5.1.5"               // минимальная версия ОС Аврора (Chromium-линейка)
