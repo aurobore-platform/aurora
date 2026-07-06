@@ -32,6 +32,8 @@ export interface AuroraEnv {
   AUROBORE_W5_COOKIES?: string;
   /** W6 spike: 10 WebView dispose/recreate cycles after loopback load (optional). */
   AUROBORE_W6_DISPOSE?: string;
+  /** E2E harness: bridge assert via runJavaScript (optional). */
+  AUROBORE_E2E?: string;
   /** Extra Valgrind flags for container:valgrind (optional). */
   VALGRIND_OPTS?: string;
 }

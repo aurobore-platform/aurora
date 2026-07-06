@@ -1,0 +1,27 @@
+{
+  "configVersion": 1,
+  "app": {
+    "id": "ru.auroraos.ota_demo",
+    "name": "OTA Demo",
+    "version": "1.0.0",
+    "orientation": "portrait"
+  },
+  "web": {
+    "root": "dist",
+    "entry": "index.html"
+  },
+  "permissions": ["Internet"],
+  "plugins": ["@aurobore/echo", "@aurobore/device"],
+  "build": {
+    "engine": "chromium",
+    "minOs": "5.1.5"
+  },
+  "updates": {
+    "enabled": true,
+    "url": "http://192.168.0.1:8765/ota",
+    "channel": "stable",
+    "publicKey": "Ok/S1eveUtHaK8iL1NwSjLEP39BRur4y7X1Ehf1ISTQ=",
+    "checkOnResume": true,
+    "checkIntervalMs": 300000
+  }
+}

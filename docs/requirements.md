@@ -91,7 +91,10 @@
   → плагины Aurobore; opt-in через `web.polyfills` в конфиге. См. [w3c-polyfills.md](dev/w3c-polyfills.md),
   [ADR-010](adr/ADR-010-w3c-polyfills.md).
 - **FR-D3.** DevTools: лог bridge-вызовов, инспекция, базовое профилирование.
+- **FR-D5.** JSON Schema для `aurobore.config` и `plugin.manifest` в `@aurobore/build`; шаблоны с `$schema`
+  для автодополнения в редакторе. См. [configuration.md](architecture/configuration.md) §7.
 - **FR-T1.** Набор тестов совместимости плагинов (conformance suite).
+- **FR-T2.** E2E device harness: сквозной сценарий на эмуляторе (`pnpm e2e:verify`). См. [tests/e2e/README.md](../tests/e2e/README.md).
 
 ## 3. Дополнительные идеи (COULD)
 
@@ -103,6 +106,10 @@
 - **FR-S5.** Адаптеры/биндинги к популярным фреймворкам (хуки React, composables Vue).
 - **FR-D4.** Автогенерация справочника API из манифестов в сайт документации.
 - **FR-X1.** Кросс-платформенный режим (повторное использование плагинов на других ОС) — стратегическая опция.
+- **FR-R13.** OTA-обновления веб-бандла: проверка подписи, скачивание, атомарное применение, откат;
+  события `update:*` в JS. Только веб-часть; натив/permissions — через RPM. См. [ADR-012](adr/ADR-012-ota-live-updates.md).
+- **FR-C14.** CLI `aurobore update keygen|publish|list|rollback` — формирование подписанного OTA-артефакта
+  и управление каналами. См. [ADR-012](adr/ADR-012-ota-live-updates.md).
 
 ---
 

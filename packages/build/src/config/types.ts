@@ -63,6 +63,15 @@ export interface CoverConfig {
   actions?: CoverActionConfig[];
 }
 
+export interface UpdatesConfig {
+  enabled?: boolean;
+  url?: string;
+  channel?: string;
+  publicKey?: string;
+  checkOnResume?: boolean;
+  checkIntervalMs?: number;
+}
+
 /** Декларативный конфиг проекта Aurobore (aurobore.config.json). */
 export interface AuroboreConfig {
   configVersion: number;
@@ -73,6 +82,7 @@ export interface AuroboreConfig {
   build?: BuildConfig;
   deepLinks?: DeepLinksConfig;
   cover?: CoverConfig;
+  updates?: UpdatesConfig;
 }
 
 /** Агрегированные nativeDeps из манифестов плагинов. */

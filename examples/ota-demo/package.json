@@ -1,0 +1,14 @@
+{
+  "name": "@aurobore/example-ota-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OTA / Live Updates demo (FR-R13, FR-C14)",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs",
+    "publish:ota": "node scripts/bump-and-publish.mjs"
+  },
+  "devDependencies": {
+    "@aurobore/build": "workspace:*"
+  }
+}

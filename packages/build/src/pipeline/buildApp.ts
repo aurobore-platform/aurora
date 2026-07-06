@@ -148,7 +148,9 @@ export async function runApp(options: RunAppOptions = {}): Promise<void> {
     env,
   });
 
-  const runScript = generateRunScript(appId, env, options.cefDebugPort);
+  const runScript = generateRunScript(appId, env, options.cefDebugPort, {
+    e2eBridgeAssert: process.env.AUROBORE_E2E === "1",
+  });
   const runScriptPath = path.join(projectRoot, ".aurobore", "run-app.sh");
   fs.mkdirSync(path.dirname(runScriptPath), { recursive: true });
   fs.writeFileSync(runScriptPath, runScript, "utf8");

@@ -38,6 +38,8 @@
 #include "NotificationsPlugin.h"
 #include "ShareBridge.h"
 #include "SharePlugin.h"
+#include "UpdateManager.h"
+#include "UpdatesPlugin.h"
 
 int main(int argc, char *argv[])
 {
@@ -110,6 +112,11 @@ int main(int argc, char *argv[])
 
     Aurora::WebView::WebEngineContext::InitBrowser(argc, argv, browserArgs, webViewParams);
 
+    LifecycleBridge lifecycleBridge;
+    BridgeRouter bridgeRouter;
+    UpdateManager updateManager(&assetResolver, &bridgeRouter);
+    updateManager.bootstrapActiveBundle();
+
     AssetSchemeServer assetServer;
     QString entryUrl;
     if (assetServer.start(&assetResolver, &tlsCredentials)) {
@@ -136,9 +143,10 @@ int main(int argc, char *argv[])
         webViewHarnessModes.append(QStringLiteral("w6"));
         qInfo("[aurobore-container] W6 dispose test enabled");
     }
+    const bool e2eEnabled = qgetenv("AUROBORE_E2E") == QByteArray("1");
+    if (e2eEnabled)
+        qInfo("[aurobore-container] E2E bridge assert enabled");
 
-    LifecycleBridge lifecycleBridge;
-    BridgeRouter bridgeRouter;
     WebViewAuthBridge webViewAuthBridge(&bridgeRouter);
     WebViewCookieBridge webViewCookieBridge(&bridgeRouter);
     CoverBridge coverBridge(&bridgeRouter);
@@ -179,6 +187,10 @@ int main(int argc, char *argv[])
     WebViewPlugin *webViewPlugin =
         new WebViewPlugin(&bridgeRouter, &webViewAuthBridge, &webViewCookieBridge);
     bridgeRouter.registerBuiltInPlugin(WebViewPlugin::descriptor(), webViewPlugin);
+    UpdatesPlugin *updatesPlugin =
+        new UpdatesPlugin(&bridgeRouter, &updateManager);
+    bridgeRouter.registerBuiltInPlugin(UpdatesPlugin::descriptor(), updatesPlugin);
+    updateManager.start();
     QObject::connect(
         application.data(), &QGuiApplication::applicationStateChanged,
         &lifecycleBridge, &LifecycleBridge::onApplicationStateChanged);
@@ -195,6 +207,9 @@ int main(int argc, char *argv[])
             else if (event == QStringLiteral("resume"))
                 coverBridge.onResume();
         });
+    QObject::connect(
+        &lifecycleBridge, &LifecycleBridge::lifecycleEvent,
+        &updateManager, &UpdateManager::onLifecycleEvent);
     QObject::connect(
         &lifecycleBridge, &LifecycleBridge::lifecycleEvent,
         &deepLinkHandler, [&deepLinkHandler, &application](const QString &event) {
@@ -220,8 +235,10 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("cameraBridge"), &cameraBridge);
     rootContext->setContextProperty(QStringLiteral("notificationsBridge"), &notificationsBridge);
     rootContext->setContextProperty(QStringLiteral("shareBridge"), &shareBridge);
+    rootContext->setContextProperty(QStringLiteral("updateManager"), &updateManager);
     rootContext->setContextProperty(QStringLiteral("entryUrl"), entryUrl);
     rootContext->setContextProperty(QStringLiteral("webViewHarnessModes"), webViewHarnessModes);
+    rootContext->setContextProperty(QStringLiteral("auroboreE2eEnabled"), e2eEnabled);
     rootContext->setContextProperty(QStringLiteral("allowedOrigins"), allowedOriginsList);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());

@@ -27,6 +27,7 @@ export type {
   EffectiveConfig,
   ConfigValidationError,
   LoadedConfig,
+  UpdatesConfig,
 } from "./config/types.js";
 export { loadConfig, parseConfig, validateConfig, findConfigFile, isValidAppId, isValidSemver } from "./config/parse.js";
 export { resolveEffectiveConfig, pluginNameFromRef } from "./config/merge.js";
@@ -55,7 +56,7 @@ export type { DockerProbeResult, DockerProbeStatus } from "./aurora/docker.js";
 export { syncDir, syncProject, runCommand, pathsEqual } from "./aurora/sync.js";
 export { sfdkBuild, findRpm } from "./aurora/sdk.js";
 export { ensureEmulator } from "./aurora/emulator.js";
-export { deployRpm, runOnEmulator, generateRunScript } from "./aurora/deploy.js";
+export { deployRpm, runOnEmulator, generateRunScript, type GenerateRunScriptOptions } from "./aurora/deploy.js";
 export {
   CEF_DEBUG_DOC_REL,
   DEFAULT_CEF_DEBUG_PORT,
@@ -171,3 +172,37 @@ export type {
 
 export { bundleWebApp, bundleVanillaWebApp } from "./web/bundle.js";
 export type { BundleWebAppOptions } from "./web/bundle.js";
+
+export {
+  OTA_MANIFEST_VERSION,
+  OTA_BUNDLE_FILENAME,
+  OTA_MANIFEST_FILENAME,
+  OTA_SIGNATURE_FILENAME,
+  OTA_CHANNEL_POINTER_FILENAME,
+  canonicalizeManifestPayload,
+  stripSignature,
+  generateEd25519KeyPair,
+  loadPrivateKeyPem,
+  signManifestPayload,
+  verifyManifestSignature,
+  writeKeyPair,
+  listWebRootFiles,
+  packWebRoot,
+  publishOtaBundle,
+  listOtaVersions,
+  rollbackOtaChannel,
+  DEFAULT_MIN_RUNTIME_VERSION,
+  DEFAULT_RUNTIME_VERSION,
+} from "./updates/index.js";
+export type {
+  OtaBundleFormat,
+  OtaManifestPayload,
+  OtaManifest,
+  OtaChannelPointer,
+  Ed25519KeyPair,
+  PackWebRootOptions,
+  PackWebRootResult,
+  PublishOtaBundleOptions,
+  PublishOtaBundleResult,
+  ListOtaVersionsOptions,
+} from "./updates/index.js";

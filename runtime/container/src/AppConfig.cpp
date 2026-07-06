@@ -119,6 +119,16 @@ QString AppConfig::appId()
     return id.isString() ? id.toString() : QString();
 }
 
+QString AppConfig::appVersion()
+{
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue appValue = root.value(QStringLiteral("app"));
+    if (!appValue.isObject())
+        return QString();
+    const QJsonValue version = appValue.toObject().value(QStringLiteral("version"));
+    return version.isString() ? version.toString() : QString();
+}
+
 QStringList AppConfig::allowedOrigins()
 {
     const QJsonObject root = loadConfigObject();
@@ -151,6 +161,26 @@ CoverConfig AppConfig::cover()
         if (!entry.id.isEmpty() && !entry.label.isEmpty())
             config.actions.append(entry);
     }
+    return config;
+}
+
+UpdatesConfig AppConfig::updates()
+{
+    UpdatesConfig config;
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue updatesValue = root.value(QStringLiteral("updates"));
+    if (!updatesValue.isObject())
+        return config;
+
+    const QJsonObject updates = updatesValue.toObject();
+    config.enabled = updates.value(QStringLiteral("enabled")).toBool(false);
+    config.url = updates.value(QStringLiteral("url")).toString();
+    config.channel = updates.value(QStringLiteral("channel")).toString(QStringLiteral("stable"));
+    config.publicKey = updates.value(QStringLiteral("publicKey")).toString();
+    config.checkOnResume = updates.value(QStringLiteral("checkOnResume")).toBool(true);
+    const QJsonValue interval = updates.value(QStringLiteral("checkIntervalMs"));
+    if (interval.isDouble() && interval.toInt() >= 60000)
+        config.checkIntervalMs = interval.toInt();
     return config;
 }
 

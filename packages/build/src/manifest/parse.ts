@@ -1,6 +1,7 @@
 import type { ManifestValidationError, PluginManifest } from "./types.js";
 
 const MANIFEST_TOP_KEYS = new Set([
+  "$schema",
   "manifestVersion",
   "name",
   "display",

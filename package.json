@@ -38,6 +38,8 @@
     "container:valgrind": "node tools/aurora/native-debug.mjs valgrind",
     "container:valgrind:fetch": "node tools/aurora/native-debug.mjs valgrind-fetch",
     "demos:verify": "node tools/aurora/verify-demos.mjs",
+    "e2e:verify": "node tools/aurora/verify-e2e.mjs",
+    "ota:serve": "node tools/aurora/serve-ota.mjs",
     "compat:verify": "node tools/aurora/verify-compat.mjs",
     "external:sync": "node tools/aurora/sync-external-examples.mjs",
     "docs:dev": "vitepress dev docs",

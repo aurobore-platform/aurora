@@ -18,6 +18,7 @@ find_package(aurora_libaurorawebview QUIET)
 pkg_check_modules(Auroraapp auroraapp REQUIRED IMPORTED_TARGET)
 pkg_check_modules(Nemonotifications nemonotifications-qt5 REQUIRED IMPORTED_TARGET)
 pkg_check_modules(qca2-qt5 REQUIRED IMPORTED_TARGET qca2-qt5)
+pkg_check_modules(ZLIB zlib REQUIRED IMPORTED_TARGET)
 
 if(aurora_libaurorawebview_FOUND)
     get_property(CEF_LIBS_PATH GLOBAL PROPERTY aurora_libcef_PROPERTY_LIBS_PATH)
@@ -103,6 +104,8 @@ add_executable(${PROJECT_NAME}
     src/WebViewPlugin.cpp
     src/CoverBridge.cpp
     src/CoverPlugin.cpp
+    src/UpdateManager.cpp
+    src/UpdatesPlugin.cpp
     generated/PluginRegistry.cpp
     ${BRIDGE_NATIVE_DIR}/BridgeRouter.cpp
     ${NATIVE_SDK_DIR}/IPlugin.cpp
@@ -166,6 +169,7 @@ target_link_libraries(${PROJECT_NAME}
         ${AUROBORE_WEBVIEW_TARGET}
         PkgConfig::Nemonotifications
         PkgConfig::qca2-qt5
+        PkgConfig::ZLIB
 )
 
 set(SUBPROCESS_NAME ${PROJECT_NAME}.webview-subprocess)

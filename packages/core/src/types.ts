@@ -29,5 +29,12 @@ export type WebViewEvent =
   | "webview:httpError"
   | "webview:loadError";
 
+/** OTA live-update события (см. ADR-012). */
+export type UpdateEvent =
+  | "update:available"
+  | "update:ready"
+  | "update:applied"
+  | "update:error";
+
 /** Все bridge-события, доступные приложению через aurobore.on(...). */
-export type BridgeEvent = LifecycleEvent | WebViewEvent;
+export type BridgeEvent = LifecycleEvent | WebViewEvent | UpdateEvent;

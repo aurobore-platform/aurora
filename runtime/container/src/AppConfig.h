@@ -16,6 +16,15 @@ struct CoverConfig {
     QList<CoverActionConfig> actions;
 };
 
+struct UpdatesConfig {
+    bool enabled = false;
+    QString url;
+    QString channel = QStringLiteral("stable");
+    QString publicKey;
+    bool checkOnResume = true;
+    int checkIntervalMs = 3600000;
+};
+
 struct AppConfig {
     static const char *kEntryUrl;
     static const char *kAppScheme;
@@ -23,10 +32,12 @@ struct AppConfig {
     static int splashTimeoutMs();
     static QString appName();
     static QString appId();
+    static QString appVersion();
     static QStringList grantedPermissions();
     static QStringList deepLinkSchemes();
     static QStringList allowedOrigins();
     static CoverConfig cover();
+    static UpdatesConfig updates();
 };
 
 } // namespace Aurobore

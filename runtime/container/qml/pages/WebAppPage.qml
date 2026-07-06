@@ -16,6 +16,9 @@ Page {
 
     property bool splashVisible: true
     property bool webReady: false
+    property bool e2eAssertDone: false
+    property int e2eAttemptCount: 0
+    readonly property bool e2eEnabled: typeof auroboreE2eEnabled !== "undefined" && auroboreE2eEnabled
     property real keyboardInset: 0
     property real baselineInnerHeight: 0
     property real webCssScale: WebChrome.computeWebCssScale(0, 0, Screen.devicePixelRatio)
@@ -173,7 +176,51 @@ Page {
             if (typeof coverBridge !== "undefined" && coverBridge)
                 coverBridge.setWebReady(true)
             bridgeRouter.emitEvent("ready")
+            scheduleE2eBridgeAssert()
         }
+    }
+
+    function scheduleE2eBridgeAssert() {
+        if (!e2eEnabled || e2eAssertDone || !webView)
+            return
+        e2eAttemptCount = 0
+        e2eAssertTimer.start()
+    }
+
+    function runE2eBridgeAssertAttempt() {
+        if (!e2eEnabled || e2eAssertDone || !webView)
+            return
+        webView.runJavaScript(
+            "(function(){ var el = document.getElementById('out'); return el ? (el.textContent || '') : ''; })()",
+            function (text) {
+                var body = text ? String(text) : ""
+                if (body.indexOf("Echo ping OK") >= 0) {
+                    e2eAssertDone = true
+                    e2eAssertTimer.stop()
+                    console.log("[aurobore-container] [e2e] bridge assert OK")
+                } else {
+                    e2eAttemptCount++
+                    if (e2eAttemptCount >= 5) {
+                        e2eAssertTimer.stop()
+                        console.log("[aurobore-container] [e2e] bridge assert FAIL: " + body)
+                    }
+                }
+            },
+            function (err) {
+                e2eAttemptCount++
+                if (e2eAttemptCount >= 5) {
+                    e2eAssertTimer.stop()
+                    console.log("[aurobore-container] [e2e] bridge assert FAIL: runJavaScript error")
+                }
+            }
+        )
+    }
+
+    function reloadEntry() {
+        webReady = false
+        splashVisible = true
+        splashTimer.restart()
+        entryLoadTimer.restart()
     }
 
     function deliverBridgeMessage(message) {
@@ -209,6 +256,7 @@ Page {
         splashTimer.stop()
         entryLoadTimer.stop()
         pageLoadProbeTimer.stop()
+        e2eAssertTimer.stop()
         if (verificationLoader.item && verificationLoader.item.stopTimers)
             verificationLoader.item.stopTimers()
     }
@@ -310,6 +358,11 @@ Page {
     }
 
     Connections {
+        target: typeof updateManager !== "undefined" ? updateManager : null
+        onReloadEntryRequested: page.reloadEntry()
+    }
+
+    Connections {
         target: bridgeRouter
         onOutbound: page.deliverBridgeMessage(message)
     }
@@ -378,6 +431,13 @@ Page {
         }
     }
 
+    Timer {
+        id: e2eAssertTimer
+        interval: 1000
+        repeat: true
+        onTriggered: page.runE2eBridgeAssertAttempt()
+    }
+
     Loader {
         id: webViewLoader
 
@@ -437,7 +497,8 @@ Page {
         onReadyProbeNeeded: pageLoadProbeTimer.start()
         onRecvAsyncMessage: BridgeMessages.handleRecvAsyncMessage(
             name, data, page, bridgeRouter, deepLinkHandler,
-            typeof notificationsBridge !== "undefined" ? notificationsBridge : null)
+            typeof notificationsBridge !== "undefined" ? notificationsBridge : null,
+            typeof updateManager !== "undefined" ? updateManager : null)
     }
 
     Connections {

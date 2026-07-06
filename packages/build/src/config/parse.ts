@@ -6,6 +6,7 @@ import type { AuroboreConfig, ConfigValidationError, LoadedConfig } from "./type
 const CONFIG_FILENAMES = ["aurobore.config.json", "aurobore.config.js"] as const;
 
 const TOP_KEYS = new Set([
+  "$schema",
   "configVersion",
   "app",
   "web",
@@ -14,6 +15,7 @@ const TOP_KEYS = new Set([
   "build",
   "deepLinks",
   "cover",
+  "updates",
 ]);
 
 const APP_KEYS = new Set(["id", "name", "version", "orientation", "icon", "splash"]);
@@ -31,6 +33,14 @@ const POLYFILL_IDS = new Set([
   "mediaDevices",
 ]);
 const COVER_ACTION_KEYS = new Set(["id", "label", "icon"]);
+const UPDATES_KEYS = new Set([
+  "enabled",
+  "url",
+  "channel",
+  "publicKey",
+  "checkOnResume",
+  "checkIntervalMs",
+]);
 
 const ORIENTATIONS = new Set(["portrait", "landscape", "auto"]);
 const ENGINES = new Set(["chromium"]);
@@ -39,6 +49,7 @@ const APP_ID_RE = /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/;
 const SEMVER_RE = /^\d+\.\d+\.\d+(-[\w.-]+)?(\+[\w.-]+)?$/;
 const COVER_ACTION_ID_RE = /^[a-z][a-z0-9_-]*$/i;
 const ALLOWED_ORIGIN_RE = /^https:\/\/[^/]+/;
+const UPDATES_URL_RE = /^https?:\/\/[^/]+/;
 const MAX_COVER_ACTIONS = 4;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -105,6 +116,55 @@ function validateAllowedOrigins(
     origins.push(item);
   });
   return origins;
+}
+
+function validateInternetForUpdates(
+  errors: ConfigValidationError[],
+  updates: Record<string, unknown> | undefined,
+  permissions: unknown,
+): void {
+  if (!updates || updates.enabled !== true) return;
+  const perms = Array.isArray(permissions) ? permissions : [];
+  if (!perms.includes("Internet")) {
+    push(errors, "updates", "updates.enabled requires Internet in permissions");
+  }
+}
+
+function validateUpdates(
+  errors: ConfigValidationError[],
+  value: unknown,
+  permissions: unknown,
+): void {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) {
+    push(errors, "updates", "updates must be an object");
+    return;
+  }
+  for (const key of Object.keys(value)) {
+    if (!UPDATES_KEYS.has(key)) {
+      push(errors, `updates.${key}`, `unknown field: ${key}`);
+    }
+  }
+  if (value.enabled === true) {
+    const url = value.url;
+    if (typeof url !== "string" || !UPDATES_URL_RE.test(url)) {
+      push(errors, "updates.url", "url must be an HTTP(S) origin base when enabled");
+    }
+    const publicKey = value.publicKey;
+    if (typeof publicKey !== "string" || publicKey.trim() === "") {
+      push(errors, "updates.publicKey", "publicKey is required when enabled");
+    }
+    if (value.channel !== undefined && (typeof value.channel !== "string" || value.channel.trim() === "")) {
+      push(errors, "updates.channel", "channel must be a non-empty string");
+    }
+    if (
+      value.checkIntervalMs !== undefined &&
+      (typeof value.checkIntervalMs !== "number" || value.checkIntervalMs < 60000)
+    ) {
+      push(errors, "updates.checkIntervalMs", "checkIntervalMs must be >= 60000");
+    }
+  }
+  validateInternetForUpdates(errors, value, permissions);
 }
 
 function validateInternetForAllowedOrigins(
@@ -313,6 +373,8 @@ export function validateConfig(raw: unknown): ConfigValidationError[] {
       }
     }
   }
+
+  validateUpdates(errors, raw.updates, raw.permissions);
 
   return errors;
 }

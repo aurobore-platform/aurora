@@ -11,6 +11,7 @@ export {
   type BridgeError,
   type BridgeEvent,
   type LifecycleEvent,
+  type UpdateEvent,
   type WebViewEvent,
 } from "./types.js";
 
@@ -85,6 +86,17 @@ export {
   type CoverActionEvent,
   type CoverState,
 } from "./cover.js";
+
+export {
+  Updates,
+  check as checkForUpdate,
+  apply as applyUpdate,
+  rollback as rollbackUpdate,
+  getStatus as getUpdateStatus,
+  type UpdateManifestInfo,
+  type UpdateStatus,
+  type UpdateErrorInfo,
+} from "./updates.js";
 
 export {
   MOCK_CLIPBOARD_TEXT,

@@ -7,12 +7,14 @@ function parseBridgeData(raw) {
     return raw
 }
 
-function handleRecvAsyncMessage(name, data, page, router, deepLinks, notifications) {
+function handleRecvAsyncMessage(name, data, page, router, deepLinks, notifications, updateManager) {
     if (name === "aurobore:bridge") {
         router.handleMessage(parseBridgeData(data))
     } else if (name === "aurobore:ready") {
         console.log("[aurobore-container] web ready signal")
         console.log("[aurobore-container] M1 OK: aurobore-app loaded, lifecycle ready, SPA back works")
+        if (updateManager)
+            updateManager.onAppReady()
         if (deepLinks)
             deepLinks.deliverPending()
         if (notifications)

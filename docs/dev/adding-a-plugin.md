@@ -6,7 +6,12 @@
 
 ## 1. Манифест
 
-Создайте `plugins/foo/plugin.manifest` по образцу `plugins/device/plugin.manifest`:
+Создайте `plugins/foo/plugin.manifest` по образцу `plugins/device/plugin.manifest`.
+Для автодополнения в IDE добавьте (как в `templates/plugin/plugin.manifest`):
+
+```json
+"$schema": "./node_modules/@aurobore/build/schema/plugin.manifest.schema.json"
+```
 
 ```json
 {

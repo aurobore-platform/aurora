@@ -62,6 +62,9 @@ export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void
   const w6Dispose =
     process.env.AUROBORE_W6_DISPOSE?.trim() || env.AUROBORE_W6_DISPOSE?.trim();
   if (w6Dispose) exports.push(`AUROBORE_W6_DISPOSE=${w6Dispose}`);
+  const e2e =
+    process.env.AUROBORE_E2E?.trim() || env.AUROBORE_E2E?.trim();
+  if (e2e) exports.push(`AUROBORE_E2E=${e2e}`);
   const exportPrefix =
     exports.length > 0 ? `${exports.map((e) => `export ${e}`).join("; ")}; ` : "";
   const remoteCmd =
@@ -72,13 +75,44 @@ export async function runOnEmulator(options: RunOnEmulatorOptions): Promise<void
 }
 
 /** Генерирует run-script для приложения на эмуляторе. */
+export interface GenerateRunScriptOptions {
+  /** Ожидать journal-маркер `[e2e] bridge assert OK` после старта приложения. */
+  e2eBridgeAssert?: boolean;
+}
+
 export function generateRunScript(
   appId: string,
   env: AuroraEnv,
   cefDebugPort?: number,
+  options?: GenerateRunScriptOptions,
 ): string {
   const cefDebugExport =
     cefDebugPort != null ? `  export AUROBORE_CEF_DEBUG_PORT=${cefDebugPort}\n` : "";
+  const e2eExport = options?.e2eBridgeAssert ? `  export AUROBORE_E2E=1\n` : "";
+
+  const e2eWaitBlock = options?.e2eBridgeAssert
+    ? `
+e2e_elapsed=0
+while [ "$e2e_elapsed" -lt "$max_wait" ]; do
+  if journalctl --no-pager -n 200 --since "2 min ago" 2>/dev/null | grep -q "\\[e2e\\] bridge assert OK"; then
+    echo "=== RESULT: e2e bridge assert OK ==="
+    tail -n 30 /tmp/app.log 2>/dev/null || true
+    exit 0
+  fi
+  if journalctl --no-pager -n 200 --since "2 min ago" 2>/dev/null | grep -q "\\[e2e\\] bridge assert FAIL"; then
+    echo "=== RESULT: e2e bridge assert FAIL ==="
+    tail -n 30 /tmp/app.log 2>/dev/null || true
+    exit 1
+  fi
+  sleep 3
+  e2e_elapsed=$((e2e_elapsed + 3))
+done
+
+echo "=== RESULT: e2e bridge assert timeout ==="
+cat /tmp/app.log 2>/dev/null || true
+exit 1
+`
+    : "";
 
   return `#!/bin/sh
 set -eu
@@ -102,7 +136,7 @@ su "\${POC_RUN_USER:-defaultuser}" -s /bin/sh -c '
   export WAYLAND_DISPLAY=/run/display/wayland-0
   export QT_QPA_PLATFORM=wayland
   export LD_LIBRARY_PATH=/usr/lib/cef:\${LD_LIBRARY_PATH:-}
-${cefDebugExport}  nohup /usr/bin/${appId} >/tmp/app.log 2>&1 &
+${cefDebugExport}${e2eExport}  nohup /usr/bin/${appId} >/tmp/app.log 2>&1 &
 '
 
 sleep 5
@@ -111,7 +145,7 @@ elapsed=0
 while [ "$elapsed" -lt "$max_wait" ]; do
   if journalctl --no-pager -n 100 --since "1 min ago" 2>/dev/null | grep -q "aurobore-app loaded"; then
     echo "=== RESULT: app started ==="
-    tail -n 30 /tmp/app.log 2>/dev/null || true
+${e2eWaitBlock}    tail -n 30 /tmp/app.log 2>/dev/null || true
     exit 0
   fi
   sleep 3

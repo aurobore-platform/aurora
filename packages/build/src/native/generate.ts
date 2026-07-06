@@ -348,6 +348,16 @@ export function generateDefaultsJson(effective: EffectiveConfig, mode: "prod" | 
   if (effective.cover) {
     defaults.cover = effective.cover;
   }
+  if (effective.updates) {
+    defaults.updates = {
+      enabled: effective.updates.enabled ?? false,
+      channel: effective.updates.channel ?? "stable",
+      checkOnResume: effective.updates.checkOnResume ?? true,
+      checkIntervalMs: effective.updates.checkIntervalMs ?? 3_600_000,
+      ...(effective.updates.url ? { url: effective.updates.url } : {}),
+      ...(effective.updates.publicKey ? { publicKey: effective.updates.publicKey } : {}),
+    };
+  }
 
   return `${JSON.stringify(defaults, null, 2)}\n`;
 }

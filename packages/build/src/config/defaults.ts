@@ -35,5 +35,6 @@ export function applyConfigDefaults(partial: AuroboreConfig): AuroboreConfig {
     },
     deepLinks: partial.deepLinks,
     cover: partial.cover,
+    updates: partial.updates,
   };
 }

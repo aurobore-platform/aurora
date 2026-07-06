@@ -1,4 +1,5 @@
 {
+  "$schema": "./node_modules/@aurobore/build/schema/aurobore.config.schema.json",
   "configVersion": 1,
   "app": {
     "id": "ru.auroraos.hello_stub",

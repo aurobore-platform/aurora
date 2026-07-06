@@ -103,7 +103,29 @@ Web-UI локализуется средствами фронтенда (vue-i18
 - Схема конфига валидируется CLI на каждом запуске (`doctor`, `build`, `dev`).
 - Понятные ошибки: отсутствующий appId, неверный формат версии, неизвестный плагин, конфликт разрешений.
 
-## 7. Связи
+## 7. JSON Schema и `$schema` (FR-D5)
+
+Публикуемые JSON Schema дают автодополнение и подсветку ошибок в редакторе **без** отдельного
+IDE-расширения.
+
+| Файл | Путь в пакете |
+|---|---|
+| `aurobore.config.json` | `@aurobore/build/schema/aurobore.config.schema.json` |
+| `plugin.manifest` | `@aurobore/build/schema/plugin.manifest.schema.json` |
+
+В корне проекта добавьте в JSON:
+
+```json
+"$schema": "./node_modules/@aurobore/build/schema/aurobore.config.schema.json"
+```
+
+Шаблоны `templates/*` уже содержат эту строку. После `pnpm install` VS Code / Cursor подхватят схему
+автоматически.
+
+CLI (`aurobore config validate`, `build`, `dev`) использует TypeScript-валидатор в `@aurobore/build`
+(`validateConfig` / `parseManifest`), а не runtime JSON Schema — схема ориентирована на IDE и документацию.
+
+## 8. Связи
 
 - ↔ [Build System](build-system.md) — основной потребитель конфига.
 - ↔ [CLI](cli.md) — чтение/валидация/миграция.
