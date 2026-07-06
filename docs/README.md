@@ -57,6 +57,7 @@
 | [roadmap.md](roadmap.md) | Этапы: Research → Design → MVP → Alpha → Beta → RC → 1.0 |
 | [mvp-plan.md](mvp-plan.md) | Детальный план этапа MVP (майлстоуны M0…M5, первый шаг — PoC моста) |
 | [alpha-plan.md](alpha-plan.md) | Детальный план этапа Alpha (майлстоуны A1…A6, первый шаг — Bridge+) |
+| [improvements-plan.md](improvements-plan.md) | План улучшений — идеи развития инструмента (черновик, кандидаты в requirements) |
 | [checklists.md](checklists.md) | Чек-листы: архитектура, инфраструктура, Runtime, Bridge, CLI, SDK, тесты, релиз |
 
 ### Архитектура (`architecture/`)

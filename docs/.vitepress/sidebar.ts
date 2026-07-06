@@ -161,6 +161,7 @@ export const projectSidebar: SidebarItem[] = [
       { text: "Структура репо", link: "/repository-structure" },
       { text: "Roadmap", link: "/roadmap" },
       { text: "MVP Plan", link: "/mvp-plan" },
+      { text: "План улучшений", link: "/improvements-plan" },
     ],
   },
 ];

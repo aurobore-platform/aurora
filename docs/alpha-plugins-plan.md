@@ -1,6 +1,10 @@
 # План доработки плагинов A3 (post-Alpha)
 
-
+> **СТАТУС ДЛЯ АГЕНТОВ: ✅ практически завершён.** Native-реализации **P1–P5** (Camera, Geolocation,
+> Sensors, Notifications, Share) готовы, чек-боксы `[x]`; `pnpm container:all` — все плагины registered,
+> M3 OK на SDK 5.2.1.200. **Остаётся только:** sign-off на **физическом устройстве** (реальная съёмка/GPS/IMU,
+> tap по уведомлению), аудит `errors-audit` и conformance-suite (**FR-T1, этап Beta**). Кодовой feature-работы
+> по этому плану не требуется.
 
 > Детализация задач **после** майлстоуна A3 в [alpha-plan.md](alpha-plan.md) — от каркаса (stub → `*_UNAVAILABLE`)
 
