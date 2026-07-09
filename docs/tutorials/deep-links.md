@@ -76,4 +76,4 @@ xdg-open myapp://settings
 
 - [architecture/runtime.md](../architecture/runtime.md) §9
 - [architecture/configuration.md](../architecture/configuration.md)
-- [requirements.md](../requirements.md) FR-R8
+- [requirements.md](https://github.com/aurobore-platform/aurora/blob/main/docs/requirements.md) FR-R8

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   AURORA_ICON_SIZES,
   checkProjectIcons,
+  inspectProjectIcons,
   materializeIcons,
   resolveAppIcons,
 } from "./icons.js";

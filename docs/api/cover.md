@@ -104,9 +104,22 @@ cover.onAction(({ id }) => {
 });
 ```
 
-## Вне scope v1
+## Режим preview
 
-- `cover.mode: "preview"` (скриншот WebView) — отдельная задача.
+В конфиге можно включить обложку со снимком WebView:
+
+```json
+{
+  "cover": {
+    "mode": "preview"
+  }
+}
+```
+
+При уходе в фон контейнер сохраняет снимок WebView на обложке. `cover.setState` / `setActions` работают как в режиме `template`.
+
+## Вне scope
+
 - Кастомный QML (`cover.customQml`) — для продвинутых нативных сценариев.
 
-См. также: [tutorial: обложка](../tutorials/cover.md), [runtime § обложка](../architecture/runtime.md).
+См. также: [tutorial: обложка](../tutorials/cover.md), [runtime § обложка](../architecture/runtime.md), [ui-kit.md](../aurora/ui-kit.md).

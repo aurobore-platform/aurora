@@ -1,6 +1,6 @@
 # Native SDK (нативный SDK для авторов плагинов)
 
-> **Реализация MVP (M3):** код и контракты — [runtime/native-sdk/README.md](../../runtime/native-sdk/README.md).
+> **Реализация MVP (M3):** код и контракты — [runtime/native-sdk/README.md](https://github.com/aurobore-platform/aurora/blob/main/runtime/native-sdk/README.md).
 > Ниже — архитектурное описание (концепции, целевое API).
 
 > Контракты и библиотека для написания нативной части плагинов (C++/QML). Архитектура без привязки к конкретным файлам репо.

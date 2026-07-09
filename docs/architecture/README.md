@@ -106,18 +106,18 @@ aurobore build
 - **Формат конфига** — `configVersion` с правилами миграции.
 
 Runtime при загрузке плагина проверяет совместимость и сообщает понятную ошибку при несовпадении.
-Решение зафиксировано в [ADR-002](../adr/ADR-002-bridge-model.md) и [ADR-003](../adr/ADR-003-plugin-api.md).
+Решение зафиксировано в [ADR-002](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-002-bridge-model.md) и [ADR-003](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-003-plugin-api.md).
 
 ## 8. Ключевые архитектурные решения (ADR)
 
-- [ADR-001](../adr/ADR-001-runtime-architecture.md) — архитектура Runtime (нативный контейнер на C++/QML).
-- [ADR-002](../adr/ADR-002-bridge-model.md) — модель моста (async message passing, Promise/события/стримы).
-- [ADR-003](../adr/ADR-003-plugin-api.md) — Plugin API на основе манифеста + кодогенерация.
-- [ADR-004](../adr/ADR-004-webview-engine-abstraction.md) — целевой движок Chromium/CEF; тонкий шов транспорта.
-- [ADR-005](../adr/ADR-005-cli-stack.md) — стек CLI/инструментов (Node/TypeScript).
-- [ADR-006](../adr/ADR-006-configuration-format.md) — формат конфигурации.
-- [ADR-007](../adr/ADR-007-packaging-build.md) — упаковка и сборка (CMake/RPM).
-- [ADR-008](../adr/ADR-008-typescript-sdk-codegen.md) — кодогенерация SDK.
-- [ADR-010](../adr/ADR-010-w3c-polyfills.md) — опциональные W3C API polyfills.
-- [ADR-011](../adr/ADR-011-camera-frame-channel.md) — getUserMedia fallback через Camera.
-- [ADR-012](../adr/ADR-012-ota-live-updates.md) — OTA live-updates веб-бандла.
+- [ADR-001](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-001-runtime-architecture.md) — архитектура Runtime (нативный контейнер на C++/QML).
+- [ADR-002](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-002-bridge-model.md) — модель моста (async message passing, Promise/события/стримы).
+- [ADR-003](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-003-plugin-api.md) — Plugin API на основе манифеста + кодогенерация.
+- [ADR-004](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md) — целевой движок Chromium/CEF; тонкий шов транспорта.
+- [ADR-005](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-005-cli-stack.md) — стек CLI/инструментов (Node/TypeScript).
+- [ADR-006](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-006-configuration-format.md) — формат конфигурации.
+- [ADR-007](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-007-packaging-build.md) — упаковка и сборка (CMake/RPM).
+- [ADR-008](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-008-typescript-sdk-codegen.md) — кодогенерация SDK.
+- [ADR-010](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-010-w3c-polyfills.md) — опциональные W3C API polyfills.
+- [ADR-011](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-011-camera-frame-channel.md) — getUserMedia fallback через Camera.
+- [ADR-012](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-012-ota-live-updates.md) — OTA live-updates веб-бандла.

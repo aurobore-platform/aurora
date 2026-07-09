@@ -38,12 +38,38 @@ const tutorialsSidebar: SidebarItem[] = [
   { text: "Написание плагина", link: "/tutorials/writing-a-plugin" },
   { text: "Использование плагинов", link: "/tutorials/using-plugins" },
   { text: "События и lifecycle", link: "/tutorials/events-and-lifecycle" },
+  { text: "Deep links", link: "/tutorials/deep-links" },
+  { text: "Immersive UI", link: "/tutorials/immersive-ui" },
+  { text: "Обложка (cover)", link: "/tutorials/cover" },
 ];
 
 const humanAuroraSidebar: SidebarItem[] = [
+  { text: "SDK Overview", link: "/aurora/sdk-overview" },
   { text: "Разработка приложений", link: "/aurora/app-development" },
+  { text: "Build & Packaging", link: "/aurora/build-and-packaging" },
+  { text: "Tooling", link: "/aurora/tooling" },
+  { text: "WebView", link: "/aurora/webview" },
+  { text: "UI Kit", link: "/aurora/ui-kit" },
   { text: "Песочница и разрешения", link: "/aurora/sandbox-and-permissions" },
   { text: "Матрица совместимости", link: "/aurora/compatibility-matrix" },
+  { text: "Verification Status", link: "/aurora/verification-status" },
+];
+
+const humanArchitectureSidebar: SidebarItem[] = [
+  { text: "Обзор", link: "/architecture/" },
+  { text: "Runtime", link: "/architecture/runtime" },
+  { text: "Bridge", link: "/architecture/bridge" },
+  { text: "Configuration", link: "/architecture/configuration" },
+  { text: "Build System", link: "/architecture/build-system" },
+  { text: "Dev Server", link: "/architecture/dev-server" },
+  { text: "CLI", link: "/architecture/cli" },
+  { text: "TypeScript SDK", link: "/architecture/typescript-sdk" },
+];
+
+const humanDevSidebar: SidebarItem[] = [
+  { text: "Browser mock (`dev --web`)", link: "/dev/web-mock-mode" },
+  { text: "W3C polyfills", link: "/dev/w3c-polyfills" },
+  { text: "OTA / Live Updates", link: "/dev/ota-updates" },
 ];
 
 const humanRootSidebar: SidebarItem[] = [
@@ -201,6 +227,8 @@ function buildHumanSidebar(): DefaultTheme.Sidebar {
     "/tutorials/": [{ text: "Tutorials", items: tutorialsSidebar }],
     "/api/": [{ text: "API Reference", link: "/api/" }],
     "/plugins/": [{ text: "Plugins", items: pluginItems }],
+    "/architecture/": [{ text: "Architecture", items: humanArchitectureSidebar }],
+    "/dev/": [{ text: "Guides", items: humanDevSidebar }],
     "/aurora/": [{ text: "Aurora OS", items: humanAuroraSidebar }],
     "/": humanRootSidebar,
   };

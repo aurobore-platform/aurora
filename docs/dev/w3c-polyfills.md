@@ -3,7 +3,7 @@
 Опциональный слой `@aurobore/polyfills` маппит стандартные браузерные API на плагины Aurobore.
 Цель — перенос SPA/PWA **без изменения кода** (vision G1).
 
-См. [RFC-001](../rfc/RFC-001-w3c-polyfills.md), [ADR-010](../adr/ADR-010-w3c-polyfills.md).
+См. [RFC-001](https://github.com/aurobore-platform/aurora/blob/main/docs/rfc/RFC-001-w3c-polyfills.md), [ADR-010](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-010-w3c-polyfills.md).
 
 ## Подключение
 
@@ -69,7 +69,7 @@
 2. `mediaDevices` — **только явный opt-in** (`web.polyfills: [..., "mediaDevices"]`), не в дефолте.
 3. **Fallback** через `Camera.watchPreview` (stream → JPEG-кадры в `binaryPayload`, base64) и
    `canvas.captureStream()` для `<video srcObject>` — **заблокирован на device-спайк**
-   `V-webview-getusermedia` (см. [ADR-011](../adr/ADR-011-camera-frame-channel.md) §Spike и
+   `V-webview-getusermedia` (см. [ADR-011](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-011-camera-frame-channel.md) §Spike и
    [verification-status](../aurora/verification-status.md)). Эмулятор x86 отдаёт `CAMERA_UNAVAILABLE` —
    проверять только на устройстве с камерой.
 

@@ -1,7 +1,7 @@
 # Build System (система сборки)
 
 > web → нативный проект Аврора (CMake/RPM) → пакет. Архитектура без реализации.
-> Решение по упаковке — [ADR-007](../adr/ADR-007-packaging-build.md).
+> Решение по упаковке — [ADR-007](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-007-packaging-build.md).
 
 Build System превращает веб-приложение + конфиг + плагины в устанавливаемый пакет Аврора (RPM).
 Ключевой принцип — **детерминированная генерация**: пользователь не правит нативные артефакты вручную.
@@ -41,11 +41,11 @@ aurobore build
   с учётом известных проблем RPATH/зависимостей WebView. (Заметка из исследования сборки на Аврора.)
 - При генерации `.aurobore/native` (`generateNativeProject`) из `runtime/container` исключается
   `qml/verification/` — harness W3–W6 для dev-toolkit, не для user RPM. Harness доступен только через
-  `pnpm container:*` (sync из repo root без exclude); см. [runtime/container/README.md](../../runtime/container/README.md).
+  `pnpm container:*` (sync из repo root без exclude); см. [runtime/container/README.md](https://github.com/aurobore-platform/aurora/blob/main/runtime/container/README.md).
 
 ## 4. Движок WebView
 
-- Целевой движок — **Chromium/CEF** ([ADR-004](../adr/ADR-004-webview-engine-abstraction.md)); Gecko не поддерживается.
+- Целевой движок — **Chromium/CEF** ([ADR-004](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md)); Gecko не поддерживается.
 - Подключается пакет CEF-WebView: `ru.auroraos.webview` (`BuildRequires: pkgconfig(aurorawebview)` /
   `ru.auroraos.webview-devel`, `Requires: ru.auroraos.webview`) — точные имена верифицируются на SDK.
 - Транспорт моста — единственная реализация на WebView async API (`WebViewTransport`; см. [bridge.md](bridge.md#транспорт)).
@@ -53,7 +53,7 @@ aurobore build
 - **Гибридные приложения** (bundled SPA + external HTTPS): в `aurobore.config.json` задают
   `web.allowedOrigins` — массив origin-only URL (`https://host`, без path). Поле проецируется в
   `config/defaults.json` при `aurobore build`; runtime применяет whitelist в URL policy, HTTP auth и cookies.
-  Непустой whitelist требует permission `Internet`. Пример: [`examples/hybrid-demo/`](../../examples/hybrid-demo/).
+  Непустой whitelist требует permission `Internet`. Пример: [`examples/hybrid-demo/`](https://github.com/aurobore-platform/aurora/tree/main/examples/hybrid-demo).
 
 ## 5. Требования к окружению
 

@@ -87,6 +87,14 @@ void CoverBridge::onCoverStatusChanged(bool active)
                                : QStringLiteral("cover:inactive"));
 }
 
+void CoverBridge::setPreviewSource(const QString &source)
+{
+    if (m_previewSource == source)
+        return;
+    m_previewSource = source;
+    emit previewSourceChanged();
+}
+
 void CoverBridge::setWebReady(bool ready)
 {
     if (m_webReady == ready)

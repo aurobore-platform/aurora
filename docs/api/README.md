@@ -102,4 +102,4 @@ import { Camera } from "@aurobore/camera";
 
 ## Написание плагина
 
-Платформенный гайд: [dev/adding-a-plugin.md](../dev/adding-a-plugin.md).
+Платформенный гайд: [dev/adding-a-plugin.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/adding-a-plugin.md).

@@ -37,8 +37,9 @@ export function generateTsContent(options: {
   const source = NATIVE_APP_NAME_SOURCE;
 
   const contexts = [
-    { name: "DefaultCover", file: "cover/DefaultCover.qml", lines: [11] },
-    { name: "SplashScreen", file: "components/SplashScreen.qml", lines: [11, 28] },
+    { name: "DefaultCover", file: "cover/DefaultCover.qml", lines: [12] },
+    { name: "PreviewCover", file: "cover/PreviewCover.qml", lines: [20] },
+    { name: "SplashScreen", file: "components/SplashScreen.qml", lines: [52] },
   ];
 
   const contextBlocks = contexts

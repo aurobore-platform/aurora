@@ -16,6 +16,7 @@ Page {
 
     property bool splashVisible: true
     property bool webReady: false
+    readonly property bool coverPreviewEnabled: (typeof coverMode !== "undefined") && coverMode === "preview"
     property bool e2eAssertDone: false
     property int e2eAttemptCount: 0
     readonly property bool e2eEnabled: typeof auroboreE2eEnabled !== "undefined" && auroboreE2eEnabled
@@ -177,7 +178,19 @@ Page {
                 coverBridge.setWebReady(true)
             bridgeRouter.emitEvent("ready")
             scheduleE2eBridgeAssert()
+            if (coverPreviewEnabled)
+                captureCoverPreview()
         }
+    }
+
+    function captureCoverPreview() {
+        if (!coverPreviewEnabled || !webView
+                || typeof coverBridge === "undefined" || !coverBridge)
+            return
+        webView.grabToImage(function (result) {
+            if (result && result.url && coverBridge)
+                coverBridge.setPreviewSource(result.url)
+        })
     }
 
     function scheduleE2eBridgeAssert() {
@@ -311,6 +324,11 @@ Page {
     onOrientationChanged: calibrateWebCssScale()
     onWidthChanged: calibrateWebCssScale()
     onHeightChanged: calibrateWebCssScale()
+
+    onPageStatusChanged: {
+        if (status !== PageStatus.Active && coverPreviewEnabled && webReady)
+            captureCoverPreview()
+    }
 
     Component.onCompleted: {
         bridgeRouter.trustedOrigin = assetServerOrigin && assetServerOrigin.length > 0

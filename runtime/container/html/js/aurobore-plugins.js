@@ -48,8 +48,9 @@
   A.Camera = {
     getPhoto: function (args) { return A.invoke("Camera", "getPhoto", args || {}); },
     pickPhoto: function (args) { return A.invoke("Camera", "pickPhoto", args || {}); },
+    watchPreview: function (args) { return A.invoke("Camera", "watchPreview", args || {}, { stream: true }); },
   };
-  A.__plugins["Camera"] = { version: "1.0.0", methods: ["getPhoto","pickPhoto"], events: [] };
+  A.__plugins["Camera"] = { version: "1.0.0", methods: ["getPhoto","pickPhoto","watchPreview"], events: [] };
   A.Geolocation = {
     getCurrentPosition: function (args) { return A.invoke("Geolocation", "getCurrentPosition", args || {}); },
     watch: function (args) { return A.invoke("Geolocation", "watch", args || {}, { stream: true }); },

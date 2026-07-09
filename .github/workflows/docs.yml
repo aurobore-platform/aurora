@@ -34,6 +34,9 @@ jobs:
       - name: Generate API reference
         run: pnpm gen-api-reference
 
+      - name: Verify doc links (human audience)
+        run: pnpm docs:verify-links
+
       - name: Build docs
         env:
           DOCS_AUDIENCE: human

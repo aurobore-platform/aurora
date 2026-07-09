@@ -56,6 +56,19 @@ describe("config parse", () => {
     expect(errors).toEqual([]);
   });
 
+  it("принимает cover.mode и app.iconMode", () => {
+    const errors = validateConfig({
+      ...validConfig,
+      app: {
+        ...validConfig.app,
+        iconMode: "Crop",
+        splash: { gradientStart: "#AABBCC", gradientEnd: "#112233" },
+      },
+      cover: { mode: "preview" },
+    });
+    expect(errors).toEqual([]);
+  });
+
   it("отклоняет слишком много cover.actions", () => {
     const errors = validateConfig({
       ...validConfig,

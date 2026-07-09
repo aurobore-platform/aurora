@@ -23,9 +23,10 @@ RPM, WebView, песочница). Чтобы Runtime/Build/CLI принимал
 | [app-development.md](app-development.md) | Рабочий цикл: создать → собрать → запустить; среда сборки; отладка/профилирование | `/doc/sdk/app_development/work` |
 | [build-and-packaging.md](build-and-packaging.md) | `mb2`/`sb2`/`apptool`, сборка RPM, подпись, доставка на устройство, `.spec`/`.desktop`, CMake/qmake | `/doc/sdk/psdk/build`, `/doc/software_development/guidelines` |
 | [tooling.md](tooling.md) | Инструменты SDK (сборка/отладка/пакеты/анализ/тесты), контакты ОМП | `/doc/sdk/tools` |
-| [webview.md](webview.md) | Адаптация веб-приложения через фреймворк WebView, интеграция в QML/C++ | `/doc/software_development` |
+| [webview.md](webview.md) | Адаптация веб-приложения через фреймворк WebView; пути доставки (Aurobore, WebApp Generator, PWA, Flutter) — §8 | `/doc/software_development` |
 | [sandbox-and-permissions.md](sandbox-and-permissions.md) | Песочница (Firejail), разрешения в `.desktop`, общие директории, D-Bus | `/doc/sdk/app_development/work/sandbox` |
 | [requirements-and-conventions.md](requirements-and-conventions.md) | Требования к ПО, профили безопасности, чек-лист готовности, оформление кода C++/QML | `/doc/software_development/guidelines` |
+| [ui-kit.md](ui-kit.md) | UI Kit Авроры: scope для нативного chrome Aurobore (cover, splash, icons, desktop) | `/doc/ui_kit` |
 | [glossary.md](glossary.md) | Термины ОС Аврора (МУ, таргет, sysroot, кросс-компиляция, песочница, Build Engine) | сводно |
 | [verification-status.md](verification-status.md) | Реестр допущений: что подтверждено официально, что открыто и как проверить | — |
 | [compatibility-matrix.md](compatibility-matrix.md) | Матрица совместимости: minOs, SDK targets, прогон сценариев A6 | — |

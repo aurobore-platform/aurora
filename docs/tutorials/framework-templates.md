@@ -2,7 +2,7 @@
 
 Официальные точки входа для популярных фреймворков (FR-S4). Каждый шаблон — готовый Vite-проект с `aurobore.config.json`, демо Echo/Device и адаптером `@aurobore/*`.
 
-> Примеры в репозитории: [`react-demo`](../../examples/react-demo/), [`vue-demo`](../../examples/vue-demo/), [`svelte-demo`](../../examples/svelte-demo/).
+> Примеры в репозитории: [`react-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/react-demo), [`vue-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/vue-demo), [`svelte-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/svelte-demo).
 
 ## `create` или `init`?
 

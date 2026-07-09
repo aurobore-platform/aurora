@@ -2,7 +2,7 @@
 
 App-facing гайд: добавить **собственный** плагин в проект приложения поверх `aurobore plugin create`.
 
-> Для разработки **платформы** Aurobore (core-плагины в монорепо) см. [dev/adding-a-plugin.md](../dev/adding-a-plugin.md) и [dev/native-plugin-guide.md](../dev/native-plugin-guide.md).
+> Для разработки **платформы** Aurobore (core-плагины в монорепо) см. [dev/adding-a-plugin.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/adding-a-plugin.md) и [dev/native-plugin-guide.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/native-plugin-guide.md).
 
 ## Когда нужен свой плагин
 
@@ -10,7 +10,7 @@ App-facing гайд: добавить **собственный** плагин в
 - Нужен доступ к нативным API Аврора через мост с типизированным JS SDK.
 - Плагин специфичен для одного приложения (корпоративный модуль, интеграция с SDK заказчика).
 
-На этапе Alpha плагин живёт в каталоге **вашего проекта** (`./plugins/<name>/`). Публикация сторонних плагинов в npm — [FR-P7](../requirements.md), этап Beta.
+На этапе Alpha плагин живёт в каталоге **вашего проекта** (`./plugins/<name>/`). Публикация сторонних плагинов в npm — [FR-P7](https://github.com/aurobore-platform/aurora/blob/main/docs/requirements.md), этап Beta.
 
 ## 1. Создать скелет
 
@@ -123,10 +123,10 @@ aurobore run
 | Плагин в `./plugins/` проекта приложения | Поддерживается |
 | `plugin create` + `generate` + typed SDK | Поддерживается |
 | Установка плагина из npm | Beta (FR-P7) |
-| Плагин в монорепо платформы | См. [dev/adding-a-plugin.md](../dev/adding-a-plugin.md) |
+| Плагин в монорепо платформы | См. [dev/adding-a-plugin.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/adding-a-plugin.md) |
 
 ## См. также
 
 - [plugin-api.md](../plugins/plugin-api.md) — контракт манифеста
-- [dev/native-plugin-guide.md](../dev/native-plugin-guide.md) — workflow в монорепо
+- [dev/native-plugin-guide.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/native-plugin-guide.md) — workflow в монорепо
 - [using-plugins.md](using-plugins.md) — built-in плагины и `plugin add`

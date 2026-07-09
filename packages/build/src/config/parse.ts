@@ -18,13 +18,13 @@ const TOP_KEYS = new Set([
   "updates",
 ]);
 
-const APP_KEYS = new Set(["id", "name", "version", "orientation", "icon", "splash"]);
+const APP_KEYS = new Set(["id", "name", "version", "orientation", "icon", "iconMode", "splash"]);
 const WEB_KEYS = new Set(["root", "entry", "entryUrl", "devServer", "allowedOrigins", "polyfills"]);
-const SPLASH_KEYS = new Set(["image", "background", "timeoutMs"]);
+const SPLASH_KEYS = new Set(["image", "background", "gradientStart", "gradientEnd", "showName", "timeoutMs"]);
 const DEV_SERVER_KEYS = new Set(["port", "host"]);
 const BUILD_KEYS = new Set(["engine", "minOs", "targets"]);
 const DEEP_LINKS_KEYS = new Set(["schemes"]);
-const COVER_KEYS = new Set(["actions"]);
+const COVER_KEYS = new Set(["mode", "actions"]);
 const POLYFILL_IDS = new Set([
   "geolocation",
   "share",
@@ -51,6 +51,22 @@ const COVER_ACTION_ID_RE = /^[a-z][a-z0-9_-]*$/i;
 const ALLOWED_ORIGIN_RE = /^https:\/\/[^/]+/;
 const UPDATES_URL_RE = /^https?:\/\/[^/]+/;
 const MAX_COVER_ACTIONS = 4;
+const ICON_MODES = new Set(["Scale", "Crop"]);
+const COVER_MODES = new Set(["template", "preview"]);
+const HEX_COLOR_RE = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+
+function validateHexColor(
+  errors: ConfigValidationError[],
+  value: unknown,
+  path: string,
+): void {
+  if (value === undefined) {
+    return;
+  }
+  if (typeof value !== "string" || !HEX_COLOR_RE.test(value)) {
+    push(errors, path, "must be a hex color (#RRGGBB or #AARRGGBB)");
+  }
+}
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -225,6 +241,11 @@ export function validateConfig(raw: unknown): ConfigValidationError[] {
         push(errors, "app.orientation", "orientation must be portrait, landscape, or auto");
       }
     }
+    if (raw.app.iconMode !== undefined) {
+      if (typeof raw.app.iconMode !== "string" || !ICON_MODES.has(raw.app.iconMode)) {
+        push(errors, "app.iconMode", "iconMode must be Scale or Crop");
+      }
+    }
     if (raw.app.splash !== undefined) {
       if (!isPlainObject(raw.app.splash)) {
         push(errors, "app.splash", "splash must be an object");
@@ -233,6 +254,15 @@ export function validateConfig(raw: unknown): ConfigValidationError[] {
           if (!SPLASH_KEYS.has(key)) {
             push(errors, `app.splash.${key}`, `unknown field: ${key}`);
           }
+        }
+        validateHexColor(errors, raw.app.splash.background, "app.splash.background");
+        validateHexColor(errors, raw.app.splash.gradientStart, "app.splash.gradientStart");
+        validateHexColor(errors, raw.app.splash.gradientEnd, "app.splash.gradientEnd");
+        if (
+          raw.app.splash.showName !== undefined &&
+          typeof raw.app.splash.showName !== "boolean"
+        ) {
+          push(errors, "app.splash.showName", "showName must be a boolean");
         }
         if (
           raw.app.splash.timeoutMs !== undefined &&
@@ -332,6 +362,11 @@ export function validateConfig(raw: unknown): ConfigValidationError[] {
       for (const key of Object.keys(raw.cover)) {
         if (!COVER_KEYS.has(key)) {
           push(errors, `cover.${key}`, `unknown field: ${key}`);
+        }
+      }
+      if (raw.cover.mode !== undefined) {
+        if (typeof raw.cover.mode !== "string" || !COVER_MODES.has(raw.cover.mode)) {
+          push(errors, "cover.mode", "mode must be template or preview");
         }
       }
       if (raw.cover.actions !== undefined) {

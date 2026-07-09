@@ -1,7 +1,7 @@
 # Матрица совместимости Aurobore
 
 > FR-R7, NFR-3. Целевой движок — **Chromium/CEF** (`ru.auroraos.webview`). Gecko вне области поддержки
-> ([ADR-004](../adr/ADR-004-webview-engine-abstraction.md)).
+> ([ADR-004](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md)).
 
 ## Объявленная поддержка
 
@@ -60,7 +60,7 @@ pnpm compat:verify -- --run-demo hello-world
 
 ## Bridge benchmark (V-7)
 
-Неформальный бенчмарк в [`examples/hello-world/`](../../examples/hello-world/): кнопка **Benchmark**
+Неформальный бенчмарк в [`examples/hello-world/`](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world): кнопка **Benchmark**
 → 100× `Echo.ping` + короткий `Echo.watchTicks`. Результаты в UI и journal (`[hello-world] bench:`).
 
 | Метрика | 5.2.1.200 эмулятор | Физ. устройство |
@@ -75,11 +75,11 @@ pnpm compat:verify -- --run-demo hello-world
 
 | Demo | Плагины | Поведение на эмуляторе x86 |
 |---|---|---|
-| [`camera-demo`](../../examples/camera-demo/) | Camera, Echo | P1 native; `getPhoto` → `CAMERA_UNAVAILABLE` без камеры; `pickPhoto` — при наличии галереи |
-| [`geo-demo`](../../examples/geo-demo/) | Geolocation, Echo | P2 native; `GEOLOCATION_UNAVAILABLE` без mock GPS |
-| [`sensors-demo`](../../examples/sensors-demo/) | Sensors, Echo | P3 native; `SENSORS_UNAVAILABLE` без IMU |
-| [`notifications-demo`](../../examples/notifications-demo/) | Notifications, Echo | P4 native; notify/schedule на эмуляторе; tap — manual |
-| [`share-demo`](../../examples/share-demo/) | Share, Echo | P5 native; share text/url/file; back → `SHARE_CANCELLED` |
+| [`camera-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/camera-demo) | Camera, Echo | P1 native; `getPhoto` → `CAMERA_UNAVAILABLE` без камеры; `pickPhoto` — при наличии галереи |
+| [`geo-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/geo-demo) | Geolocation, Echo | P2 native; `GEOLOCATION_UNAVAILABLE` без mock GPS |
+| [`sensors-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/sensors-demo) | Sensors, Echo | P3 native; `SENSORS_UNAVAILABLE` без IMU |
+| [`notifications-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/notifications-demo) | Notifications, Echo | P4 native; notify/schedule на эмуляторе; tap — manual |
+| [`share-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/share-demo) | Share, Echo | P5 native; share text/url/file; back → `SHARE_CANCELLED` |
 
 Путь create→build→run:
 

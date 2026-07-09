@@ -1,6 +1,6 @@
 # OTA / Live Updates (разработка)
 
-См. [ADR-012](../adr/ADR-012-ota-live-updates.md), [RFC-002](../rfc/RFC-002-ota-live-updates.md).
+См. [ADR-012](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-012-ota-live-updates.md), [RFC-002](https://github.com/aurobore-platform/aurora/blob/main/docs/rfc/RFC-002-ota-live-updates.md).
 
 ## CLI
 

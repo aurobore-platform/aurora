@@ -1,7 +1,7 @@
 # Plugin System (система плагинов)
 
 > Модель плагина, манифест, версионирование, разрешения. Архитектура без реализации.
-> Решение — [ADR-003](../adr/ADR-003-plugin-api.md). Подробный контракт API — [plugins/plugin-api.md](../plugins/plugin-api.md).
+> Решение — [ADR-003](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-003-plugin-api.md). Подробный контракт API — [plugins/plugin-api.md](../plugins/plugin-api.md).
 
 Плагин — единица расширения платформы, добавляющая нативную возможность и её типизированный
 JS-интерфейс. Плагины — первоклассная сущность: устанавливаются, обнаруживаются и регистрируются
@@ -40,7 +40,7 @@ plugins/camera/
 
 ## 3. Манифест (концептуально)
 
-Манифест декларативен и человеко-/машиночитаем (формат — JSON/подобный, фиксируется в [ADR-006](../adr/ADR-006-configuration-format.md)):
+Манифест декларативен и человеко-/машиночитаем (формат — JSON/подобный, фиксируется в [ADR-006](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-006-configuration-format.md)):
 
 ```
 name: "camera"

@@ -47,6 +47,7 @@
     "docs:build": "vitepress build docs",
     "docs:build:full": "cross-env DOCS_AUDIENCE=full vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "docs:verify-links": "node tools/aurora/verify-docs-links.mjs",
     "gen-api-reference": "pnpm --filter @aurobore/build build && node packages/build/scripts/gen-api-reference.mjs",
     "version:bump": "node scripts/bump-version.mjs",
     "publish": "node scripts/check-npm-publish.mjs && pnpm build && pnpm changeset publish"

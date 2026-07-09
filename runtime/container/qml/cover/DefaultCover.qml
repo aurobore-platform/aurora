@@ -5,6 +5,7 @@ CoverBackground {
     objectName: "defaultCover"
 
     readonly property var bridge: (typeof coverBridge !== "undefined") ? coverBridge : null
+    readonly property string launcherIcon: (typeof appIconPath !== "undefined") ? appIconPath : ""
 
     CoverTemplate {
         objectName: "applicationCover"
@@ -12,6 +13,15 @@ CoverBackground {
                          ? bridge.primaryText
                          : qsTr("AUROBORE_APP_NAME")
         secondaryText: bridge ? bridge.secondaryText : ""
+
+        icon {
+            visible: launcherIcon.length > 0
+            source: launcherIcon.length > 0 ? "file://" + launcherIcon : ""
+            sourceSize {
+                width: icon.width
+                height: icon.height
+            }
+        }
     }
 
     CoverActionList {
@@ -20,6 +30,7 @@ CoverBackground {
         Repeater {
             model: bridge ? bridge.actions : []
             CoverAction {
+                objectName: modelData.label || modelData.id
                 iconSource: modelData.icon
                               ? "image://theme/" + modelData.icon
                               : "image://theme/icon-m-action"

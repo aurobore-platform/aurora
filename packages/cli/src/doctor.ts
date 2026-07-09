@@ -9,6 +9,7 @@ import {
   resolveBundledRuntimeRoot,
   resolvePluginManifests,
   checkProjectIcons,
+  inspectProjectIcons,
   validateConfig,
   probeDockerDaemon,
   resolveDevHost,
@@ -185,6 +186,33 @@ function checkProjectIconsDoctor(cwd: string): DoctorCheck {
   }
 }
 
+async function inspectProjectIconsDoctor(cwd: string): Promise<DoctorCheck> {
+  const configPath = findConfigFile(cwd);
+  if (!configPath) {
+    return {
+      name: "App icons (UI Kit)",
+      status: "warn",
+      detail: "aurobore.config не найден",
+    };
+  }
+  try {
+    const { config } = loadConfig(cwd);
+    const result = await inspectProjectIcons(cwd, config.app.id, config.app.icon);
+    const hintText = result.hints?.length ? ` — ${result.hints.join("; ")}` : "";
+    return {
+      name: "App icons (UI Kit)",
+      status: result.level === "warn" ? "warn" : "ok",
+      detail: `${result.detail}${hintText}`,
+    };
+  } catch (err) {
+    return {
+      name: "App icons (UI Kit)",
+      status: "warn",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
 function checkDocker(): DoctorCheck {
   const probe = probeDockerDaemon();
   return {
@@ -284,6 +312,7 @@ export async function runDoctor(cwd: string = process.cwd()): Promise<DoctorRepo
     checkDocker(),
     checkProjectConfig(cwd),
     checkProjectIconsDoctor(cwd),
+    await inspectProjectIconsDoctor(cwd),
     checkSfdkTarget(cwd),
     checkDevHost(),
     await checkDevPort(cwd),

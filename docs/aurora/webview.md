@@ -17,7 +17,7 @@
 | **Webview (Gecko)** | Gecko | ≥ 4.0.2 |
 
 Источник версий — таблица «с какой версии доступен API» в справочной документации.
-**Целевой для Aurobore — Webview (Chromium)/CEF**; Gecko — легаси, вне поддержки ([ADR-004](../adr/ADR-004-webview-engine-abstraction.md)).
+**Целевой для Aurobore — Webview (Chromium)/CEF**; Gecko — легаси, вне поддержки ([ADR-004](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md)).
 
 ## 2. Базовый сценарий адаптации веб-приложения
 
@@ -179,14 +179,14 @@ btn.addEventListener('click', function () {
 `InitBrowser(argc, argv, {"--default-encoding=UTF-8"})`, выбор пути — через макросы `MAJOR`/`MINOR`).
 `OrganizationName = "ru.auroraos"`; ресурсы — через `PackageFilesLocation` (контекст-свойство `htmlRootPath`).
 
-**Как это ложится на наш мост** ([ADR-002](../adr/ADR-002-bridge-model.md)):
+**Как это ложится на наш мост** ([ADR-002](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-002-bridge-model.md)):
 - `invoke → Promise`: корреляция по id поверх `sendAsyncMessage`/`onRecvAsyncMessage`;
 - события и стримы: те же async-сообщения с именами-каналами;
 - сериализация: JSON в `data`.
 
 **Уровни ниже / что не используем:** под капотом WebView — CEF (`CefMessageRouter`/`window.cefQuery`,
 `CefFrame::ExecuteJavaScript`), но интегрируемся мы на уровне **wrapper-API `ru.auroraos.WebView`**, а CEF
-считаем деталью/fallback ([ADR-004](../adr/ADR-004-webview-engine-abstraction.md)). **Qt WebChannel** не
+считаем деталью/fallback ([ADR-004](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md)). **Qt WebChannel** не
 применяется (только для QtWebEngine). Легаси **Gecko**-специфика (`loadFrameScript`,
 `navigator.qt.postMessage`) — другой фреймворк, не используем. *(Примечание: `addMessageListener` и
 `onRecvAsyncMessage` — это API Chromium-обёртки, подтверждён демо; не путать с frame-script-моделью Gecko.)*
@@ -205,7 +205,7 @@ btn.addEventListener('click', function () {
 
 **WebViewAPI** подтверждает, что штатный WebView API даёт всё, на чём строится Aurobore:
 
-- **Async messages** (web↔native) → наш **мост** (invoke/события/стримы), [ADR-002](../adr/ADR-002-bridge-model.md);
+- **Async messages** (web↔native) → наш **мост** (invoke/события/стримы), [ADR-002](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-002-bridge-model.md);
 - **Выполнение JavaScript** (native→JS) → доставка событий и инъекция bridge-скрипта;
 - **URL filtering** → контроль навигации + Asset Loader/безопасная схема ([runtime.md](../architecture/runtime.md));
 - **SSL-провайдеры** (в т.ч. CryptoPro), **JS-диалоги**, **приватный режим**, **загрузка файла в HTML-форму**,
@@ -215,12 +215,12 @@ btn.addEventListener('click', function () {
 нативного проекта Аврора.
 
 > **Уточнение транспорта (важно для MVP).** Раз WebView предоставляет **собственный** асинхронный
-> message-API + `runJavaScript`, наш тонкий [шов транспорта](../adr/ADR-004-webview-engine-abstraction.md)
+> message-API + `runJavaScript`, наш тонкий [шов транспорта](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md)
 > логично строить **поверх официального WebView API**, а низкоуровневый `cefQuery`/`CefMessageRouter` —
 > рассматривать как деталь/fallback. Архитектуру это не меняет (плагинов шов не касается), но уточняет цель PoC по V-1.
 >
 > Примечание: демо собраны через **qmake** (`*.pro`), тогда как Aurobore генерирует **CMake**
-> ([ADR-007](../adr/ADR-007-packaging-build.md)) — оба пути официально поддерживаются, это не противоречие.
+> ([ADR-007](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-007-packaging-build.md)) — оба пути официально поддерживаются, это не противоречие.
 
 ## 6.1. InitQCA (Qt Cryptographic Architecture)
 
@@ -274,7 +274,7 @@ Built-in plugin `webview` (без manifest): методы `respondAuth`, `cancel
 3. Journal: `W4 auth OK: loaded …` после успешной авторизации.
 
 Реализация: `WebViewAuthBridge` (`AuthHandler::GetInstance` из `aurorawebview/authhandler.h`), QML `onLoadFinished` /
-`onLoadError` в [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml).
+`onLoadError` в [`WebAppPage.qml`](https://github.com/aurobore-platform/aurora/blob/main/runtime/container/qml/pages/WebAppPage.qml).
 
 ## 6.3. Cookie manager (W5)
 
@@ -303,12 +303,12 @@ await bridge.invoke("webview", "clearCookies", {});
 
 На SDK 5.2.1 public `CookieManager` (`aurorawebview/cookies/cookiemanager.h`) **не содержит**
 `setCookie` — в отличие от internal API OMP Flutter
-([`webview_flutter_aurora_plugin.cpp`](../../examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_flutter_aurora_plugin.cpp),
+([`webview_flutter_aurora_plugin.cpp`](https://github.com/aurobore-platform/aurora/blob/main/examples_external/flutter/webview-flutter/packages/webview_flutter_aurora/aurora/webview_flutter_aurora_plugin.cpp),
 `manager->setCookie`). До появления public native API Aurobore использует **interim** QML orchestration.
 
 | Аспект | Interim (сейчас) | Target (когда SDK/OMP даст API) |
 |---|---|---|
-| `setCookie` | Navigate на `https://<domain>/` + `document.cookie` в QML ([`WebViewCookieOrchestrator.qml`](../../runtime/container/qml/components/WebViewCookieOrchestrator.qml)) | `CookieManager::setCookie` native |
+| `setCookie` | Navigate на `https://<domain>/` + `document.cookie` в QML ([`WebViewCookieOrchestrator.qml`](https://github.com/aurobore-platform/aurora/blob/main/runtime/container/qml/components/WebViewCookieOrchestrator.qml)) | `CookieManager::setCookie` native |
 | HttpOnly | не поддерживается | да (если API поддержит) |
 | UX | краткий flash navigation при invoke | без navigation |
 | `clearCookies` | native `deleteCookies("", "")` | без изменений |
@@ -333,7 +333,7 @@ Follow-up **W+3b:** при обновлении SDK — spike `CookieManager::se
 3. Journal: `W5 cookie test: setCookie OK`, `W5 cookie OK: Cookie header verified`, `W5 cookie OK: cleared`.
 
 Реализация: `WebViewCookieBridge` (`CookieManager::GetInstance` из `aurorawebview/cookies/cookiemanager.h`),
-методы в [`WebViewPlugin`](../../runtime/container/src/WebViewPlugin.cpp).
+методы в [`WebViewPlugin`](https://github.com/aurobore-platform/aurora/blob/main/runtime/container/src/WebViewPlugin.cpp).
 
 **W5 harness на эмуляторе:** cookie устанавливается через `https://httpbin.org/cookies/set/foo/bar`
 (redirect Set-Cookie), затем проверка на `/anything` и `clearCookies`. Bridge `setCookie` тестируется
@@ -351,7 +351,7 @@ Runtime-контейнер уничтожает и пересоздаёт QML `W
 - Очистка `globalThis.__auroboreBridgeReceive`, навигация на `about:blank`.
 - `Loader.active = false` → destroy QML WebView → `active = true` → повторная регистрация listeners.
 
-**Graceful shutdown процесса** ([`main.cpp`](../../runtime/container/src/main.cpp)):
+**Graceful shutdown процесса** ([`main.cpp`](https://github.com/aurobore-platform/aurora/blob/main/runtime/container/src/main.cpp)):
 
 - `aboutToQuit` → `destroy` event → `AssetSchemeServer::stop()` → `WebEngineContext::Shutdown()`.
 
@@ -361,17 +361,70 @@ Runtime-контейнер уничтожает и пересоздаёт QML `W
 2. Journal: `W6 dispose cycle N/10`, финал `W6 OK: 10 dispose cycles complete`.
 3. На эмуляторе: `ps | grep webview-subprocess` — число процессов не растёт за 10 циклов.
 
-Реализация: [`WebAppPage.qml`](../../runtime/container/qml/pages/WebAppPage.qml) (`teardownWebView`,
+Реализация: [`WebAppPage.qml`](https://github.com/aurobore-platform/aurora/blob/main/runtime/container/qml/pages/WebAppPage.qml) (`teardownWebView`,
 `recreateWebView`, `Loader` + `Component`).
 
 ## 7. Связь с архитектурой Aurobore
 
 - [architecture/runtime.md](../architecture/runtime.md) — контейнер, lifecycle, asset loader.
 - [architecture/bridge.md](../architecture/bridge.md) — мост JS ↔ C++.
-- [adr/ADR-001](../adr/ADR-001-runtime-architecture.md), [adr/ADR-002](../adr/ADR-002-bridge-model.md),
-  [adr/ADR-004](../adr/ADR-004-webview-engine-abstraction.md), [adr/ADR-007](../adr/ADR-007-packaging-build.md).
+- [adr/ADR-001](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-001-runtime-architecture.md), [adr/ADR-002](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-002-bridge-model.md),
+  [adr/ADR-004](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-004-webview-engine-abstraction.md), [adr/ADR-007](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-007-packaging-build.md).
 
-## 8. Смежный путь: PWA
+## 8. Альтернативные пути доставки веб-контента
 
-ОС Аврора отдельно поддерживает **PWA** (в т.ч. установку из браузера) — иной путь доставки, чем у
-Aurobore (нативный контейнер + мост + плагины). Держим как точку сравнения, но это не наша модель.
+На Авроре есть несколько официальных и смежных способов довести веб до пользователя. Aurobore занимает
+нишу **Capacitor-подобной платформы** (bundled SPA + мост + плагины + CLI); остальные пути — для
+сравнения и выбора стека.
+
+| Путь | Кто | Типичный кейс | Веб-контент | Мост / плагины | Сборка |
+|---|---|---|---|---|---|
+| **Aurobore** | Платформа сообщества | SPA (React/Vue/…), офлайн, нативные API | Локальный `dist/` в RPM | Да (`@aurobore/*`, codegen) | `aurobore build`, CMake |
+| [**WebApp Generator**](https://hub.mos.ru/auroraos/tools/WebAppGenerator) | OMP (официальный) | Обёртка **удалённого сайта** (портал, корпоративный URL) | Стартовый `url` по HTTPS | Нет | Python-генератор → qmake-проект → SDK |
+| **PWA** | ОС / браузер | Установка из браузера, без своего RPM | Хостинг + `webmanifest` | Нет (только Web API) | Не требует нативного проекта |
+| **Flutter** | OMP + сообщество | Кросс-платформенное приложение на Dart | `webview_flutter` и др. | MethodChannel, community plugins | Flutter toolchain + Aurora target |
+
+### WebApp Generator (OMP)
+
+[WebApp Generator](https://hub.mos.ru/auroraos/tools/WebAppGenerator) — набор Python-скриптов OMP: по
+JSON-конфигу (`generator.py` + `configuration.py`) создаётся **отдельный** нативный проект на приложение:
+
+- `.desktop`, `.spec`, QML с WebView и cover, иконки 86/108/128/172, `main.cpp`, `.pro`;
+- движок **Chromium** (`webview_version`);
+- стартовая страница — **удалённый URL** (`url`), не bundled assets;
+- опции: `background_activity` (cover с контентом WebView), `external_urls` / `frame_urls` (regex),
+  `web_permissions`, `user_agent`, Aurora Push (`push_app_id`).
+
+Минимальный пример конфига (из README проекта):
+
+```json
+{
+  "application_name": "DevPortalWEB",
+  "organization_name": "auroraos.ru",
+  "summary": "A reference WebView wrapper for Aurora OS Developer Portal",
+  "version": 1.0,
+  "application_permission": ["Internet", "UserDirs", "DeviceInfo"],
+  "webview_version": "Chromium",
+  "background_activity": true,
+  "url": "https://developer.auroraos.ru/"
+}
+```
+
+**Сходство с Aurobore:** оба автоматизируют рутину из §2 (нативное приложение + WebView + RPM-артефакты).
+**Отличие:** WAG — одноразовый генератор под **URL-обёртку**; Aurobore — общий runtime, bundled SPA,
+asset loader (loopback origin для History API), dev-сервер, TypeScript SDK и система плагинов.
+Сценарий «просто обернуть сайт по URL» — зона WAG; перенос SPA с `dist/` и нативным мостом — зона Aurobore
+(см. [demo-existing-app.md](../tutorials/demo-existing-app.md)).
+
+### PWA
+
+ОС Аврора отдельно поддерживает **PWA** (в т.ч. установку из браузера) — иной путь доставки без
+нативного контейнера разработчика. Импорт `webmanifest` в `aurobore.config` планируется в roadmap
+([roadmap.md](https://github.com/aurobore-platform/aurora/blob/main/docs/roadmap.md) III.2).
+
+### Flutter
+
+Официально поддерживаемый стек с адаптированной средой и плагинами; для Aurobore — **референс**
+platform-кода (камера, WebView, геолокация), не целевой путь разработки. См.
+[flutter-community-plugins](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins),
+[native-plugin-guide.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/native-plugin-guide.md) §Flutter-референс.

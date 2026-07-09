@@ -4,8 +4,8 @@
 
 > Онлайн-версия: [aurobore-platform.github.io/aurora/tutorials/quick-start](https://aurobore-platform.github.io/aurora/tutorials/quick-start)
 
-> Пример в репозитории: [`examples/hello-world/`](../../examples/hello-world/).
-> Гибридное приложение (bundled SPA + external HTTPS): [`examples/hybrid-demo/`](../../examples/hybrid-demo/).
+> Пример в репозитории: [`examples/hello-world/`](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world).
+> Гибридное приложение (bundled SPA + external HTTPS): [`examples/hybrid-demo/`](https://github.com/aurobore-platform/aurora/tree/main/examples/hybrid-demo).
 
 ## Требования
 
@@ -13,7 +13,7 @@
 - Аврора SDK (mb2), эмулятор, сертификаты подписи RPM
 - На Windows: Git Bash для команд `mb2`/`sfdk`
 
-Подробнее: [README.md](../../README.md#требования-к-окружению-разработчика).
+Подробнее: [README.md](https://github.com/aurobore-platform/aurora/blob/main/README.md#требования-к-окружению-разработчика).
 
 ## 1. Установка CLI
 
@@ -117,12 +117,12 @@ aurobore dev --web
 ## 6. Проверка моста
 
 В созданном проекте нажмите **Echo ping** — в статусе должно появиться `pong=true`.
-Полный набор демо: [`examples/hello-world/`](../../examples/hello-world/).
+Полный набор демо: [`examples/hello-world/`](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world).
 
 ## Дальше
 
 - [Использование плагинов](using-plugins.md)
 - [События и lifecycle](events-and-lifecycle.md)
 - [Справочник API](../api/README.md)
-- Перенос SPA/PWA: [W3C polyfills](../dev/w3c-polyfills.md), пример [`w3c-demo`](../../examples/w3c-demo/)
-- OTA-обновления: [ota-updates.md](../dev/ota-updates.md), пример [`ota-demo`](../../examples/ota-demo/)
+- Перенос SPA/PWA: [W3C polyfills](../dev/w3c-polyfills.md), пример [`w3c-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/w3c-demo)
+- OTA-обновления: [ota-updates.md](../dev/ota-updates.md), пример [`ota-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/ota-demo)

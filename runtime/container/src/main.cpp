@@ -242,6 +242,18 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty(QStringLiteral("allowedOrigins"), allowedOriginsList);
     rootContext->setContextProperty(QStringLiteral("splashTimeoutMs"),
                                     Aurobore::AppConfig::splashTimeoutMs());
+    rootContext->setContextProperty(QStringLiteral("splashGradientStart"),
+                                    Aurobore::AppConfig::splashGradientStart());
+    rootContext->setContextProperty(QStringLiteral("splashGradientEnd"),
+                                    Aurobore::AppConfig::splashGradientEnd());
+    rootContext->setContextProperty(QStringLiteral("splashShowName"),
+                                    Aurobore::AppConfig::splash().showName);
+    rootContext->setContextProperty(QStringLiteral("appIconPath"),
+                                    Aurobore::AppConfig::appIconPath());
+    rootContext->setContextProperty(QStringLiteral("splashImagePath"),
+                                    Aurobore::AppConfig::splashImagePath());
+    rootContext->setContextProperty(QStringLiteral("coverMode"),
+                                    Aurobore::AppConfig::coverMode());
 
     static bool cefShutdownDone = false;
     QObject::connect(application.data(), &QGuiApplication::aboutToQuit, [&]() {

@@ -65,6 +65,6 @@ await Share.shareFile({
 });
 ```
 
-Демо: [`examples/share-demo`](../../examples/share-demo/).
+Демо: [`examples/share-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/share-demo).
 
 См. также [standard-plugins.md](standard-plugins.md) §3.

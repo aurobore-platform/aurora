@@ -85,4 +85,4 @@ emit("app:custom", { action: "refresh" });
 
 ## Пример
 
-Полный демо-код: [`examples/hello-world/src/ts/app.ts`](../../examples/hello-world/src/ts/app.ts).
+Полный демо-код: [`examples/hello-world/src/ts/app.ts`](https://github.com/aurobore-platform/aurora/blob/main/examples/hello-world/src/ts/app.ts).

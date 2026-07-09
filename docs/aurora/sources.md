@@ -22,6 +22,8 @@
 | Справочная документация (таблица версий API) | https://developer.auroraos.ru/doc/5.1.6/software_development/reference/webview_chromium | [webview.md](webview.md) |
 | Веб и контент (Webview Chromium/Gecko) | https://developer.auroraos.ru/doc/5.1.6/software_development/reference/web_and_content | [webview.md](webview.md) |
 | Фреймворк WebView (Chromium) — API | https://developer.auroraos.ru/doc/5.1.3/software_development/reference/webview_chromium | [webview.md](webview.md) |
+| UI Kit (проектирование и дизайн) | https://developer.auroraos.ru/doc/ui_kit | [ui-kit.md](ui-kit.md) |
+| Требования к .desktop | https://developer.auroraos.ru/doc/5.1.3/software_development/guidelines/rpm_requirements/desktop_requirements | [ui-kit.md](ui-kit.md), [build-and-packaging.md](build-and-packaging.md) |
 
 ## Перепроверка по сообществу/примерам (не первоисточник)
 
@@ -29,6 +31,7 @@
 
 | Что | Источник | Где использовано |
 |---|---|---|
+| WebApp Generator — официальный OMP-генератор WebView-обёрток (JSON → `.desktop`/`.spec`/QML/cover, удалённый `url`) | https://hub.mos.ru/auroraos/tools/WebAppGenerator | [webview.md](webview.md) §8, [glossary.md](glossary.md) |
 | Flutter-плагины и пакеты, адаптированные под Аврору (референс platform-кода при реализации Aurobore-плагинов) | https://hub.mos.ru/auroraos/flutter/flutter-community-plugins | [alpha-plugins-plan.md](../alpha-plugins-plan.md), [native-plugin-guide.md](../dev/native-plugin-guide.md) |
 | Демо «WebView Browser» (CEF engine, зависимости `ru.aurora.webview`/`libcef`) | https://hub.mos.ru/auroraos/demos/WebViewBrowser | [webview.md](webview.md), [verification-status.md](verification-status.md) |
 | Демо «WebView API» (async messages, runJavaScript, SSL, download — с 5.1.3) | https://hub.mos.ru/auroraos/demos/WebViewAPI | [webview.md](webview.md), [verification-status.md](verification-status.md) |

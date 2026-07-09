@@ -4,7 +4,7 @@ Name=Aurobore Container
 Comment=M1 runtime-контейнер Aurobore
 Icon=ru.auroraos.aurobore-container
 Exec=ru.auroraos.aurobore-container %u
-X-Application-Type=silica-qt5
+X-Nemo-Application-Type=silica-qt5
 MimeType=x-scheme-handler/aurobore-demo;
 Intents=OpenURI
 

@@ -26,7 +26,7 @@
 | W3C polyfills (перенос PWA) | [w3c-polyfills.md](../dev/w3c-polyfills.md) |
 | OTA live-updates | [ota-updates.md](../dev/ota-updates.md) |
 
-Примеры: [`examples/hello-world/`](../../examples/hello-world/), [`react-demo`](../../examples/react-demo/), [`vue-demo`](../../examples/vue-demo/), [`svelte-demo`](../../examples/svelte-demo/), [`w3c-demo`](../../examples/w3c-demo/), [`ota-demo`](../../examples/ota-demo/).
+Примеры: [`examples/hello-world/`](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world), [`react-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/react-demo), [`vue-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/vue-demo), [`svelte-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/svelte-demo), [`w3c-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/w3c-demo), [`ota-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/ota-demo).
 
 Справочник API: [api/README.md](../api/README.md).
 

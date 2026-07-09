@@ -105,17 +105,17 @@ try {
 
 | Пакет | Плагин | Назначение | Демо |
 |---|---|---|---|
-| `@aurobore/echo` | Echo | Conformance-stub, тест моста | [hello-world](../../examples/hello-world/) |
+| `@aurobore/echo` | Echo | Conformance-stub, тест моста | [hello-world](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world) |
 | `@aurobore/device` | Device | Информация об устройстве | hello-world |
 | `@aurobore/storage` | Storage | Key-value хранилище | — |
 | `@aurobore/filesystem` | FileSystem | Файловая система (scope `appData`) | — |
 | `@aurobore/clipboard` | Clipboard | Буфер обмена | — |
 | `@aurobore/network` | Network | Сетевой статус | — |
-| `@aurobore/camera` | Camera | Фото / галерея → URL ресурса | [camera-demo](../../examples/camera-demo/) |
-| `@aurobore/geolocation` | Geolocation | Позиция и `watch` | [geo-demo](../../examples/geo-demo/) |
-| `@aurobore/notifications` | Notifications | Локальные уведомления | [notifications-demo](../../examples/notifications-demo/) |
-| `@aurobore/share` | Share | Системный шаринг | [share-demo](../../examples/share-demo/) |
-| `@aurobore/sensors` | Sensors | Акселерометр / гироскоп (стримы) | [sensors-demo](../../examples/sensors-demo/) |
+| `@aurobore/camera` | Camera | Фото / галерея → URL ресурса | [camera-demo](https://github.com/aurobore-platform/aurora/tree/main/examples/camera-demo) |
+| `@aurobore/geolocation` | Geolocation | Позиция и `watch` | [geo-demo](https://github.com/aurobore-platform/aurora/tree/main/examples/geo-demo) |
+| `@aurobore/notifications` | Notifications | Локальные уведомления | [notifications-demo](https://github.com/aurobore-platform/aurora/tree/main/examples/notifications-demo) |
+| `@aurobore/share` | Share | Системный шаринг | [share-demo](https://github.com/aurobore-platform/aurora/tree/main/examples/share-demo) |
+| `@aurobore/sensors` | Sensors | Акселерометр / гироскоп (стримы) | [sensors-demo](https://github.com/aurobore-platform/aurora/tree/main/examples/sensors-demo) |
 
 Подробнее по каждому: [plugins/README.md](../plugins/README.md).
 
@@ -123,4 +123,4 @@ try {
 
 См. туториал [writing-a-plugin.md](writing-a-plugin.md) (`aurobore plugin create` в проекте приложения).
 
-Для авторов плагинов в монорепо платформы: [dev/adding-a-plugin.md](../dev/adding-a-plugin.md).
+Для авторов плагинов в монорепо платформы: [dev/adding-a-plugin.md](https://github.com/aurobore-platform/aurora/blob/main/docs/dev/adding-a-plugin.md).

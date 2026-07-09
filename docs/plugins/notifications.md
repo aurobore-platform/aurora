@@ -77,6 +77,6 @@ try {
 }
 ```
 
-Демо: [`examples/notifications-demo/`](../../examples/notifications-demo/).
+Демо: [`examples/notifications-demo/`](https://github.com/aurobore-platform/aurora/tree/main/examples/notifications-demo).
 
 См. также [standard-plugins.md](standard-plugins.md) §3.

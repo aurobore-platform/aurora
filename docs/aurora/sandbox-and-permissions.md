@@ -34,7 +34,7 @@
 сеть/каталог» фиксируется на этапе упаковки. Это напрямую влияет на модель Aurobore:
 
 - В нашем глоссарии **Permission** «проецируется в артефакты Аврора (`.desktop`)» —
-  это согласуется с официальной моделью ([glossary.md](../glossary.md)).
+  это согласуется с официальной моделью ([glossary.md](https://github.com/aurobore-platform/aurora/blob/main/docs/glossary.md)).
 - Значит, секция разрешений в `aurobore.config` должна **детерминированно** генерировать корректные
   записи в `.desktop` (см. [architecture/configuration.md](../architecture/configuration.md)).
 
@@ -44,7 +44,7 @@
 |---|---|---|
 | Разрешения в `.desktop` | Генерировать декларации из конфига | [architecture/configuration.md](../architecture/configuration.md) |
 | Общие директории / каталог данных | Asset Loader и FS-плагин работают в пределах разрешённых каталогов | [architecture/runtime.md](../architecture/runtime.md), [plugins/standard-plugins.md](../plugins/standard-plugins.md) |
-| D-Bus (`OrganizationName`/`ApplicationName`) | Корректно задавать имена при генерации проекта | [adr/ADR-009](../adr/ADR-009-naming.md) |
+| D-Bus (`OrganizationName`/`ApplicationName`) | Корректно задавать имена при генерации проекта | [adr/ADR-009](https://github.com/aurobore-platform/aurora/blob/main/docs/adr/ADR-009-naming.md) |
 | Отладка изолированного приложения | Учесть в DevTools/диагностике (`doctor`) | [architecture/cli.md](../architecture/cli.md) |
 
 ## 5. Что верифицировать `(verify)`

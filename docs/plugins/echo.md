@@ -50,4 +50,4 @@ sub.onData = (p) => console.log((p as { tick: number }).tick);
 sub.onComplete = () => console.log("done");
 ```
 
-См. также [examples/hello-world/](../../examples/hello-world/).
+См. также [examples/hello-world/](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world).

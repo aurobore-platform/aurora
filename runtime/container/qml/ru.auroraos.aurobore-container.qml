@@ -9,7 +9,9 @@ ApplicationWindow {
 
     objectName: "applicationWindow"
     allowedOrientations: defaultAllowedOrientations
-    cover: Qt.resolvedUrl("cover/DefaultCover.qml")
+    cover: (typeof coverMode !== "undefined" && coverMode === "preview")
+           ? Qt.resolvedUrl("cover/PreviewCover.qml")
+           : Qt.resolvedUrl("cover/DefaultCover.qml")
     focus: true
     displayMode : "FillScreen"
     statusbarForceVisible : true

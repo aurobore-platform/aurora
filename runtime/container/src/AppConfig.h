@@ -13,7 +13,16 @@ struct CoverActionConfig {
 };
 
 struct CoverConfig {
+    QString mode = QStringLiteral("template");
     QList<CoverActionConfig> actions;
+};
+
+struct SplashConfig {
+    QString background;
+    QString gradientStart;
+    QString gradientEnd;
+    QString packageImage;
+    bool showName = false;
 };
 
 struct UpdatesConfig {
@@ -38,6 +47,12 @@ struct AppConfig {
     static QStringList allowedOrigins();
     static CoverConfig cover();
     static UpdatesConfig updates();
+    static SplashConfig splash();
+    static QString splashGradientStart();
+    static QString splashGradientEnd();
+    static QString appIconPath();
+    static QString splashImagePath();
+    static QString coverMode();
 };
 
 } // namespace Aurobore

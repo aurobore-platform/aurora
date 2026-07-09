@@ -86,6 +86,31 @@ describe("native generate templates", () => {
     expect(desktop).toContain("Name=Demo App");
     expect(desktop).toContain("Permissions=DeviceInfo;Internet");
     expect(desktop).toContain("Exec=ru.example.demo");
+    expect(desktop).toContain("X-Nemo-Application-Type=silica-qt5");
+    expect(desktop).toContain("[X-Aurora-Application]");
+    expect(desktop).toContain("Orientation=Portrait");
+  });
+
+  it("генерирует .desktop с splash gradient и iconMode", () => {
+    const withUi = parseConfig({
+      configVersion: 1,
+      app: {
+        id: "ru.example.demo",
+        name: "Demo",
+        version: "1.0.0",
+        orientation: "auto",
+        iconMode: "Crop",
+        splash: { background: "#112233", gradientEnd: "#AABBCC" },
+      },
+      web: { root: "dist", entry: "index.html" },
+    });
+    const effective = resolveEffectiveConfig(withUi, [manifest]);
+    const desktop = generateDesktop("ru.example.demo", effective);
+    expect(desktop).toContain("[X-Aurora-SplashScreen]");
+    expect(desktop).toContain("GradientStartColor=#112233");
+    expect(desktop).toContain("GradientEndColor=#AABBCC");
+    expect(desktop).toContain("Orientation=All");
+    expect(desktop).toContain("IconMode=Crop");
   });
 
   it("генерирует .desktop с deep link schemes", () => {
@@ -107,12 +132,14 @@ describe("native generate templates", () => {
       app: { id: "ru.example.demo", name: "Demo", version: "1.0.0" },
       web: { root: "dist", entry: "index.html" },
       cover: {
+        mode: "preview",
         actions: [{ id: "refresh", label: "Refresh", icon: "icon-m-sync" }],
       },
     });
     const effective = resolveEffectiveConfig(withCover, [manifest]);
     const json = JSON.parse(generateDefaultsJson(effective, "prod"));
     expect(json.cover).toEqual({
+      mode: "preview",
       actions: [{ id: "refresh", label: "Refresh", icon: "icon-m-sync" }],
     });
   });

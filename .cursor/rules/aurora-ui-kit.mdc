@@ -1,0 +1,33 @@
+---
+description: UI Kit Авроры — scope и чеклист для нативного chrome Aurobore
+globs: runtime/container/**/*.{qml,cpp,h},packages/build/src/native/**/*
+alwaysApply: false
+---
+
+# Aurora UI Kit (нативный chrome)
+
+Источники: [UI Kit](https://developer.auroraos.ru/doc/ui_kit), [desktop](https://developer.auroraos.ru/doc/5.1.3/software_development/guidelines/rpm_requirements/desktop_requirements), [QML cover](https://developer.auroraos.ru/doc/5.1.0/software_development/guides/qml/qml_quick_start). Матрица: `docs/aurora/ui-kit.md`.
+
+## In scope (платформа Aurobore)
+
+- **Cover:** `CoverBackground` + `CoverTemplate` (+ `CoverActionList`, до 4 actions); `cover.mode: preview|template`
+- **Splash:** OS `[X-Aurora-SplashScreen]` в `.desktop` + in-app `SplashScreen.qml` (gradient + icon)
+- **Иконки:** PNG 86/108/128/172, `Icon=<appId>`, опционально `IconMode` в desktop
+- **Ориентация:** `app.orientation` → `[X-Aurora-Application] Orientation=…`
+- **Silica Dialog / hybrid pages:** `Dialog`+`DialogHeader`, `Theme.*`, системные picker/share
+
+## Out of scope
+
+- WebView SPA UI (non-goal N2)
+- `SplitView`, `PageHeader`, PopUp Menu для типичных fullscreen WebView-приложений
+
+## Чеклист QML
+
+- Обложка: `CoverTemplate` (не deprecated `CoverPlaceholder`), иконка в `icon { }`
+- Spacing/colors: `Theme.padding*`, `Theme.highlightColor`, не хардкод без причины
+- Диалоги: `Dialog` + `DialogHeader` + `SilicaFlickable`
+
+## Чеклист generate / config
+
+- `.desktop`: `X-Nemo-Application-Type=silica-qt5`, `[X-Aurora-SplashScreen]`, `[X-Aurora-Application]`
+- `generateDesktop()` в `packages/build/src/native/generate.ts` — единственный источник desktop-артефакта

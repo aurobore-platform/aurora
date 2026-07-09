@@ -1,9 +1,16 @@
 /** Ориентация экрана приложения. */
 export type AppOrientation = "portrait" | "landscape" | "auto";
 
+export type AppIconMode = "Scale" | "Crop";
+
+export type CoverMode = "template" | "preview";
+
 export interface SplashConfig {
   image?: string;
   background?: string;
+  gradientStart?: string;
+  gradientEnd?: string;
+  showName?: boolean;
   timeoutMs?: number;
 }
 
@@ -13,6 +20,7 @@ export interface AppConfig {
   version: string;
   orientation?: AppOrientation;
   icon?: string;
+  iconMode?: AppIconMode;
   splash?: SplashConfig;
 }
 
@@ -60,6 +68,7 @@ export interface CoverActionConfig {
 }
 
 export interface CoverConfig {
+  mode?: CoverMode;
   actions?: CoverActionConfig[];
 }
 

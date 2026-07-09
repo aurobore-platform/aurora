@@ -50,6 +50,6 @@ sub.onComplete = () => console.log("sensor stream ended");
 // sub.stop();
 ```
 
-Демо: [`examples/sensors-demo`](../../examples/sensors-demo/).
+Демо: [`examples/sensors-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/sensors-demo).
 
 См. также [standard-plugins.md](standard-plugins.md) §3.

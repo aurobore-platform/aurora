@@ -49,6 +49,11 @@ const humanNav = [
   { text: "API", link: "/api/", activeMatch: "/api/" },
   { text: "Плагины", link: "/plugins/", activeMatch: "/plugins/" },
   {
+    text: "Архитектура",
+    link: "/architecture/",
+    activeMatch: "/architecture/|/dev/",
+  },
+  {
     text: "Aurora",
     link: "/aurora/app-development",
     activeMatch: "/aurora/",
@@ -71,7 +76,7 @@ export default defineConfig({
     "Открытая платформа для WebView-приложений под ОС Аврора (мост + плагины + CLI).",
   base: process.env.DOCS_BASE ?? "/",
   cleanUrls: true,
-  ignoreDeadLinks: true,
+  ignoreDeadLinks: audience === "full",
   srcExclude,
   rewrites,
   head: [["meta", { name: "theme-color", content: "#3c8772" }]],

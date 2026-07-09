@@ -15,12 +15,21 @@
 Для Aurobore основной — **Аврора SDK** (сборка приложения), а сценарии CI/упаковки ближе к **PSDK**
 (сборка из командной строки, см. [build-and-packaging.md](build-and-packaging.md)).
 
-> Помимо Qt-стека, ОС Аврора официально поддерживает **Flutter** (адаптированные среда разработки,
-> системные плагины, плагины сообщества, примеры; код Flutter исполняется без изменений). Для Aurobore
-> это не целевой путь, но **обязательный референс** при реализации native-плагинов: каталог
-> [Flutter Packages на Mos.Hub](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins)
-> (в Cursor — `@flutter-community-plugins`). Если нужный плагин есть в каталоге — смотреть его platform-код
-> и логику интеграции с ОС; см. [alpha-plugins-plan.md](../alpha-plugins-plan.md).
+> Помимо Qt-стека, ОС Аврора официально поддерживает несколько путей доставки веб-контента (сводка —
+> [webview.md](webview.md) §8):
+>
+> - **WebApp Generator** — [официальный OMP-генератор](https://hub.mos.ru/auroraos/tools/WebAppGenerator)
+>   WebView-обёрток: JSON-конфиг → готовый нативный проект (Chromium) под **удалённый URL**.
+>   Ближайший аналог «мастера в SDK»; не заменяет платформу с мостом и плагинами.
+> - **PWA** — установка из браузера, без нативного контейнера разработчика.
+> - **Flutter** — адаптированные среда разработки, системные плагины, плагины сообщества, примеры;
+>   код Flutter исполняется без изменений.
+>
+> Для Aurobore Flutter — не целевой путь, но **обязательный референс** при реализации native-плагинов:
+> каталог [Flutter Packages на Mos.Hub](https://hub.mos.ru/auroraos/flutter/flutter-community-plugins)
+> (в Cursor — `@flutter-community-plugins`). WebApp Generator — референс по packaging/QML-обёртке WebView
+> (`.desktop`, cover, permissions). Если нужный плагин есть в каталоге Flutter — смотреть его platform-код
+> и логику интеграции с ОС; см. [alpha-plugins-plan.md](https://github.com/aurobore-platform/aurora/blob/main/docs/alpha-plugins-plan.md).
 
 ## 2. Варианты поставки Аврора SDK
 

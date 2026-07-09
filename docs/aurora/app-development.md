@@ -27,7 +27,7 @@ Aurobore автоматизирует именно эти шаги для веб
 
 | Шаг Аврора | Что делает Aurobore | Документ |
 |---|---|---|
-| Создать проект | `aurobore create` генерирует нативный проект-контейнер из шаблона | [architecture/cli.md](../architecture/cli.md), [repository-structure.md](../repository-structure.md) |
+| Создать проект | `aurobore create` генерирует нативный проект-контейнер из шаблона | [architecture/cli.md](../architecture/cli.md), [repository-structure.md](https://github.com/aurobore-platform/aurora/blob/main/docs/repository-structure.md) |
 | Собрать проект | `aurobore build` → генерация CMake/RPM → штатный `mb2`/`apptool` | [architecture/build-system.md](../architecture/build-system.md), [build-and-packaging.md](build-and-packaging.md) |
 | Запустить | `aurobore run` (эмулятор/устройство) + Dev Server для итерации | [architecture/dev-server.md](../architecture/dev-server.md) |
 | Отладка | DevTools моста + штатные средства (gdb, runtime-manager-tool) | [architecture/bridge.md](../architecture/bridge.md) |

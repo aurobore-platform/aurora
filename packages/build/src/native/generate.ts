@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { AuroboreConfig, EffectiveConfig } from "../config/types.js";
+import type { AppOrientation, AuroboreConfig, EffectiveConfig, SplashConfig } from "../config/types.js";
 import { resolveEffectiveConfig } from "../config/merge.js";
 import type { PluginManifest } from "../manifest/types.js";
 import { runProjectCodegenFromConfig } from "../codegen/project.js";
@@ -94,6 +94,26 @@ function ensureBridgeScripts(runtimeRoot: string, htmlDir: string, polyfills?: b
     fs.mkdirSync(cssDir, { recursive: true });
     fs.copyFileSync(containerCss, path.join(cssDir, "aurobore-chrome.css"));
   }
+}
+
+/** Копирует app.splash.image в config/splash.png пакета; возвращает package-relative путь или null. */
+export function materializeSplashImage(
+  projectRoot: string,
+  nativeDir: string,
+  imagePath?: string,
+): string | null {
+  if (!imagePath) {
+    return null;
+  }
+  const src = path.isAbsolute(imagePath) ? imagePath : path.join(projectRoot, imagePath);
+  if (!fs.existsSync(src)) {
+    return null;
+  }
+  const rel = "config/splash.png";
+  const dest = path.join(nativeDir, rel);
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(src, dest);
+  return rel;
 }
 
 const RPM_WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -274,6 +294,33 @@ ${WEBVIEW_RPM_FILES}
 `;
 }
 
+/** Маппинг app.orientation → desktop [X-Aurora-Application] Orientation. */
+export function mapAppOrientationToDesktop(orientation?: AppOrientation): string {
+  switch (orientation) {
+    case "landscape":
+      return "Landscape";
+    case "auto":
+      return "All";
+    default:
+      return "Portrait";
+  }
+}
+
+/** Цвета splash для [X-Aurora-SplashScreen]; null — полагаться на OS auto. */
+export function resolveSplashGradientColors(
+  splash?: SplashConfig,
+): { start: string; end: string } | null {
+  if (!splash) {
+    return null;
+  }
+  const start = splash.gradientStart ?? splash.background;
+  if (!start) {
+    return null;
+  }
+  const end = splash.gradientEnd ?? splash.background ?? start;
+  return { start, end };
+}
+
 export function generateDesktop(appId: string, effective: EffectiveConfig): string {
   const perms = effective.effectivePermissions.join(";");
   const orgParts = appId.split(".");
@@ -289,7 +336,7 @@ export function generateDesktop(appId: string, effective: EffectiveConfig): stri
     `Comment=${effective.app.name}`,
     `Icon=${appId}`,
     execLine,
-    "X-Application-Type=silica-qt5",
+    "X-Nemo-Application-Type=silica-qt5",
   ];
 
   if (schemes.length > 0) {
@@ -309,6 +356,26 @@ export function generateDesktop(appId: string, effective: EffectiveConfig): stri
   if (schemes.length > 0) {
     lines.push(`Custom-Schemes=${schemes.join(";")}`);
   }
+
+  const splashGradient = resolveSplashGradientColors(effective.app.splash);
+  if (splashGradient) {
+    lines.push(
+      "",
+      "[X-Aurora-SplashScreen]",
+      `GradientStartColor=${splashGradient.start}`,
+      `GradientEndColor=${splashGradient.end}`,
+    );
+  }
+
+  const auroraAppLines = [
+    "",
+    "[X-Aurora-Application]",
+    `Orientation=${mapAppOrientationToDesktop(effective.app.orientation)}`,
+  ];
+  if (effective.app.iconMode) {
+    auroraAppLines.push(`IconMode=${effective.app.iconMode}`);
+  }
+  lines.push(...auroraAppLines);
 
   return `${lines.join("\n")}\n`;
 }
@@ -346,7 +413,12 @@ export function generateDefaultsJson(effective: EffectiveConfig, mode: "prod" | 
     defaults.deepLinks = { schemes: effective.deepLinks.schemes };
   }
   if (effective.cover) {
-    defaults.cover = effective.cover;
+    defaults.cover = {
+      ...effective.cover,
+      mode: effective.cover.mode ?? "template",
+    };
+  } else {
+    defaults.cover = { mode: "template" };
   }
   if (effective.updates) {
     defaults.updates = {
@@ -667,9 +739,23 @@ export async function generateNativeProject(
   fs.mkdirSync(path.join(nativeDir, "rpm"), { recursive: true });
   fs.writeFileSync(path.join(nativeDir, "rpm", `${appId}.spec`), generateSpec(appId, effective), "utf8");
   fs.writeFileSync(path.join(nativeDir, `${appId}.desktop`), generateDesktop(appId, effective), "utf8");
+
+  const splashPackageImage = materializeSplashImage(
+    projectRoot,
+    nativeDir,
+    effective.app.splash?.image,
+  );
+  const defaultsPayload = JSON.parse(generateDefaultsJson(effective, mode)) as Record<string, unknown>;
+  if (splashPackageImage) {
+    const app = defaultsPayload.app as Record<string, unknown>;
+    const splash = (app.splash as Record<string, unknown> | undefined) ?? {};
+    splash.packageImage = splashPackageImage;
+    app.splash = splash;
+    defaultsPayload.app = app;
+  }
   fs.writeFileSync(
     path.join(nativeDir, "config", "defaults.json"),
-    generateDefaultsJson(effective, mode),
+    `${JSON.stringify(defaultsPayload, null, 2)}\n`,
     "utf8",
   );
   fs.writeFileSync(

@@ -22,9 +22,9 @@
 | Sensors | `@aurobore/sensors` | — | [sensors.md](sensors.md) |
 
 Все пакеты публикуются в npm и подключаются через `aurobore plugin add <name>`.
-Демо: [`examples/camera-demo/`](../../examples/camera-demo/), [`geo-demo`](../../examples/geo-demo/),
-[`notifications-demo`](../../examples/notifications-demo/), [`share-demo`](../../examples/share-demo/),
-[`sensors-demo`](../../examples/sensors-demo/).
+Демо: [`examples/camera-demo/`](https://github.com/aurobore-platform/aurora/tree/main/examples/camera-demo), [`geo-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/geo-demo),
+[`notifications-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/notifications-demo), [`share-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/share-demo),
+[`sensors-demo`](https://github.com/aurobore-platform/aurora/tree/main/examples/sensors-demo).
 
 ## Импорт
 
@@ -77,10 +77,10 @@ try {
 
 ## Примеры
 
-- [examples/hello-world/](../../examples/hello-world/) — Echo, Device, lifecycle
-- [examples/camera-demo/](../../examples/camera-demo/) — Camera
-- [examples/geo-demo/](../../examples/geo-demo/) — Geolocation
-- [examples/sensors-demo/](../../examples/sensors-demo/) — Sensors
-- [examples/notifications-demo/](../../examples/notifications-demo/) — Notifications
-- [examples/share-demo/](../../examples/share-demo/) — Share
+- [examples/hello-world/](https://github.com/aurobore-platform/aurora/tree/main/examples/hello-world) — Echo, Device, lifecycle
+- [examples/camera-demo/](https://github.com/aurobore-platform/aurora/tree/main/examples/camera-demo) — Camera
+- [examples/geo-demo/](https://github.com/aurobore-platform/aurora/tree/main/examples/geo-demo) — Geolocation
+- [examples/sensors-demo/](https://github.com/aurobore-platform/aurora/tree/main/examples/sensors-demo) — Sensors
+- [examples/notifications-demo/](https://github.com/aurobore-platform/aurora/tree/main/examples/notifications-demo) — Notifications
+- [examples/share-demo/](https://github.com/aurobore-platform/aurora/tree/main/examples/share-demo) — Share
 - [docs/tutorials/using-plugins.md](../tutorials/using-plugins.md) — добавление плагинов в проект

@@ -33,7 +33,7 @@ export { loadConfig, parseConfig, validateConfig, findConfigFile, isValidAppId, 
 export { resolveEffectiveConfig, pluginNameFromRef } from "./config/merge.js";
 export { applyConfigDefaults } from "./config/defaults.js";
 
-export { AURORA_ICON_SIZES, checkProjectIcons } from "./native/icons.js";
+export { AURORA_ICON_SIZES, checkProjectIcons, inspectProjectIcons } from "./native/icons.js";
 export type { IconCheckResult, ResolvedAppIcons } from "./native/icons.js";
 export {
   generateNativeProject,

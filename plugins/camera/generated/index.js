@@ -9,4 +9,7 @@ export const Camera = {
   pickPhoto(args) {
     return getAurobore().invoke("Camera", "pickPhoto", args ?? {});
   },
+  watchPreview(args) {
+    return getAurobore().invoke("Camera", "watchPreview", args ?? {}, { stream: true });
+  },
 };

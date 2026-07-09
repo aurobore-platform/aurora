@@ -73,7 +73,7 @@ QList<PluginDescriptor> PluginRegistry::descriptors()
         1,
         QStringList({ QStringLiteral("Camera") }),
         QStringList({  }),
-        QStringList({ QStringLiteral("getPhoto"), QStringLiteral("pickPhoto") }),
+        QStringList({ QStringLiteral("getPhoto"), QStringLiteral("pickPhoto"), QStringLiteral("watchPreview") }),
         QStringList({  })
     },
     {

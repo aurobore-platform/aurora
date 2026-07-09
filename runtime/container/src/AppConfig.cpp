@@ -64,6 +64,39 @@ QStringList readStringArray(const QJsonObject &root, const QString &key)
     return values;
 }
 
+QString resolvePackagePath(const QString &relative)
+{
+    if (relative.isEmpty())
+        return QString();
+
+    const QUrl configUrl = Aurora::Application::pathTo(relative);
+    QString localPath = configUrl.toLocalFile();
+    if (localPath.isEmpty()) {
+        const QString decoded = configUrl.toString(QUrl::PrettyDecoded);
+        localPath = decoded.startsWith(QStringLiteral("file://"))
+            ? QUrl(decoded).toLocalFile()
+            : decoded;
+    }
+    if (localPath.isEmpty()) {
+        localPath = Aurora::Application::getPath(
+                          Aurora::Application::PathType::PackageFilesLocation)
+            + QLatin1Char('/') + relative;
+    }
+    return QFile::exists(localPath) ? localPath : QString();
+}
+
+QJsonObject readAppObject()
+{
+    const QJsonObject root = loadConfigObject();
+    const QJsonValue appValue = root.value(QStringLiteral("app"));
+    return appValue.isObject() ? appValue.toObject() : QJsonObject();
+}
+
+QJsonObject readSplashObject()
+{
+    return readAppObject().value(QStringLiteral("splash")).toObject();
+}
+
 } // namespace
 
 const char *AppConfig::kEntryUrl = "aurobore-app://localhost/index.html";
@@ -146,7 +179,12 @@ CoverConfig AppConfig::cover()
     if (!coverValue.isObject())
         return config;
 
-    const QJsonValue actionsValue = coverValue.toObject().value(QStringLiteral("actions"));
+    const QJsonObject coverObj = coverValue.toObject();
+    const QJsonValue modeValue = coverObj.value(QStringLiteral("mode"));
+    if (modeValue.isString() && !modeValue.toString().isEmpty())
+        config.mode = modeValue.toString();
+
+    const QJsonValue actionsValue = coverObj.value(QStringLiteral("actions"));
     if (!actionsValue.isArray())
         return config;
 
@@ -162,6 +200,72 @@ CoverConfig AppConfig::cover()
             config.actions.append(entry);
     }
     return config;
+}
+
+SplashConfig AppConfig::splash()
+{
+    SplashConfig config;
+    const QJsonObject splashObj = readSplashObject();
+    if (splashObj.isEmpty())
+        return config;
+
+    config.background = splashObj.value(QStringLiteral("background")).toString();
+    config.gradientStart = splashObj.value(QStringLiteral("gradientStart")).toString();
+    config.gradientEnd = splashObj.value(QStringLiteral("gradientEnd")).toString();
+    config.packageImage = splashObj.value(QStringLiteral("packageImage")).toString();
+    config.showName = splashObj.value(QStringLiteral("showName")).toBool(false);
+    return config;
+}
+
+QString AppConfig::splashGradientStart()
+{
+    const SplashConfig config = splash();
+    if (!config.gradientStart.isEmpty())
+        return config.gradientStart;
+    if (!config.background.isEmpty())
+        return config.background;
+    return QStringLiteral("#1a1a2e");
+}
+
+QString AppConfig::splashGradientEnd()
+{
+    const SplashConfig config = splash();
+    if (!config.gradientEnd.isEmpty())
+        return config.gradientEnd;
+    if (!config.background.isEmpty())
+        return config.background;
+    return splashGradientStart();
+}
+
+QString AppConfig::appIconPath()
+{
+    const QString id = appId();
+    if (id.isEmpty())
+        return QString();
+
+    static const char *kSizes[] = {"172x172", "128x128", "108x108", "86x86"};
+    for (const char *size : kSizes) {
+        const QString rel = QStringLiteral("icons/%1/%2.png")
+            .arg(QString::fromLatin1(size), id);
+        const QString path = resolvePackagePath(rel);
+        if (!path.isEmpty())
+            return path;
+    }
+    return QString();
+}
+
+QString AppConfig::coverMode()
+{
+    const CoverConfig config = cover();
+    return config.mode.isEmpty() ? QStringLiteral("template") : config.mode;
+}
+
+QString AppConfig::splashImagePath()
+{
+    const SplashConfig config = splash();
+    if (config.packageImage.isEmpty())
+        return QString();
+    return resolvePackagePath(config.packageImage);
 }
 
 UpdatesConfig AppConfig::updates()
